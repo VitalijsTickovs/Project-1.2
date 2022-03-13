@@ -1,7 +1,6 @@
-package finterpreter;
+package function;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Used for lexing a function input
@@ -12,10 +11,11 @@ public class Lexer {
      * @param function The function to lex (as a {@code String})
      * @return An {@code ArrayList} containing the {@code Token}s
      */
-    public static ArrayList<Token> lex(String function) {
+    protected static ArrayList<Token> lex(String function) {
         ArrayList<Token> tokens = new ArrayList<Token>();
         ArrayList<Integer> ignorePositions = new ArrayList<Integer>();
         int pos = 0;
+        // Loop throughthe function string and turn it into tokens
         while (pos < function.length()) {
             int tokenStartPos = pos;
             char lookAhead = function.charAt(pos);
@@ -39,9 +39,11 @@ public class Lexer {
             } else
             // Mult and pow
             if (lookAhead == '*') {
+                // Mult
                 if (pos+1 < function.length() && function.charAt(pos+1) == '*') {
                     pos+=2;
                     tokens.add(new Token(Token.Type.POW, "**", tokenStartPos));
+                // Pow
                 } else {
                     pos++;
                     tokens.add(new Token(Token.Type.MULT, lookAhead+"", tokenStartPos));
@@ -56,6 +58,7 @@ public class Lexer {
             if (Character.isDigit(lookAhead)) {
                 String text = "";
                 boolean dot = false;
+                // Keep going while it is a number
                 while (pos < function.length() && (Character.isDigit(function.charAt(pos)) || (function.charAt(pos) == '.' && !dot))) {
                     if (function.charAt(pos) == '.') {
                         dot = true;
@@ -77,6 +80,7 @@ public class Lexer {
             } else
             // Word
             if (Character.isLetter(lookAhead)) {
+                // Find the string of the word (only letters and digits)
                 String text = "";
                 while (pos < function.length() && Character.isLetterOrDigit(function.charAt(pos))) {
                     text += function.charAt(pos);
@@ -93,7 +97,7 @@ public class Lexer {
                     // Function
                     if (pos < function.length() && function.charAt(pos) == '(') {
                         tokens.add(new Token(Token.Type.FUNCTION, text, tokenStartPos));
-                    // Word
+                    // Variable
                     } else {
                         tokens.add(new Token(Token.Type.WORD, text, tokenStartPos));
                     }
@@ -103,7 +107,9 @@ public class Lexer {
                 throw new RuntimeException("Unknown character "+lookAhead+" at position "+pos);
             }
         }
+        // Insert brackets to prioritize x pow y
         insertBrackets(tokens, new Token.Type[] {Token.Type.POW});
+        // Insert brackets to prioritize multiplication and division
         insertBrackets(tokens, new Token.Type[] {Token.Type.MULT, Token.Type.DIV});
         return tokens;
     }
@@ -111,8 +117,9 @@ public class Lexer {
     /**
      * Inserts brackets where needed for multiplication and division
      * @param tokens The list of tokens defining a function
+     * @param types The array containing the types you wish to put brackets around
      */
-    public static void insertBrackets(ArrayList<Token> tokens, Token.Type[] types) {
+    private static void insertBrackets(ArrayList<Token> tokens, Token.Type[] types) {
         for (int i=0; i<tokens.size(); i++) {
             Token t = tokens.get(i);
             // If the symbol is multiplication or division, insert brackets
@@ -175,26 +182,4 @@ public class Lexer {
             }
         }
     }
-
-    public static void printTokensAsFunction(ArrayList<Token> tokens) {
-        String s = "";
-        for (Token t : tokens) {
-            s += t.getText();
-        }
-        System.out.println(s);
-    }
-
-    public static void main(String[] args) {
-        Scanner s = new Scanner(System.in);
-        String function = s.nextLine();
-        s.close();
-
-        ArrayList<Token> tokens = lex(function);
-        for (Token t : tokens) {
-            System.out.println(t);
-        }
-
-        printTokensAsFunction(tokens);
-    }
-
 }

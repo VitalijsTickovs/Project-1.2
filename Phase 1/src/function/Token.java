@@ -1,4 +1,4 @@
-package finterpreter;
+package function;
 
 /**
  * Used for storing tokens of the function
@@ -27,21 +27,43 @@ public class Token {
     private String text;
     private int position;
 
-    public Token(Type type, String text, int position) {
+    /**
+     * Constructor. Creates an instance of a {@code Token}.
+     * @param type The {@code Type} of the {@code Token}.
+     * @param text The text of the {@code Token}.
+     * @param position The position of the {@code Token}.
+     */
+    protected Token(Type type, String text, int position) {
         this.type = type;
         this.text = text;
         this.position = position;
     }
 
-    public Type getType() {
+    protected void setText(String text) {
+        this.text = text;
+    }
+
+    /**
+     * Gets the {@code Type} of the {@code Token}.
+     * @return The {@code Type}.
+     */
+    protected Type getType() {
         return type;
     }
 
-    public String getText() {
+    /**
+     * Gets the text of the {@code Token}.
+     * @return The text
+     */
+    protected String getText() {
         return text;
     }
 
-    public int getPosition() {
+    /**
+     * Gets the position of the {@code Token}.
+     * @return The position
+     */
+    protected int getPosition() {
         return position;
     }
 
