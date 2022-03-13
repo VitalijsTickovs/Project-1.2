@@ -45,7 +45,17 @@ public class Vector2 {
         return new Vector2(x * scale, y * scale);
     }
 
+    public Vector2 normalized() {
+        Vector2 normalizedVector = copy().scale(1 / length());
+        return normalizedVector;
+    }
+
     public Vector2 copy() {
         return new Vector2(x, y);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
     }
 }

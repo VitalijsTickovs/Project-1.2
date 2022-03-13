@@ -7,6 +7,8 @@ public class Terrain {
     public IObstacle[] obstacles;
 
     public double staticFriction;
-    public double kinematicFriction;
+    public double kineticFriction;
+
+    public TerrainFunction terrainFunction;
     
 }

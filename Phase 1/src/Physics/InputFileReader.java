@@ -7,7 +7,7 @@ import java.util.Queue;
 import java.util.Scanner;
 import Data_storage.*;
 
-public class ShotReader extends InputModule {
+public class InputFileReader extends InputModule {
 
     static String fileName = "Data";
     static Scanner fileScanner;

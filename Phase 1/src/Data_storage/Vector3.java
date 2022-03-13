@@ -52,8 +52,18 @@ public class Vector3 {
         return new Vector3(x * scale, y * scale, z * scale);
     }
 
+    public Vector3 normalized() {
+        Vector3 normalizedVector = copy().scale(1 / length());
+        return normalizedVector;
+    }
+
     public Vector3 copy() {
         return new Vector3(x, y, z);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ", " + z + ")";
     }
 
 }
