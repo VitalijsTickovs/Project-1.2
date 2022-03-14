@@ -177,6 +177,8 @@ public class ParserNode {
                     } else {
                         s = getLeftChild().toString()+element.getText()+getRightChild().toString();
                     }
+                } else {
+                    s = getLeftChild().toString()+element.getText()+getRightChild().toString();
                 }
             } else {
                 s = getLeftChild().toString()+element.getText()+getRightChild().toString();

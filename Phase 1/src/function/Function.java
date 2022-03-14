@@ -162,6 +162,8 @@ public class Function {
                 case "tan" -> "(" + df + "*(1+tan(" + f + ")**2))";
                 // sqrt
                 case "sqrt" -> "(" + df + "*0.5/sqrt(" + f + "))";
+                // ln
+                case "ln" -> "("+df+"*"+"1/("+f+"))";
                 default -> result;
             };
             
@@ -233,10 +235,8 @@ public class Function {
                 node.getRightChild().setParent(node.getParent());
                 if (node.getParent() != null) {
                     if (node.getParent().getLeftChild() == node) {
-                        System.out.println("Here1");
                         node.getParent().setLeftChild(node.getRightChild());
                     } else if (node.getParent().getRightChild() == node) {
-                        System.out.println("Here2");
                         node.getParent().setRightChild(node.getRightChild());
                     }
                 } else {
@@ -411,8 +411,9 @@ public class Function {
     }
 
     public static void main(String[] args) {
-        Function f = new Function("2**x");
+        Function f = new Function("ln(2*x+1)");
         System.out.println(f);
+        System.out.println(f.evaluate(new String[] {"x"}, new double[] {1}));
         System.out.println(f.getDerivative("x"));
     }
 }

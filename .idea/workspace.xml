@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="06575b88-b907-4c35-bbae-157bf77177da" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/TerrainFunction1.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/TerrainFunction1.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/function/Function.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/function/Function.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/function/ParserNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/function/ParserNode.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,7 +28,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
-  <component name="RunManager" selected="Application.TerrainFunction1">
+  <component name="RunManager" selected="Application.Function">
     <configuration name="Function" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="function.Function" />
       <module name="Project-1.2" />
@@ -57,8 +57,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.TerrainFunction1" />
         <item itemvalue="Application.Function" />
+        <item itemvalue="Application.TerrainFunction1" />
       </list>
     </recent_temporary>
   </component>
@@ -83,5 +83,6 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>
