@@ -1,6 +1,8 @@
 package Data_storage;
 import function.Function;
 
+import java.util.Arrays;
+
 public class TerrainFunction1 extends TerrainFunction {
     private Function f;
     private Function dfx;
@@ -23,6 +25,7 @@ public class TerrainFunction1 extends TerrainFunction {
         final double MINY = -10;
         final double MAXY = 10;
         float[] heightMap = new float[numVertecesX*numVertecesY];
+        int pos = 0;
         // Loop through the points
         for (int x=-numVertecesX/2; x<numVertecesX/2; x++) {
             for (int y=-numVertecesY/2; y<numVertecesY/2; y++) {
@@ -40,6 +43,8 @@ public class TerrainFunction1 extends TerrainFunction {
                 }
                 // Scale with normal factor
                 val *= normalFactor;
+                heightMap[pos] = (float) val;
+                pos++;
             }
         }
         return heightMap;

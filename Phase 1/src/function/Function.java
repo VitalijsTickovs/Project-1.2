@@ -144,6 +144,7 @@ public class Function {
                 String df = derive(node.getRightChild(), varName);
                 String l = node.getLeftChild().toString();
                 result = "("+l+"**"+f+"*"+df+"*ln("+l+"))";
+                System.out.println(result);
             // a**b (both are numbers)
             } else if (!leftHasVar) {
                 result = "0";
@@ -232,8 +233,10 @@ public class Function {
                 node.getRightChild().setParent(node.getParent());
                 if (node.getParent() != null) {
                     if (node.getParent().getLeftChild() == node) {
+                        System.out.println("Here1");
                         node.getParent().setLeftChild(node.getRightChild());
                     } else if (node.getParent().getRightChild() == node) {
+                        System.out.println("Here2");
                         node.getParent().setRightChild(node.getRightChild());
                     }
                 } else {
@@ -248,7 +251,7 @@ public class Function {
                         node.getParent().setRightChild(node.getLeftChild());
                     }
                 } else {
-                    root = node.getRightChild();
+                    root = node.getLeftChild();
                 }
             // Both children are numbers
             } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM && node.getRightChild().getElement().getType() == Token.Type.NUM) {
@@ -282,7 +285,7 @@ public class Function {
                         node.getParent().setRightChild(node.getLeftChild());
                     }
                 } else {
-                    root = node.getRightChild();
+                    root = node.getLeftChild();
                 }
             // Adding 2 numbers
             } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM && node.getRightChild().getElement().getType() == Token.Type.NUM) {
@@ -305,7 +308,7 @@ public class Function {
                         node.getParent().setRightChild(node.getLeftChild());
                     }
                 } else {
-                    root = node.getRightChild();
+                    root = node.getLeftChild();
                 }
             // Both are numbers
             } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM && node.getRightChild().getElement().getType() == Token.Type.NUM) {
@@ -328,7 +331,7 @@ public class Function {
                         node.getParent().setRightChild(node.getLeftChild());
                     }
                 } else {
-                    root = node.getRightChild();
+                    root = node.getLeftChild();
                 }
             // Dividing 0
             } else if (node.getLeftChild().getElement().getText().equals("0")) {
@@ -373,7 +376,7 @@ public class Function {
                         node.getParent().setRightChild(node.getLeftChild());
                     }
                 } else {
-                    root = node.getRightChild();
+                    root = node.getLeftChild();
                 }
             // 0**n
             } else if (node.getLeftChild().getElement().getText().equals("0")) {
@@ -408,13 +411,8 @@ public class Function {
     }
 
     public static void main(String[] args) {
-        Function f = new Function("-0.5*(sin((x-y)/7)+0.9)");
+        Function f = new Function("2**x");
         System.out.println(f);
-        //System.out.println(f.evaluate(new String[] {"x"}, new double[] {-0.5}));
-        Function df = f.getDerivative("x");
-        long start = System.nanoTime();
-        df.evaluate(new String[] {"x", "y"}, new double[] {1.0, 2.1});
-        System.out.println("Time: "+((System.nanoTime()-start)/1000000.0)+"ms");
-        System.out.println(df);
+        System.out.println(f.getDerivative("x"));
     }
 }
