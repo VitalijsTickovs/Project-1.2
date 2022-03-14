@@ -20,9 +20,6 @@ public class Main extends SimpleApplication {
     public void InitHeight(){
         TerrainFunction1 generator = new TerrainFunction1("sin(x + y)");
         this.HeightMap = generator.getHeightMap(128, 128, 50);
-        for(int i=0; i<this.HeightMap.length; i++){
-            System.out.print( this.HeightMap[i] + " ");
-        }
     }
 
     protected Geometry player;
@@ -55,7 +52,12 @@ public class Main extends SimpleApplication {
         player.setMaterial(mat);
         rootNode.attachChild(player);
 
-        player.move(0, -5, 0);
+        int x = 10;
+        int z = 50;
+
+        float y = this.HeightMap[(z*10) + x] + 1f ;
+
+        player.move(x, y, z);
 
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(1,0,-2).normalizeLocal());
