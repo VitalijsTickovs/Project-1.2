@@ -4,9 +4,9 @@ import Data_storage.*;
 
 public class TerrainGenerator {
 
-    private static double step;
-    private static int xRepetitions;
-    private static int yRepetitions;
+    private static double step = 0.05;
+    private static int xRepetitions = 100;
+    private static int yRepetitions = 100;
 
     public static void generateMeshGrid(Terrain terrain) {
         double[][] meshGrid = new double[xRepetitions][yRepetitions];
