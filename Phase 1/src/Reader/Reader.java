@@ -39,11 +39,6 @@ public class Reader {
             }
          }
          br.close();
-         for (int i = 0; i < finalArr.size(); i++) {
-            temp2 = finalArr.get(i);
-            System.out.println(temp2);
-         }
-
       } catch (IOException ioe) {
          ioe.printStackTrace();
       }
@@ -64,9 +59,10 @@ public class Reader {
       muss = Double.parseDouble(finalArr.get(11));
    }
 
-   public static void main(String[] args) {
-      String csvFile = "C:/Users/leahi/Documents/AAA-Maastricht class/Period 1.3/Project/UserInput.csv";
-      Reader.read(csvFile);
+
+   public void main() {
+      String csvFile = System.getProperty("user.dir") + "/Phase 1/src/Reader/UserInput.csv";
+      read(csvFile);
    }
 
 }

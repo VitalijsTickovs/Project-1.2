@@ -1,4 +1,5 @@
 import Data_storage.TerrainFunction1;
+import Reader.Reader;
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
@@ -17,24 +18,24 @@ public class Main extends SimpleApplication {
 
     float[] HeightMap;
 
-    public void InitHeight(){
+    public void initTerrain(){
         TerrainFunction1 generator = new TerrainFunction1("sin(x + y)");
         this.HeightMap = generator.getHeightMap(128, 128, 50);
-    }
 
-    protected Geometry player;
-    @Override
-    public void simpleInitApp() {
         Material mat1 = new Material(assetManager,
                 "Common/MatDefs/Misc/Unshaded.j3md");  // create a simple material
         mat1.setColor("Color", ColorRGBA.Blue);
-        InitHeight();
+
         TerrainQuad terrain = new TerrainQuad("Course", 65, 129, this.HeightMap);
         terrain.setMaterial(mat1);
         terrain.move(0,-10,0);
         rootNode.attachChild(terrain);
+    }
 
 
+    protected Geometry player;
+    float x, y, z;
+    public void InitBall(){
         Sphere ball = new Sphere(200, 120, 0.1f);
         TangentBinormalGenerator.generate(ball);
         player = new Geometry("Ball", ball);
@@ -51,26 +52,31 @@ public class Main extends SimpleApplication {
         mat.setFloat("Shininess", 64f);
         player.setMaterial(mat);
         rootNode.attachChild(player);
+    }
 
-        int x = 10;
-        int z = 50;
+    public void moveBall(Double x, Double y){
+        this.x = Float.parseFloat(String.valueOf(x));
+        this.z = Float.parseFloat(String.valueOf(y));
 
-        float y = this.HeightMap[(z*10) + x] + 1f ;
+        this.y = this.HeightMap[(int) ((Math.round(z)*10) + Math.round(x))] + 1f ;
 
-        player.move(x, y, z);
-
-        DirectionalLight sun = new DirectionalLight();
-        sun.setDirection(new Vector3f(1,0,-2).normalizeLocal());
-        sun.setColor(ColorRGBA.White);
-        rootNode.addLight(sun);
-
-        DirectionalLight sun2 = new DirectionalLight();
-        sun2.setDirection(new Vector3f(1,0,2).normalizeLocal());
-        sun2.setColor(ColorRGBA.White);
-        rootNode.addLight(sun2);
+        player.move( this.x, this.y, this.z);
     }
 
 
+    Reader reader = new Reader();
+    @Override
+    public void simpleInitApp() {
+        initTerrain();
+        InitBall();
+
+        reader.main();
+        moveBall(reader.x0,reader.y0);
+    }
+
+    @Override
+    public void simpleUpdate(float tpf) {
+    }
 
     public static void main(String[] args){
         Main game = new Main();
