@@ -13,16 +13,11 @@ public class Lexer {
      */
     protected static ArrayList<Token> lex(String function) {
         ArrayList<Token> tokens = new ArrayList<Token>();
-        ArrayList<Integer> ignorePositions = new ArrayList<Integer>();
         int pos = 0;
-        // Loop throughthe function string and turn it into tokens
+        // Loop through the function string and turn it into tokens
         while (pos < function.length()) {
             int tokenStartPos = pos;
             char lookAhead = function.charAt(pos);
-            // Ignore position
-            if (ignorePositions.indexOf(pos) != -1) {
-                pos++;
-            } else
             // Space
             if (lookAhead == ' ') {
                 pos++;
@@ -124,8 +119,8 @@ public class Lexer {
             Token t = tokens.get(i);
             // If the symbol is multiplication or division, insert brackets
             boolean match = false;
-            for (int j=0; j<types.length; j++) {
-                if (t.getType() == types[j]) {
+            for (Token.Type type : types) {
+                if (t.getType() == type) {
                     match = true;
                     break;
                 }

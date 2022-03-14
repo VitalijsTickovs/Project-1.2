@@ -23,9 +23,9 @@ public class Token {
         NUM // Any number
     }
 
-    private Type type;
+    private final Type type;
     private String text;
-    private int position;
+    private final int position;
 
     /**
      * Constructor. Creates an instance of a {@code Token}.

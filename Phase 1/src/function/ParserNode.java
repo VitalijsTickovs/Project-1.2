@@ -136,27 +136,21 @@ public class ParserNode {
         // Function - return f(left child)
         } else if (element.getType() == Token.Type.FUNCTION) {
             // f = sin
-            if (element.getText().equals("sin")) {
-                return Math.sin(leftChild.getValue());
-            // f = cos
-            } else if (element.getText().equals("cos")) {
-                return Math.cos(leftChild.getValue());
-            // f = tan
-            } else if (element.getText().equals("tan")) {
-                return Math.tan(leftChild.getValue());
-            // f = sqrt
-            } else if (element.getText().equals("sqrt")) {
-                return Math.sqrt(leftChild.getValue());
-            // f = log
-            } else if (element.getText().equals("log")) {
-                return Math.log10(leftChild.getValue());
-            // f = ln
-            } else if (element.getText().equals("ln")) {
-                return Math.log(leftChild.getValue());
-            // Unknown function
-            } else {
-                throw new RuntimeException("Unknown function name "+element.getText()+" at position "+element.getPosition());
-            }
+            return switch (element.getText()) {
+                case "sin" -> Math.sin(leftChild.getValue());
+                // f = cos
+                case "cos" -> Math.cos(leftChild.getValue());
+                // f = tan
+                case "tan" -> Math.tan(leftChild.getValue());
+                // f = sqrt
+                case "sqrt" -> Math.sqrt(leftChild.getValue());
+                // f = log
+                case "log" -> Math.log10(leftChild.getValue());
+                // f = ln
+                case "ln" -> Math.log(leftChild.getValue());
+                // Unknown function
+                default -> throw new RuntimeException("Unknown function name " + element.getText() + " at position " + element.getPosition());
+            };
         // Unknown token type
         } else {
             throw new RuntimeException("Non-operator/value token type "+element.getText()+" at position "+element.getPosition());

@@ -1,7 +1,7 @@
 package function;
 
 public class Function {
-    private String functionString;
+    private final String functionString;
     private ParserNode root;
 
     /**
@@ -144,27 +144,25 @@ public class Function {
                 String df = derive(node.getRightChild(), varName);
                 String l = node.getLeftChild().toString();
                 result = "("+l+"**"+f+"*"+df+"*ln("+l+"))";
-            // a**b
-            } else if (!leftHasVar && !rightHasVar) {
+            // a**b (both are numbers)
+            } else if (!leftHasVar) {
                 result = "0";
             }
         // Function
         } else if (type == Token.Type.FUNCTION) {
             String f = node.getLeftChild().toString();
             String df = derive(node.getLeftChild(), varName);
-            // sin
-            if (node.getElement().getText().equals("sin")) { 
-                result = "("+df+"*cos("+f+"))";
-            // cos
-            } else if (node.getElement().getText().equals("cos")) {
-                result = "("+df+"*-sin("+f+"))";
-            // tan
-            } else if (node.getElement().getText().equals("cos")) {
-                result = "("+df+"*(1+tan("+f+")**2))";
-            // sqrt
-            } else if (node.getElement().getText().equals("cos")) {
-                result = "("+df+"*0.5/sqrt("+f+"))";
-            }
+            result = switch (node.getElement().getText()) {
+                // sin
+                case "sin" -> "(" + df + "*cos(" + f + "))";
+                // cos
+                case "cos" -> "(" + df + "*-sin(" + f + "))";
+                // tan
+                case "tan" -> "(" + df + "*(1+tan(" + f + ")**2))";
+                // sqrt
+                case "sqrt" -> "(" + df + "*0.5/sqrt(" + f + "))";
+                default -> result;
+            };
             
         }
         return result;
@@ -188,11 +186,8 @@ public class Function {
             return true;
         }
         // If the right subtree contains the variable, return true
-        if (root.getRightChild() != null && subTreeHasVar(root.getRightChild(), varName)) {
-            return true;
-        }
+        return root.getRightChild() != null && subTreeHasVar(root.getRightChild(), varName);
         // Otherwise, return false
-        return false;
     }
 
     /**
