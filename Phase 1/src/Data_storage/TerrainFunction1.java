@@ -1,6 +1,7 @@
 package Data_storage;
 
 public class TerrainFunction1 extends TerrainFunction {
+
     @Override
     public double valueAt(double x, double y) {
         return Math.sin(x + y);

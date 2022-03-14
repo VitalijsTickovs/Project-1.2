@@ -11,4 +11,8 @@ public class Ball {
         state.velocity.translate(velocityChange);
         ballStopped = false;
     }
+
+    public double getZCoordinate(Terrain terrain){
+        return terrain.terrainFunction.valueAt(state.position.x, state.position.y);
+    }
 }
