@@ -4,7 +4,7 @@ import Data_storage.*;
 
 public class PhysicsEngine {
 
-    public double h = 0.05; // The step of the Eulet's method
+    public double h = 0.05; // The step of the Euler's method
     public Terrain terrain;
     public Ball[] ballsToSimulate;
 
@@ -71,7 +71,7 @@ public class PhysicsEngine {
         } else {
             kineticFrictionForce *= ball.state.velocity.x / ball.state.velocity.length();
         }
-        return (downHillForce - kineticFrictionForce) / ball.mass;
+        return (downHillForce - kineticFrictionForce);
     }
 
     private double yAcceleration(Ball ball, double xSlope, double ySlope, boolean mode) {
@@ -84,7 +84,7 @@ public class PhysicsEngine {
             kineticFrictionForce *= ball.state.velocity.y / ball.state.velocity.length();
 
         }
-        return (downHillForce - kineticFrictionForce) / ball.mass;
+        return (downHillForce - kineticFrictionForce);
     }
 
     private Vector2 ballStopped(Ball ball) {

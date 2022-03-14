@@ -1,7 +1,7 @@
 package function;
 
 public class Function {
-    private String functionString;
+    private final String functionString;
     private ParserNode root;
 
     /**
@@ -76,10 +76,15 @@ public class Function {
      */
     public Function getDerivative(String varName) {
         String df = derive(root, varName);
-        System.out.println(df);
         return new Function(df);
     }
 
+    /**
+     * Takes the derivative at a node, returning a String representation of the derivative function.
+     * @param node The node to take the derivative at
+     * @param varName The name of the variable to take the derivative with respect to
+     * @return The String representation of the derivative
+     */
     private String derive(ParserNode node, String varName) {
         boolean hasVar = subTreeHasVar(node, varName),
                 leftHasVar = false,
@@ -139,27 +144,25 @@ public class Function {
                 String df = derive(node.getRightChild(), varName);
                 String l = node.getLeftChild().toString();
                 result = "("+l+"**"+f+"*"+df+"*ln("+l+"))";
-            // a**b
-            } else if (!leftHasVar && !rightHasVar) {
+            // a**b (both are numbers)
+            } else if (!leftHasVar) {
                 result = "0";
             }
         // Function
         } else if (type == Token.Type.FUNCTION) {
             String f = node.getLeftChild().toString();
             String df = derive(node.getLeftChild(), varName);
-            // sin
-            if (node.getElement().getText().equals("sin")) { 
-                result = "("+df+"*cos("+f+"))";
-            // cos
-            } else if (node.getElement().getText().equals("cos")) {
-                result = "("+df+"*-sin("+f+"))";
-            // tan
-            } else if (node.getElement().getText().equals("cos")) {
-                result = "("+df+"*(1+tan("+f+")**2))";
-            // sqrt
-            } else if (node.getElement().getText().equals("cos")) {
-                result = "("+df+"*0.5/sqrt("+f+"))";
-            }
+            result = switch (node.getElement().getText()) {
+                // sin
+                case "sin" -> "(" + df + "*cos(" + f + "))";
+                // cos
+                case "cos" -> "(" + df + "*-sin(" + f + "))";
+                // tan
+                case "tan" -> "(" + df + "*(1+tan(" + f + ")**2))";
+                // sqrt
+                case "sqrt" -> "(" + df + "*0.5/sqrt(" + f + "))";
+                default -> result;
+            };
             
         }
         return result;
@@ -183,11 +186,8 @@ public class Function {
             return true;
         }
         // If the right subtree contains the variable, return true
-        if (root.getRightChild() != null && subTreeHasVar(root.getRightChild(), varName)) {
-            return true;
-        }
+        return root.getRightChild() != null && subTreeHasVar(root.getRightChild(), varName);
         // Otherwise, return false
-        return false;
     }
 
     /**
@@ -408,12 +408,13 @@ public class Function {
     }
 
     public static void main(String[] args) {
-        Function f = new Function("0.5*(sin((x-y)/7)+0.9)");
+        Function f = new Function("-0.5*(sin((x-y)/7)+0.9)");
         System.out.println(f);
         //System.out.println(f.evaluate(new String[] {"x"}, new double[] {-0.5}));
-        long start = System.nanoTime();
         Function df = f.getDerivative("x");
-        System.out.println("Time "+((System.nanoTime()-start)/1000000.0)+"ms");
+        long start = System.nanoTime();
+        df.evaluate(new String[] {"x", "y"}, new double[] {1.0, 2.1});
+        System.out.println("Time: "+((System.nanoTime()-start)/1000000.0)+"ms");
         System.out.println(df);
     }
 }
