@@ -32,16 +32,18 @@ public class Vector3 {
         return Math.sqrt((x * x) + (y * y) + (z * z));
     }
 
-    public void translate(Vector3 vector) {
+    public Vector3 translate(Vector3 vector) {
         x += vector.x;
         y += vector.y;
         z += vector.z;
+        return new Vector3(x, y, z);
     }
 
-    public void translate(double deltaX, double deltaY, double deltaZ) {
+    public Vector3 translate(double deltaX, double deltaY, double deltaZ) {
         x += deltaX;
         y += deltaY;
         z += deltaZ;
+        return new Vector3(x, y, z);
     }
 
     public Vector3 getOppositeVector() {

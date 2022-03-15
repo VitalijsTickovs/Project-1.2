@@ -21,6 +21,7 @@ public class Terrain {
     public double kineticFriction;
 
     public TerrainFunction terrainFunction;
+    public double scaleFactor;
 
     public int xRes, yRes;
 
@@ -36,6 +37,7 @@ public class Terrain {
         this.kineticFriction = kineticFriction;
         this.xRes = xRes;
         this.yRes = yRes;
+        scaleFactor = normalFactor;
         calculateHeightMap(this.xRes, this.yRes, normalFactor);
     }
 

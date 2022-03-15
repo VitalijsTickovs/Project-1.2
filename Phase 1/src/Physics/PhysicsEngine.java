@@ -9,7 +9,6 @@ public class PhysicsEngine {
     public double h = 0.05; // The step of the Euler's method
     public Terrain terrain;
     public ArrayList<Ball> ballsToSimulate;
-
     private final double G = 9.81;
 
     public PhysicsEngine() {
@@ -45,7 +44,20 @@ public class PhysicsEngine {
         double yVelocity = state.velocity.y;
 
         newPosition.translate(new Vector2(h * xVeolcity, h * yVelocity));
+        if (isTouchingAnObstacle(newPosition)) {
+            state.velocity = Vector2.zeroVector;
+            return state.position;
+        }
         return newPosition;
+    }
+
+    private boolean isTouchingAnObstacle(Vector2 position){
+        for (IObstacle obstacle : terrain.obstacles) {
+            if (obstacle.isColliding(position)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Vector2 countNewVelocity(Ball ball) {
@@ -53,38 +65,36 @@ public class PhysicsEngine {
         Vector2 ballPosition = ball.state.position;
         double xSlope = getXSlopeAt(ballPosition.x, ballPosition.y);
         double ySlope = getYSlopeAt(ballPosition.x, ballPosition.y);
-
-        double xAcceleration = 0, yAcceleration = 0;
+        Vector2 slope = new Vector2(xSlope, ySlope);
+        double xAcceleration;
+        double yAcceleration;
 
         boolean ballInMotion = newVelocity.length() > 0.01;
-
-        Vector2 slope = new Vector2(xSlope, ySlope);
-
         if (ballInMotion) {
-            xAcceleration = xAcceleration(ball, slope, ball.state.velocity, terrain.kineticFriction);
-            yAcceleration = yAcceleration(ball, slope, ball.state.velocity, terrain.kineticFriction);
+            double kineticFriction = getKineticFrictionAtPosition(ball.state.position);
+            xAcceleration = xAcceleration(slope, ball.state.velocity, kineticFriction);
+            yAcceleration = yAcceleration(slope, ball.state.velocity, kineticFriction);
         } else {
             // Stop the ball first
             newVelocity = Vector2.zeroVector;
 
-            boolean staticFrictionLessThanDownwardForce = terrain.staticFriction < slope.length();
+            double staticFriction = getStaticFrictionAtPosition(ball.state.position);
+            boolean staticFrictionLessThanDownwardForce = staticFriction < slope.length();
 
             if (staticFrictionLessThanDownwardForce) {
-                xAcceleration = xAcceleration(ball, slope, slope, terrain.staticFriction);
-                yAcceleration = yAcceleration(ball, slope, slope, terrain.staticFriction);
+                xAcceleration = xAcceleration(slope, slope, staticFriction);
+                yAcceleration = yAcceleration(slope, slope, staticFriction);
             } else {
                 xAcceleration = 0;
                 yAcceleration = 0;
             }
         }
-
-        newVelocity.translate(new Vector2(h * xAcceleration, h * yAcceleration));
-
-        return newVelocity;
+        return newVelocity.translate(new Vector2(h * xAcceleration, h * yAcceleration));
     }
+
     private double getXSlopeAt(double x, double y) {
-        double value = terrain.terrainFunction.valueAt(x, y);
-        if (value > 10 || value < -10) {
+        double functionValue = terrain.terrainFunction.valueAt(x, y) * terrain.scaleFactor;
+        if (functionValue > 10 || functionValue < -10) {
             return 0;
         } else {
             return terrain.terrainFunction.xDerivativeAt(x, y);
@@ -92,29 +102,45 @@ public class PhysicsEngine {
     }
 
     private double getYSlopeAt(double x, double y) {
-        double value = terrain.terrainFunction.valueAt(x, y);
-        if (value > 10 || value < -10) {
+        double functionValue = terrain.terrainFunction.valueAt(x, y) * terrain.scaleFactor;
+        if (functionValue > 10 || functionValue < -10) {
             return 0;
         } else {
             return terrain.terrainFunction.yDerivativeAt(x, y);
         }
     }
 
-    private double xAcceleration(Ball ball, Vector2 slope, Vector2 speed, double friction) {
+    private double getKineticFrictionAtPosition(Vector2 position) {
+        double maxFriction = terrain.kineticFriction;
+        for (Zone zone : terrain.zones) {
+            if (zone.kineticFriction > maxFriction) {
+                maxFriction = zone.kineticFriction;
+            }
+        }
+        return maxFriction;
+    }
+
+    private double getStaticFrictionAtPosition(Vector2 position) {
+        double maxFriction = terrain.staticFriction;
+        for (Zone zone : terrain.zones) {
+            if (zone.staticFriction > maxFriction) {
+                maxFriction = zone.staticFriction;
+            }
+        }
+        return maxFriction;
+    }
+
+    private double xAcceleration(Vector2 slope, Vector2 speed, double friction) {
         double downHillForce = -G * slope.x;
         double frictionForce = G * friction;
-
         frictionForce *= speed.x / speed.length();
-
         return (downHillForce - frictionForce);
     }
 
-    private double yAcceleration(Ball ball, Vector2 slope, Vector2 speed, double friction) {
+    private double yAcceleration(Vector2 slope, Vector2 speed, double friction) {
         double downHillForce = -G * slope.y;
         double frictionForce = G * friction;
-
         frictionForce *= speed.y / speed.length();
-
         return (downHillForce - frictionForce);
     }
 }
