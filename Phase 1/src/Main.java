@@ -18,8 +18,8 @@ public class Main extends Cam {
     TerrainFunction1 generator;
 
     public void initTerrain(){
-        generator = new TerrainFunction1("x+y");
-        this.HeightMap = generator.getHeightMap(64, 64, 10);
+        generator = new TerrainFunction1("sin((x+y)/7)");
+        this.HeightMap = generator.getHeightMap(64, 64, 20);
 
         Material mat1 = new Material(assetManager,
                 "Common/MatDefs/Misc/Unshaded.j3md");  // create a simple material
@@ -83,7 +83,6 @@ public class Main extends Cam {
         getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.SphereMap));
     }
 
-    Reader reader = new Reader();
     @Override
     public void simpleInitApp() {
 
@@ -94,9 +93,9 @@ public class Main extends Cam {
 
         InitSky();
 
-        reader.main();
-        float x = Float.parseFloat(String.valueOf(reader.x0));
-        float y = Float.parseFloat(String.valueOf(reader.y0));
+        Reader.main();
+        float x = Float.parseFloat(String.valueOf(Reader.terrainX0));
+        float y = Float.parseFloat(String.valueOf(Reader.terrainY0));
         //moveBall(x,y);
 
         moveBall(0, 1);
