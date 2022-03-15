@@ -17,27 +17,36 @@ public class Main extends Cam {
     TerrainQuad terrain;
     TerrainFunction1 generator;
 
+    /**
+     * Initializes area terrain based on the function given in input file
+     */
     public void initTerrain(){
         generator = new TerrainFunction1("x+y");
-        this.HeightMap = generator.getHeightMap(64, 64, 10);
+        this.HeightMap = generator.getHeightMap(128, 128, 50);
 
+        //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,
                 "Common/MatDefs/Misc/Unshaded.j3md");  // create a simple material
         Texture grass = assetManager.loadTexture("Terrain/grass.jpeg");
         mat1.setTexture("ColorMap",grass);
-
-        this.terrain = new TerrainQuad("Course", 65, 65, this.HeightMap);
+        
+        this.terrain = new TerrainQuad("Course", 65, 129, this.HeightMap);
         terrain.setMaterial(mat1);
+        
         rootNode.attachChild(terrain);
     }
 
 
-    protected Geometry player;
+    protected Geometry ball;
     float x, y, val;
+
+    /**
+     * Creates golf ball, with textures
+     */
     public void InitBall(){
         Sphere ball = new Sphere(120, 120, 1f);
         TangentBinormalGenerator.generate(ball);
-        player = new Geometry("Ball", ball);
+        this.ball = new Geometry("Ball", ball);
 
         Texture sphereTex = assetManager.loadTexture(
                 "Ball/Golfball.jpeg");
@@ -50,10 +59,13 @@ public class Main extends Cam {
         //mat.setColor("Diffuse",ColorRGBA.White);
         //mat.setColor("Specular",ColorRGBA.White);
         //mat.setFloat("Shininess", 64f);
-        player.setMaterial(mat);
-        rootNode.attachChild(player);
+        this.ball.setMaterial(mat);
+        rootNode.attachChild(this.ball);
     }
 
+    /**
+     * Moves ball according to x & y coordinates
+     */
     public void moveBall(float x, float y){
         this.x = x;
         this.y = y;
@@ -73,33 +85,35 @@ public class Main extends Cam {
         if (val < 0) {
             val = 0;
         }
-        val*=10;
+        val*=50;
 
-        player.move(this.x, this.val+1, this.y);
+        ball.move(this.x, this.val+1, this.y);
 
     }
 
     public void InitSky(){
-        getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.SphereMap));
+        getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.CubeMap));
     }
 
     Reader reader = new Reader();
     @Override
     public void simpleInitApp() {
-
+        //builds terrain based on function given
         initTerrain();
+        //generates a ball into the world
         InitBall();
-        ChaseCamera chaseCam = new ChaseCamera(cam, player, inputManager);
+        //creating and attaching camera to ball
+        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
         InitCam(chaseCam);
-
+        //setting sky background to Sky.jpg
         InitSky();
 
+        //reading from input file and assigning ball x and y positions
         reader.main();
-        float x = Float.parseFloat(String.valueOf(reader.x0));
-        float y = Float.parseFloat(String.valueOf(reader.y0));
-        //moveBall(x,y);
-
-        moveBall(0, 1);
+        float x = Float.parseFloat(String.valueOf(reader.getBallX()));
+        float y = Float.parseFloat(String.valueOf(reader.getBallY()));
+        //moving the ball according to input file
+        moveBall(x,y);
     }
 
 
@@ -110,21 +124,14 @@ public class Main extends Cam {
     public static void main(String[] args){
         Main game = new Main();
         game.setShowSettings(false);
-
+        //Setting up renderer settings, so JME settings tab wouldnt pop out
         AppSettings settings = new AppSettings(true);
-
         settings.put("Width", 1280);
-
         settings.put("Height", 720);
-
         settings.put("Title", "Golf Game");
-
         settings.put("VSync", true);
-
         //Anti-Aliasing
-
         settings.put("Samples", 4);
-
         game.setSettings(settings);
 
         game.start();

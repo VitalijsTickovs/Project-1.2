@@ -9,23 +9,10 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 public class Cam extends SimpleApplication{
-
-    //private ChaseCamera chaseCam;
-    //private Spatial player;
-    //private Node rootNode;
-    /*private final InputManager inputManager;
-    private final AssetManager assetManager;
-    private final Camera cam;*/
-    private Vector3f flyDirection = Vector3f.ZERO;
-
-    /*public Cam (SimpleApplication app){
-        // player = Main.player;
-        rootNode = app.getRootNode();
-        inputManager = app.getInputManager();
-        assetManager = app.getAssetManager();
-        cam = app.getCamera();
-    }*/
-
+    /**
+     * Creating Chase camera
+     * @param chaseCam object that follows to a player/ball
+     */
     public void InitCam(ChaseCamera chaseCam) {
         flyCam.setEnabled(false);               // disable the default first-person camera
         chaseCam.setSmoothMotion(true);
@@ -40,7 +27,5 @@ public class Cam extends SimpleApplication{
     }
 
     @Override
-    public void simpleInitApp() {
-
-    }
+    public void simpleInitApp(){}
 }
