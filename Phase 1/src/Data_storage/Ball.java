@@ -6,6 +6,14 @@ public class Ball {
     public double mass;
     public boolean ballStopped;
 
+<<<<<<< Updated upstream
+=======
+    public Ball(Vector2 startPosition, Vector2 startVelocity) {
+        state = new BallState(startPosition, startVelocity);
+        mass = 1;
+    }
+
+>>>>>>> Stashed changes
     public void addForce(Vector2 force) {
         Vector2 velocityChange = force.scale(1 / mass);
         state.velocity.translate(velocityChange);

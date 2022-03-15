@@ -13,8 +13,12 @@ public class Print {
     public static void printSquare(double[] arr) {
         int modulus = (int) Math.sqrt(arr.length);
         for (int i = 0; i < arr.length; i++) {
-            System.out.print(arr[i % modulus]);
+            if (i % modulus == 0) {
+                System.out.println();
+            }
+            System.out.print(arr[i % modulus] + " ");
         }
+        System.out.println();
     }
 
     public static void printSquare(float[] arr) {
@@ -24,6 +28,16 @@ public class Print {
                 System.out.println();
             }
             System.out.print(arr[i % modulus] + " ");
+        }
+        System.out.println();
+    }
+    public static void printSquare(int[] arr) {
+        int modulus = (int) Math.sqrt(arr.length);
+        for (int i = 0; i < arr.length; i++) {
+            if (i % modulus == 0) {
+                System.out.println();
+            }
+            System.out.print(arr[i] + " ");
         }
         System.out.println();
     }

@@ -84,12 +84,16 @@ public class PhysicsEngine {
         double downHillForce = -G * xSlope;
         double kineticFrictionForce = G * terrain.kineticFriction;
 
+<<<<<<< Updated upstream
         if (mode) {
             kineticFrictionForce *= xSlope / (xSlope * xSlope + ySlope * ySlope);
         } else {
             kineticFrictionForce *= ball.state.velocity.x / ball.state.velocity.length();
         }
         return (downHillForce - kineticFrictionForce);
+=======
+        return (downHillForce - frictionForce) / ball.mass;
+>>>>>>> Stashed changes
     }
 
     private double yAcceleration(Ball ball, double xSlope, double ySlope, boolean mode) {
@@ -105,8 +109,12 @@ public class PhysicsEngine {
         return (downHillForce - kineticFrictionForce);
     }
 
+<<<<<<< Updated upstream
     private Vector2 ballStopped(Ball ball) {
         ball.ballStopped = true;
         return Vector2.zeroVector;
+=======
+        return (downHillForce - frictionForce) / ball.mass;
+>>>>>>> Stashed changes
     }
 }
