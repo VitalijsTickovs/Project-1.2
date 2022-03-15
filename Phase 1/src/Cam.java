@@ -34,8 +34,8 @@ public class Cam extends SimpleApplication{
         chaseCam.setRotationSensitivity(5f);
         chaseCam.setMaxDistance(50f);
         chaseCam.setMinDistance(30f);
-        chaseCam.setDefaultVerticalRotation(-FastMath.PI/2);
-        chaseCam.setDefaultHorizontalRotation(-FastMath.PI/2);
+        //chaseCam.setDefaultVerticalRotation(-FastMath.PI/2);
+        //chaseCam.setDefaultHorizontalRotation(-FastMath.PI/2);
 
     }
 
