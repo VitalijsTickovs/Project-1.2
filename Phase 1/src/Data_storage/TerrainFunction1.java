@@ -4,8 +4,6 @@ import org.mariuszgromada.math.mxparser.*;
 
 import function.Function;
 
-import java.util.Arrays;
-
 public class TerrainFunction1 extends TerrainFunction {
     /*private Function f;
     private Function dfx;

@@ -11,7 +11,6 @@ import Data_storage.Target;
 import Data_storage.Terrain;
 import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
-import function.Function;
 
 public class Reader {
 

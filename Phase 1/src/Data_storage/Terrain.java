@@ -2,7 +2,8 @@ package Data_storage;
 
 public class Terrain {
     //This is generated after Terrain is created
-    public double[][] meshGrid;
+    public double[][] meshGrid2;
+    public double[] meshGrid;
 
     public float[] heightmap;
 
@@ -35,19 +36,19 @@ public class Terrain {
     }
 
     public void calculateHeightMap(int numVertecesX, int numVertecesY, double normalFactor) {
-        heightmap = new float[numVertecesX*numVertecesY];
+        heightmap = new float[numVertecesX * numVertecesY];
         int pos = 0;
         float minVal = Float.MAX_VALUE;
         float maxVal = Float.MIN_VALUE;
-        double xOff = (limitingCorner.x-startingCorner.x)/(double) numVertecesX;
-        double yOff = (limitingCorner.y-startingCorner.y)/(double) numVertecesY;
-        for (int x=0; x<numVertecesX; x++) {
-            for (int y=0; y<numVertecesY; y++) {
-                double xx = startingCorner.x + x*xOff;
-                double yy = startingCorner.y + y*yOff;
+        double xOff = (limitingCorner.x - startingCorner.x) / (double) numVertecesX;
+        double yOff = (limitingCorner.y - startingCorner.y) / (double) numVertecesY;
+        for (int x = 0; x < numVertecesX; x++) {
+            for (int y = 0; y < numVertecesY; y++) {
+                double xx = startingCorner.x + x * xOff;
+                double yy = startingCorner.y + y * yOff;
                 long start = System.nanoTime();
                 float val = (float) terrainFunction.valueAt(xx, yy);
-                System.out.println("Time: "+((System.nanoTime() - start)/1000000.0)+" ms");
+                System.out.println("Time: " + ((System.nanoTime() - start) / 1000000.0) + " ms");
                 if (val > maxVal) {
                     maxVal = val;
                 }
@@ -58,10 +59,34 @@ public class Terrain {
                 pos++;
             }
         }
-        for (int i=0; i<heightmap.length; i++) {
+        for (int i = 0; i < heightmap.length; i++) {
             heightmap[i] += Math.abs(minVal);
-            heightmap[i] /= maxVal-minVal;
+            heightmap[i] /= maxVal - minVal;
             heightmap[i] *= normalFactor;
         }
+    }
+
+    public void print(){
+        System.out.println("Mesh grid:");
+        System.out.print("Starting position: ");
+        System.out.println(ballStartingPoisition);
+        System.out.print("Starting corner: ");
+        System.out.println(startingCorner);
+        System.out.print("Limiting corner: ");
+        System.out.println(limitingCorner);
+        System.out.print("Kinetic friction: ");
+        System.out.println(kineticFriction);
+        System.out.print("Static friction: ");
+        System.out.println(staticFriction);
+        
+
+        Print.printSquare(meshGrid);
+        for (Zone zone : zones) {
+            zone.print();
+        }
+        for (IObstacle obstacle : obstacles) {
+            obstacle.print();
+        }
+        target.print();
     }
 }
