@@ -153,20 +153,22 @@ public class Function {
         } else if (type == Token.Type.FUNCTION) {
             String f = node.getLeftChild().toString();
             String df = derive(node.getLeftChild(), varName);
-            result = switch (node.getElement().getText()) {
-                // sin
-                case "sin" -> "(" + df + "*cos(" + f + "))";
-                // cos
-                case "cos" -> "(" + df + "*-sin(" + f + "))";
-                // tan
-                case "tan" -> "(" + df + "*(1+tan(" + f + ")**2))";
-                // sqrt
-                case "sqrt" -> "(" + df + "*0.5/sqrt(" + f + "))";
-                // ln
-                case "ln" -> "("+df+"*"+"1/("+f+"))";
-                default -> result;
-            };
-            
+            switch (node.getElement().getText()) {
+                case "sin":
+                    result = "(" + df + "*cos(" + f + "))";
+                    break;
+                case "cos":
+                    result = "(" + df + "*-sin(" + f + "))";
+                    break;
+                case "tan":
+                    result = "(" + df + "*(1+tan(" + f + ")**2))";
+                    break;
+                case "sqrt":
+                    result = "(" + df + "*0.5/sqrt(" + f + "))";
+                    break;
+                default:
+                    break;
+            }
         }
         return result;
     }

@@ -6,8 +6,6 @@ import java.awt.image.*;
 import Data_storage.*;
 import Physics.PhysicsEngine;
 
-import java.util.ArrayList;
-
 public class Game extends Canvas implements Runnable, GameObject {
     private final int FPS;
     private boolean running;
@@ -21,11 +19,6 @@ public class Game extends Canvas implements Runnable, GameObject {
     private Ball ball;
     private PhysicsEngine engine;
     private double unitSizePixelsX, unitSizePixelsY;
-
-    public static void main(String[] args) {
-        Game game = new Game(2);
-        game.start();
-    }
 
     /**
      * Constructor.

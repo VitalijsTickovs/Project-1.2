@@ -24,6 +24,10 @@ public class Terrain {
 
     public int xRes, yRes;
 
+    public Terrain(){
+        
+    }
+
     public Terrain(String function, Vector2 startingCorner, Vector2 limitingCorner, double staticFriction, double kineticFriction, int xRes, int yRes) {
         this.terrainFunction = new TerrainFunction1(function);
         this.startingCorner = startingCorner;
