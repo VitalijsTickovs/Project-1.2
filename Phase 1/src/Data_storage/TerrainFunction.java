@@ -7,5 +7,4 @@ public abstract class TerrainFunction {
 
     public abstract double yDerivativeAt(double x, double y);
 
-    public abstract float[] getHeightMap(int numVertecesX, int numVertecesY, double normalFactor);
 }

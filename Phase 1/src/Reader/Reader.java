@@ -17,6 +17,9 @@ public class Reader {
    private static final String delimiter = ";";
    private static Scanner scanner;
 
+   private static int xDim = 500;
+   private static int yDim = 500;
+
    // region private Variables
    // Singular values
    public static double terrainX0;
@@ -90,7 +93,7 @@ public class Reader {
 
    // endregion
 
-   public static void main(String[] args) {
+   public static void main() {
       String csvFile = "C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv";
       Terrain terrain = Reader.readFile(csvFile);
       terrain.print();
@@ -314,7 +317,7 @@ public class Reader {
       } else {
          terrain.terrainFunction = new TerrainFunction1(terrainFunction);
       }
-      terrain.meshGrid = terrain.terrainFunction.getHeightMap(4, 4, 50);
+      terrain.calculateHeightMap(xDim, yDim, 1.0);
    }
 
    private static void defineTarget() {

@@ -37,7 +37,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         unitSizePixelsX = (double)(xDim*scale)/(xBottom - xTop);
         unitSizePixelsY = (double)(yDim*scale)/(yBottom - yTop);
         terrainImage = new BufferedImage(xDim*scale, xDim*scale, BufferedImage.TYPE_4BYTE_ABGR);
-        terrain = new Terrain("sin((x+y)/7)", new Vector2(xTop, yTop), new Vector2(xBottom, yBottom), 0.15, 0.07, xDim, yDim);
+        terrain = new Terrain("sin((x+y)/7)", new Vector2(xTop, yTop), new Vector2(xBottom, yBottom), 0.15, 0.07, xDim, yDim, 1);
         System.out.println(terrain.terrainFunction);
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,7 +47,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         frame.add(this);
         frame.setVisible(true);
 
-        ball = new Ball(new Vector2(0, 0), new Vector2(0, -5));
+        ball = new Ball(new Vector2(0, 0), new Vector2(3, -10));
         engine = new PhysicsEngine();
         engine.terrain = terrain;
         engine.addBall(ball);
@@ -69,12 +69,11 @@ public class Game extends Canvas implements Runnable, GameObject {
             numUpdates += Math.floor((now - last) / nanosPerFrame);
 
             while (numUpdates >= 1) {
-                // update();
-                // render();
+                update();
+                render();
                 //gui.renderBall();
                 last += nanosPerFrame;
                 numUpdates--;
-                System.out.print(".");
             }
         }
     }
