@@ -5,12 +5,10 @@ import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
 import com.jme3.math.*;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Cylinder;
-import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -82,9 +80,9 @@ public class Main extends Cam {
 
     Geometry target;
     public void InitTarget(){
-        Cylinder tar = new Cylinder(120, 120, 10, 2);
+        Cylinder tar = new Cylinder(120, 120, 10, 2, true);
         this.target = new Geometry("Target", tar);
-
+        this.target.rotate(48,0,0);
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.White);
 
@@ -136,11 +134,11 @@ public class Main extends Cam {
         waterProcessor.setDebug(true);
         viewPort.addProcessor(waterProcessor);
 
-        //waterProcessor.setLightPosition(lightPos);
+        waterProcessor.setLightPosition(new Vector3f(0, 0, 0));
 
         //create water quad
-        //waterPlane = waterProcessor.createWaterGeometry(100, 100);
-        waterPlane=(Spatial)  assetManager.loadModel("Models/WaterTest/WaterTest.mesh.xml");
+        waterPlane = waterProcessor.createWaterGeometry(100, 100);
+        waterPlane=  assetManager.loadModel("assets/WaterTest.mesh.xml");
         waterPlane.setMaterial(waterProcessor.getMaterial());
         waterPlane.setLocalScale(40);
         waterPlane.setLocalTranslation(-5, 0, 5);
@@ -157,9 +155,9 @@ public class Main extends Cam {
         InitBall();
         InitTarget();
         //creating and attaching camera to ball
-        //ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
-        //InitCam(chaseCam);
-        flyCam.setMoveSpeed(100);
+        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
+        InitCam(chaseCam);
+        //flyCam.setMoveSpeed(100);
         //setting sky background to Sky.jpg
         InitSky();
 
