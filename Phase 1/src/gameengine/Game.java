@@ -139,7 +139,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         g2.dispose();
         bs.show();
     }
-
+    
     /**
      * Starts the game.
      * WARNING: Uses a sepparate thread
