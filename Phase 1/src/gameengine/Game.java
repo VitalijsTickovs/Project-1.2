@@ -32,23 +32,24 @@ public class Game extends Canvas implements Runnable, GameObject {
         this.running = false;
         xDim = 500;
         yDim = 500;
-        xTop = -10;
-        yTop = -10;
-        xBottom = 10;
-        yBottom = 10;
+        xTop = -50;
+        yTop = -50;
+        xBottom = 50;
+        yBottom = 50;
         unitSizePixelsX = (double)(xDim*scale)/(xBottom - xTop);
         unitSizePixelsY = (double)(yDim*scale)/(yBottom - yTop);
         terrainImage = new BufferedImage(xDim*scale, xDim*scale, BufferedImage.TYPE_4BYTE_ABGR);
-        terrain = new Terrain("sin((x+y)/7)", new Vector2(xTop, yTop), new Vector2(xBottom, yBottom), 0.15, 0.15, xDim, yDim);
+        terrain = new Terrain("sin((x+y)/7)", new Vector2(xTop, yTop), new Vector2(xBottom, yBottom), 0.15, 0.07, xDim, yDim);
         System.out.println(terrain.terrainFunction);
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(xDim*scale, yDim*scale);
+        frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.add(this);
         frame.setVisible(true);
 
-        ball = new Ball(new Vector2(0, 0), new Vector2(-.1, -.1));
+        ball = new Ball(new Vector2(0, 0), new Vector2(0, -5));
         engine = new PhysicsEngine();
         engine.terrain = terrain;
         engine.addBall(ball);
@@ -134,12 +135,12 @@ public class Game extends Canvas implements Runnable, GameObject {
         int xx = (int) ((ball.state.position.x - xTop)*unitSizePixelsX);
         int yy = (int) ((ball.state.position.y - yTop)*unitSizePixelsY);
         g2.setColor(Color.WHITE);
-        g2.fillArc(xx, yy, (int) unitSizePixelsX/2, (int) unitSizePixelsY/2, 0, 360);
+        g2.fillArc(xx, yy, (int) unitSizePixelsX, (int) unitSizePixelsY, 0, 360);
 
         g2.dispose();
         bs.show();
     }
-    
+
     /**
      * Starts the game.
      * WARNING: Uses a sepparate thread

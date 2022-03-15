@@ -52,57 +52,56 @@ public class PhysicsEngine {
     }
 
     private Vector2 countNewVelocity(Ball ball) {
-        Vector2 newVelocity = ball.state.velocity;
+        Vector2 newVelocity = ball.state.velocity.copy();
         Vector2 ballPosition = ball.state.position;
+
         double xSlope = terrain.terrainFunction.xDerivativeAt(ballPosition.x, ballPosition.y);
         double ySlope = terrain.terrainFunction.yDerivativeAt(ballPosition.x, ballPosition.y);
 
-        boolean ballInMotion = newVelocity.length() > 0.001;
+        double xAcceleration = 0, yAcceleration = 0;
+
+        boolean ballInMotion = newVelocity.length() > 0.01;
+
+        Vector2 slope = new Vector2(xSlope, ySlope);
+
         if (ballInMotion) {
-            return countBallMotion(ball, xSlope, ySlope);
+            xAcceleration = xAcceleration(ball, slope, ball.state.velocity, terrain.kineticFriction);
+            yAcceleration = yAcceleration(ball, slope, ball.state.velocity, terrain.kineticFriction);
+        } else {
+            // Stop the ball first
+            newVelocity = Vector2.zeroVector;
+
+            boolean staticFrictionLessThanDownwardForce = terrain.staticFriction < slope.length();
+
+            if (staticFrictionLessThanDownwardForce) {
+                xAcceleration = xAcceleration(ball, slope, slope, terrain.staticFriction);
+                yAcceleration = yAcceleration(ball, slope, slope, terrain.staticFriction);
+            } else {
+                xAcceleration = 0;
+                yAcceleration = 0;
+            }
         }
 
-        return ballStopped(ball);
-    }
-
-    private Vector2 countBallMotion(Ball ball, double xSlope, double ySlope) {
-        boolean staticFrictionLessThanDownwardForce = terrain.staticFriction < Math
-                .sqrt(xSlope * xSlope + ySlope * ySlope);
-
-        double xAcceleration = xAcceleration(ball, xSlope, ySlope, staticFrictionLessThanDownwardForce);
-        double yAcceleration = yAcceleration(ball, xSlope, ySlope, staticFrictionLessThanDownwardForce);
-        Vector2 newVelocity = ball.state.velocity.copy();
         newVelocity.translate(new Vector2(h * xAcceleration, h * yAcceleration));
+
         return newVelocity;
     }
 
-    private double xAcceleration(Ball ball, double xSlope, double ySlope, boolean mode) {
-        double downHillForce = -G * xSlope;
-        double kineticFrictionForce = G * terrain.kineticFriction;
+    private double xAcceleration(Ball ball, Vector2 slope, Vector2 speed, double friction) {
+        double downHillForce = -G * slope.x;
+        double frictionForce = G * friction;
 
-        if (mode) {
-            kineticFrictionForce *= xSlope / (xSlope * xSlope + ySlope * ySlope);
-        } else {
-            kineticFrictionForce *= ball.state.velocity.x / ball.state.velocity.length();
-        }
-        return (downHillForce - kineticFrictionForce);
+        frictionForce *= speed.x / speed.length();
+
+        return (downHillForce - frictionForce);
     }
 
-    private double yAcceleration(Ball ball, double xSlope, double ySlope, boolean mode) {
-        double downHillForce = -G * ySlope;
-        double kineticFrictionForce = G * terrain.kineticFriction;
+    private double yAcceleration(Ball ball, Vector2 slope, Vector2 speed, double friction) {
+        double downHillForce = -G * slope.y;
+        double frictionForce = G * friction;
 
-        if (mode) {
-            kineticFrictionForce *= ySlope / (xSlope * xSlope + ySlope * ySlope);
-        } else {
-            kineticFrictionForce *= ball.state.velocity.y / ball.state.velocity.length();
+        frictionForce *= speed.y / speed.length();
 
-        }
-        return (downHillForce - kineticFrictionForce);
-    }
-
-    private Vector2 ballStopped(Ball ball) {
-        ball.ballStopped = true;
-        return Vector2.zeroVector;
+        return (downHillForce - frictionForce);
     }
 }
