@@ -18,4 +18,15 @@ public class Print {
             System.out.print(arr[i % modulus]);
         }
     }
+
+    public static void printSquare(float[] arr) {
+        int modulus = (int) Math.sqrt(arr.length);
+        for (int i = 0; i < arr.length; i++) {
+            if (i % modulus == 0) {
+                System.out.println();
+            }
+            System.out.print(arr[i % modulus] + " ");
+        }
+        System.out.println();
+    }
 }

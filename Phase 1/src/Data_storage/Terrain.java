@@ -3,7 +3,7 @@ package Data_storage;
 public class Terrain {
     //This is generated after Terrain is created
     public double[][] meshGrid2;
-    public double[] meshGrid;
+    public float[] meshGrid;
 
     public float[] heightmap;
 
@@ -11,7 +11,7 @@ public class Terrain {
     public Zone zones[];
     public IObstacle[] obstacles;
     public Target target;
-    public Vector2 ballStartingPoisition;
+    public Vector2 ballStartingPosition;
     
     //The corners of the whole map. The function is evaluated in this rectangle
     public Vector2 startingCorner;
@@ -69,7 +69,7 @@ public class Terrain {
     public void print(){
         System.out.println("Mesh grid:");
         System.out.print("Starting position: ");
-        System.out.println(ballStartingPoisition);
+        System.out.println(ballStartingPosition);
         System.out.print("Starting corner: ");
         System.out.println(startingCorner);
         System.out.print("Limiting corner: ");
