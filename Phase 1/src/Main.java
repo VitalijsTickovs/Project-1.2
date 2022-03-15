@@ -16,6 +16,10 @@ import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 
+import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.net.URL;
+
 public class Main extends Cam {
 
     float[] HeightMap;
@@ -61,15 +65,15 @@ public class Main extends Cam {
         this.x = Float.parseFloat(String.valueOf(x));
         this.y = Float.parseFloat(String.valueOf(y));
 
-        this.z = this.HeightMap[(int) ((Math.round(y)*10) + Math.round(x))];
+        this.z = this.HeightMap[(int) ((Math.round(x)*10) + Math.round(y))];
 
 
-        player.move( this.x, this.z, this.y);
+        player.move( this.x, this.y, this.z);
     }
 
     public void InitSky(){
-        getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), assetManager.loadTexture(
-                "Sky/Sky.jpg"), SkyFactory.EnvMapType.CubeMap));
+        //Texture sky = assetManager.loadTexture("Sky/Sky2.jpg");
+        getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.SphereMap));
     }
 
 
@@ -81,9 +85,12 @@ public class Main extends Cam {
         ChaseCamera chaseCam = new ChaseCamera(cam, player, inputManager);
         InitCam(chaseCam);
 
+        InitSky();
+
         reader.main();
         moveBall(reader.x0,reader.y0);
     }
+
 
     @Override
     public void simpleUpdate(float tpf) {
