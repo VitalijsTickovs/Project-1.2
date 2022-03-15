@@ -8,7 +8,7 @@ public class IceZone extends Zone {
         return staticFriction;
     }
 
-    public double getKinematicFriction() {
+    public double getKineticFriction() {
         return kineticFriction;
     }
 }

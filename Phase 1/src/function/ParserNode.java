@@ -9,6 +9,7 @@ public class ParserNode {
 
     /**
      * Constructor. Creates an instance of {@code ParserNode}.
+     * 
      * @param element The element contained in the parser node ({@code Token}).
      */
     protected ParserNode(Token element) {
@@ -28,6 +29,7 @@ public class ParserNode {
 
     /**
      * Sets the replacing value for a variable of this node
+     * 
      * @param val The value to set to
      */
     protected void setReplaceValue(double val) {
@@ -36,6 +38,7 @@ public class ParserNode {
 
     /**
      * Sets the element of this node
+     * 
      * @param element The new element to set to
      */
     protected void setElement(Token element) {
@@ -44,6 +47,7 @@ public class ParserNode {
 
     /**
      * Sets the left child of this node
+     * 
      * @param child The new left child
      */
     protected void setLeftChild(ParserNode child) {
@@ -52,6 +56,7 @@ public class ParserNode {
 
     /**
      * Sets the right child of this node
+     * 
      * @param child The new right child
      */
     protected void setRightChild(ParserNode child) {
@@ -60,6 +65,7 @@ public class ParserNode {
 
     /**
      * Sets the parent of this node
+     * 
      * @param parent The new parent
      */
     protected void setParent(ParserNode parent) {
@@ -68,6 +74,7 @@ public class ParserNode {
 
     /**
      * Gets the element of this node
+     * 
      * @return The element or {@code null} if none
      */
     protected Token getElement() {
@@ -76,6 +83,7 @@ public class ParserNode {
 
     /**
      * Gets the parent of this node
+     * 
      * @return The parent or {@code null} if none
      */
     protected ParserNode getParent() {
@@ -84,6 +92,7 @@ public class ParserNode {
 
     /**
      * Gets the left child of this node
+     * 
      * @return The left child or {@code null} if none
      */
     protected ParserNode getLeftChild() {
@@ -92,6 +101,7 @@ public class ParserNode {
 
     /**
      * Gets the right child of this node
+     * 
      * @return The right child or {@code null} if none
      */
     protected ParserNode getRightChild() {
@@ -100,6 +110,7 @@ public class ParserNode {
 
     /**
      * Evaluates this nodes value
+     * 
      * @return The value of the node
      */
     protected double getValue() {
@@ -109,51 +120,55 @@ public class ParserNode {
         // Number - return the elements value
         if (element.getType() == Token.Type.NUM) {
             return Double.parseDouble(element.getText());
-        // pi - return pi
+            // pi - return pi
         } else if (element.getType() == Token.Type.PI) {
             return Math.PI;
-        // e - return e
+            // e - return e
         } else if (element.getType() == Token.Type.E) {
             return Math.E;
-        // Plus - return left child + right child
+            // Plus - return left child + right child
         } else if (element.getType() == Token.Type.PLUS) {
             return leftChild.getValue() + rightChild.getValue();
-        // Minus - return left child - right child
+            // Minus - return left child - right child
         } else if (element.getType() == Token.Type.MINUS) {
             return leftChild.getValue() - rightChild.getValue();
-        // Multiplication - return left child * right child
+            // Multiplication - return left child * right child
         } else if (element.getType() == Token.Type.MULT) {
             return leftChild.getValue() * rightChild.getValue();
-        // Division - return left child / right child
+            // Division - return left child / right child
         } else if (element.getType() == Token.Type.DIV) {
             return leftChild.getValue() / rightChild.getValue();
-        // Power - return left child ^ right child
+            // Power - return left child ^ right child
         } else if (element.getType() == Token.Type.POW) {
             return Math.pow(leftChild.getValue(), rightChild.getValue());
-        // Variable - return the replace value of the node
+            // Variable - return the replace value of the node
         } else if (element.getType() == Token.Type.WORD) {
             return replaceValue;
-        // Function - return f(left child)
+            // Function - return f(left child)
         } else if (element.getType() == Token.Type.FUNCTION) {
             // f = sin
-            return switch (element.getText()) {
-                case "sin" -> Math.sin(leftChild.getValue());
-                // f = cos
-                case "cos" -> Math.cos(leftChild.getValue());
-                // f = tan
-                case "tan" -> Math.tan(leftChild.getValue());
-                // f = sqrt
-                case "sqrt" -> Math.sqrt(leftChild.getValue());
-                // f = log
-                case "log" -> Math.log10(leftChild.getValue());
-                // f = ln
-                case "ln" -> Math.log(leftChild.getValue());
-                // Unknown function
-                default -> throw new RuntimeException("Unknown function name " + element.getText() + " at position " + element.getPosition());
-            };
-        // Unknown token type
+            switch (element.getText()) {
+                case "sin":
+                    return Math.sin(leftChild.getValue());
+                case "cos":
+                    return Math.cos(leftChild.getValue());
+                case "tan":
+                    return Math.tan(leftChild.getValue());
+                case "sqrt":
+                    return Math.sqrt(leftChild.getValue());
+                case "log":
+                    return Math.log10(leftChild.getValue());
+                case "ln":
+                    return Math.log(leftChild.getValue());
+
+                default:
+                    throw new RuntimeException(
+                            "Unknown function name " + element.getText() + " at position " + element.getPosition());
+            }
+            // Unknown token type
         } else {
-            throw new RuntimeException("Non-operator/value token type "+element.getText()+" at position "+element.getPosition());
+            throw new RuntimeException(
+                    "Non-operator/value token type " + element.getText() + " at position " + element.getPosition());
         }
     }
 
@@ -165,25 +180,28 @@ public class ParserNode {
             String s = "";
             if (getParent() != null) {
                 if (getElement().getType() == Token.Type.PLUS || getElement().getType() == Token.Type.MINUS) {
-                    if (getParent().getElement().getType() == Token.Type.MULT || getParent().getElement().getType() == Token.Type.DIV
-                        || getParent().getElement().getType() == Token.Type.POW) {
-                        s = "("+getLeftChild().toString()+element.getText()+getRightChild().toString()+")";
+                    if (getParent().getElement().getType() == Token.Type.MULT
+                            || getParent().getElement().getType() == Token.Type.DIV
+                            || getParent().getElement().getType() == Token.Type.POW) {
+                        s = "(" + getLeftChild().toString() + element.getText() + getRightChild().toString() + ")";
                     } else {
-                        s = getLeftChild().toString()+element.getText()+getRightChild().toString();
+                        s = getLeftChild().toString() + element.getText() + getRightChild().toString();
                     }
                 } else if (getElement().getType() == Token.Type.MULT || getElement().getType() == Token.Type.DIV) {
                     if (getParent().getElement().getType() == Token.Type.POW) {
-                        s = "("+getLeftChild().toString()+element.getText()+getRightChild().toString()+")";
+                        s = "(" + getLeftChild().toString() + element.getText() + getRightChild().toString() + ")";
                     } else {
-                        s = getLeftChild().toString()+element.getText()+getRightChild().toString();
+                        s = getLeftChild().toString() + element.getText() + getRightChild().toString();
                     }
+                } else {
+                    s = getLeftChild().toString()+element.getText()+getRightChild().toString();
                 }
             } else {
-                s = getLeftChild().toString()+element.getText()+getRightChild().toString();
+                s = getLeftChild().toString() + element.getText() + getRightChild().toString();
             }
             return s;
         } else if (hasLeft) {
-            return element.getText()+"("+getLeftChild().toString()+")";
+            return element.getText() + "(" + getLeftChild().toString() + ")";
         } else {
             return element.getText();
         }

@@ -1,5 +1,7 @@
 package Data_storage;
 
+import org.mariuszgromada.math.mxparser.*;
+
 public class Print {
     public static void print(double[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
@@ -7,6 +9,13 @@ public class Print {
                 System.out.print(matrix[i][j] + " ");
             }
             System.out.println();
+        }
+    }
+
+    public static void printSquare(double[] arr) {
+        int modulus = (int) Math.sqrt(arr.length);
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i % modulus]);
         }
     }
 }

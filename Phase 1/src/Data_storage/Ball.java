@@ -6,6 +6,10 @@ public class Ball {
     public double mass;
     public boolean ballStopped;
 
+    public Ball(Vector2 startPosition, Vector2 startVelocity) {
+        state = new BallState(startPosition, startVelocity);
+    }
+
     public void addForce(Vector2 force) {
         Vector2 velocityChange = force.scale(1 / mass);
         state.velocity.translate(velocityChange);

@@ -28,4 +28,13 @@ public class ObstacleTree extends Circle implements IObstacle {
         // TODO Auto-generated method stub
         return null;
     }
+    @Override
+    public void print(){
+        System.out.print("Position: ");
+        System.out.println(originPosition);
+        System.out.print("Radius: ");
+        System.out.println(radius);
+        System.out.print("Bounciness: ");
+        System.out.println(bounciness);
+    }
 }

@@ -10,6 +10,20 @@ public class PhysicsEngine {
 
     private final double G = 9.81;
 
+    public PhysicsEngine() {
+        ballsToSimulate = new Ball[0];
+        terrain = null;
+    }
+
+    public void addBall(Ball ball) {
+        Ball[] temp = new Ball[ballsToSimulate.length+1];
+        for (int i=0; i<ballsToSimulate.length; i++) {
+            temp[i] = ballsToSimulate[i];
+        }
+        temp[temp.length-1] = ball;
+        ballsToSimulate = temp;
+    }
+
     /**
      * Moves all balls by a timeframe h using Euler's integration method. Call this
      * at a regular (frame independent) rate.
@@ -43,7 +57,7 @@ public class PhysicsEngine {
         double xSlope = terrain.terrainFunction.xDerivativeAt(ballPosition.x, ballPosition.y);
         double ySlope = terrain.terrainFunction.yDerivativeAt(ballPosition.x, ballPosition.y);
 
-        boolean ballInMotion = newVelocity.length() != 0;
+        boolean ballInMotion = newVelocity.length() > 0.001;
         if (ballInMotion) {
             return countBallMotion(ball, xSlope, ySlope);
         }
