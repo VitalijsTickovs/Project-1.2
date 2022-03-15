@@ -4,15 +4,20 @@ import Data_storage.Vector2;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
+import com.jme3.math.*;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Cylinder;
+import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
+import com.jme3.water.SimpleWaterProcessor;
 
 public class Main extends Cam {
 
@@ -26,7 +31,7 @@ public class Main extends Cam {
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
-        generator = new Terrain("sin(x+y)", new Vector2(0,0), new Vector2(1024,1024), 0.1, 0.2, 1024, 1024);
+        generator = new Terrain("sin(x+y)", new Vector2(0,0), new Vector2(1024,1024), 0.1, 0.2, 1024, 1024, 20);
 
         generator.calculateHeightMap(1024, 1024, 20);
         this.HeightMap = this.generator.heightmap;
@@ -77,11 +82,14 @@ public class Main extends Cam {
 
     Geometry target;
     public void InitTarget(){
-        Cylinder tar = new Cylinder(120, 120, 10, 1);
+        Cylinder tar = new Cylinder(120, 120, 10, 2);
         this.target = new Geometry("Target", tar);
 
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("ColorMap", ColorRGBA.White);
+        mat.setColor("Color", ColorRGBA.White);
+
+        this.target.setMaterial(mat);
+        this.target.move(0, 20, 0);
 
         rootNode.attachChild(target);
     }
@@ -119,6 +127,27 @@ public class Main extends Cam {
         getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.SphereMap));
     }
 
+    SimpleWaterProcessor waterProcessor;
+    Spatial waterPlane;
+    Node sceneNode;
+    public void InitWater(){
+        waterProcessor = new SimpleWaterProcessor(assetManager);
+        waterProcessor.setReflectionScene(sceneNode);
+        waterProcessor.setDebug(true);
+        viewPort.addProcessor(waterProcessor);
+
+        //waterProcessor.setLightPosition(lightPos);
+
+        //create water quad
+        //waterPlane = waterProcessor.createWaterGeometry(100, 100);
+        waterPlane=(Spatial)  assetManager.loadModel("Models/WaterTest/WaterTest.mesh.xml");
+        waterPlane.setMaterial(waterProcessor.getMaterial());
+        waterPlane.setLocalScale(40);
+        waterPlane.setLocalTranslation(-5, 0, 5);
+
+        rootNode.attachChild(waterPlane);
+    }
+
     Reader reader = new Reader();
     @Override
     public void simpleInitApp() {
@@ -126,9 +155,11 @@ public class Main extends Cam {
         initTerrain();
         //generates a ball into the world
         InitBall();
+        InitTarget();
         //creating and attaching camera to ball
-        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
-        InitCam(chaseCam);
+        //ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
+        //InitCam(chaseCam);
+        flyCam.setMoveSpeed(100);
         //setting sky background to Sky.jpg
         InitSky();
 
