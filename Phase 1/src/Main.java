@@ -18,29 +18,14 @@ import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 
 import javax.imageio.ImageIO;
-<<<<<<< HEAD
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-
-public class Main extends SimpleApplication {
-=======
-import java.io.IOException;
-import java.net.URL;
 
 public class Main extends Cam {
->>>>>>> 6e98647c9e12f4c134c39034f43017ff06f001fc
 
     float[] HeightMap;
 
     public void initTerrain(){
-<<<<<<< HEAD
-        TerrainFunction1 generator = new TerrainFunction1("sin((x - y)/7) + 0.5");
-        this.HeightMap = generator.getHeightMap(128, 128, 5.0);
-=======
         TerrainFunction1 generator = new TerrainFunction1("sin(x+y)");
-        this.HeightMap = generator.getHeightMap(128, 128, 50);
->>>>>>> 6e98647c9e12f4c134c39034f43017ff06f001fc
+        this.HeightMap = generator.getHeightMap(128, 128, 5.0);
 
         Material mat1 = new Material(assetManager,
                 "Common/MatDefs/Light/Lighting.j3md");  // create a simple material
@@ -97,8 +82,6 @@ public class Main extends Cam {
         getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.SphereMap));
     }
 
-
-    Reader reader = new Reader();
     @Override
     public void simpleInitApp() {
         initTerrain();
@@ -108,8 +91,8 @@ public class Main extends Cam {
 
         InitSky();
 
-        reader.main();
-        moveBall(reader.x0,reader.y0);
+        Reader.main();
+        moveBall(Reader.terrainX0,Reader.terrainY0);
     }
 
 

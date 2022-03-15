@@ -13,15 +13,15 @@ public class Terrain {
     public Vector2 ballStartingPoisition;
     
     //The corners of the whole map. The function is evaluated in this rectangle
-    public final Vector2 startingCorner;
-    public final Vector2 limitingCorner;
+    public Vector2 startingCorner;
+    public Vector2 limitingCorner;
 
-    public final double staticFriction;
-    public final double kineticFriction;
+    public double staticFriction;
+    public double kineticFriction;
 
-    public final TerrainFunction terrainFunction;
+    public TerrainFunction terrainFunction;
 
-    public final int xRes, yRes;
+    public int xRes, yRes;
 
     public Terrain(String function, Vector2 startingCorner, Vector2 limitingCorner, double staticFriction, double kineticFriction, int xRes, int yRes) {
         this.terrainFunction = new TerrainFunction1(function);

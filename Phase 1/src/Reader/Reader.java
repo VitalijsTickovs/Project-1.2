@@ -20,8 +20,8 @@ public class Reader {
 
    // region private Variables
    // Singular values
-   private static double terrainX0;
-   private static double terrainY0;
+   public static double terrainX0;
+   public static double terrainY0;
    private static double terrainX1;
    private static double terrainY1;
    private static double greenKineticFriction;
@@ -83,8 +83,8 @@ public class Reader {
 
    // endregion
 
-   public static void main(String[] args) {
-      String csvFile = "C:/Users/leahi/Documents/AAA-Maastricht class/Period 1.3/Project/UserInput.csv";
+   public static void main() {
+      String csvFile = "UserInput.csv";
       Reader.readFile(csvFile);
    }
 
