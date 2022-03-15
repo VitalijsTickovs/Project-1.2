@@ -9,4 +9,11 @@ public class Print {
             System.out.println();
         }
     }
+
+    public static void printSquare(double[] arr) {
+        int modulus = (int) Math.sqrt(arr.length);
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i % modulus]);
+        }
+    }
 }

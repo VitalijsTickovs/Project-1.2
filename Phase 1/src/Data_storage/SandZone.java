@@ -9,7 +9,7 @@ public class SandZone extends Zone {
         return staticFriction;
     }
 
-    public double getKinematicFriction() {
+    public double getKineticFriction() {
         return kineticFriction;
     }
 }

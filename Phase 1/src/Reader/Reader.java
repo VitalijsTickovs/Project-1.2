@@ -11,7 +11,6 @@ import Data_storage.Target;
 import Data_storage.Terrain;
 import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
-import function.Function;
 
 public class Reader {
 
@@ -84,8 +83,8 @@ public class Reader {
    // endregion
 
    public static void main(String[] args) {
-      String csvFile = "C:/Users/leahi/Documents/AAA-Maastricht class/Period 1.3/Project/UserInput.csv";
-      Reader.readFile(csvFile);
+      String csvFile = "C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv";
+      Terrain terrain = Reader.readFile(csvFile);
    }
 
    public static Terrain readFile(String csvFile) {

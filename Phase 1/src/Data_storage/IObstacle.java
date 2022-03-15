@@ -7,4 +7,6 @@ public interface IObstacle {
     public abstract boolean isColliding(Vector2 ballPos);
 
     public abstract Vector2 getCollisionNormal(Vector2 positiono, Vector2 velocity);
+
+    public abstract void print();
 }

@@ -19,7 +19,7 @@ public class TerrainGenerator {
                 meshGrid[x][y] = terrain.terrainFunction.valueAt(xCoord, yCoord);
             }
         }
-        terrain.meshGrid = meshGrid;
+        terrain.meshGrid2 = meshGrid;
     }
 
 }

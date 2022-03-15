@@ -9,6 +9,7 @@ public class Game implements Runnable, GameObject {
 
     /**
      * Constructor.
+     * 
      * @param fps The wanted FPS (frames per second) of the game
      */
     public Game(int fps) {
@@ -21,7 +22,7 @@ public class Game implements Runnable, GameObject {
      */
     public void run() {
         long last = System.nanoTime();
-        final double ns = 1000000000.0/FPS; // How many nanoseconds should pass between game steps
+        final double ns = 1000000000.0 / FPS; // How many nanoseconds should pass between game steps
         long now = System.nanoTime();
 
         double numUpdates = 0;

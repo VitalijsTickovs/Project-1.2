@@ -17,4 +17,13 @@ public class ObstacleBox extends Rectangle implements IObstacle {
         // TODO Auto-generated method stub
         return null;
     }
+    @Override
+    public void print(){
+        System.out.print("Down left corner: ");
+        System.out.println(downLeftCorner);
+        System.out.print("Top right corner: ");
+        System.out.println(topRightCorner);
+        System.out.print("Bounciness: ");
+        System.out.println(bounciness);
+    }
 }
