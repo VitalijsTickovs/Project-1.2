@@ -5,18 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="06575b88-b907-4c35-bbae-157bf77177da" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_mariuszgromada_math_MathParser_org_mXparser_4_4_2.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Project-1.2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Project-1.2.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/Ball.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/Ball.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/BallState.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/BallState.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/Print.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/Print.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/Terrain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/Terrain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/TerrainFunction1.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/TerrainFunction1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Phase 1/assets/Sky/Sky.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Phase 1/assets/Sky/Sky2.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Sky/Sky.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Sky/Sky2.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Ball.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Cam.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Cam.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Reader/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Reader/Reader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Reader/UserInput.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Reader/UserInput.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/function/Function.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/function/Function.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/function/ParserNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/function/ParserNode.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
