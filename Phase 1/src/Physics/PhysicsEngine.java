@@ -45,7 +45,27 @@ public class PhysicsEngine {
 
         boolean ballInMotion = newVelocity.length() != 0;
         if (ballInMotion) {
+<<<<<<< Updated upstream
             return countBallMotion(ball, xSlope, ySlope);
+=======
+            double kineticFriction = getKineticFrictionAtPosition(ball.state.position);
+            xAcceleration = xAcceleration(slope, ball.state.velocity, kineticFriction);
+            yAcceleration = yAcceleration(slope, ball.state.velocity, kineticFriction);
+        } else {
+            // Stop the ball first
+            newVelocity = Vector2.zeroVector;
+
+            double staticFriction = getStaticFrictionAtPosition(ball.state.position);
+            boolean staticFrictionLessThanDownwardForce = staticFriction < slope.length();
+
+            if (staticFrictionLessThanDownwardForce) {
+                xAcceleration = xAcceleration(slope, slope, staticFriction);
+                yAcceleration = yAcceleration(slope, slope, staticFriction);
+            } else {
+                xAcceleration = 0;
+                yAcceleration = 0;
+            }
+>>>>>>> Stashed changes
         }
 
         return ballStopped(ball);
@@ -69,6 +89,7 @@ public class PhysicsEngine {
         }
     }
 
+<<<<<<< Updated upstream
     private Vector2 countBallMotion(Ball ball, double xSlope, double ySlope) {
         boolean staticFrictionLessThanDownwardForce = terrain.staticFriction < Math
                 .sqrt(xSlope * xSlope + ySlope * ySlope);
@@ -79,6 +100,31 @@ public class PhysicsEngine {
         newVelocity.translate(new Vector2(h * xAcceleration, h * yAcceleration));
         return newVelocity;
     }
+=======
+    private double getKineticFrictionAtPosition(Vector2 position) {
+        double maxFriction = terrain.kineticFriction;
+        for (Zone zone : terrain.zones) {
+            if (zone.kineticFriction > maxFriction) {
+                maxFriction = zone.kineticFriction;
+            }
+        }
+        return maxFriction;
+    }
+
+    private double getStaticFrictionAtPosition(Vector2 position) {
+        double maxFriction = terrain.staticFriction;
+        for (Zone zone : terrain.zones) {
+            if (zone.staticFriction > maxFriction) {
+                maxFriction = zone.staticFriction;
+            }
+        }
+        return maxFriction;
+    }
+
+    private double xAcceleration(Vector2 slope, Vector2 speed, double friction) {
+        double downHillForce = -G * slope.x;
+        double frictionForce = G * friction;
+>>>>>>> Stashed changes
 
     private double xAcceleration(Ball ball, double xSlope, double ySlope, boolean mode) {
         double downHillForce = -G * xSlope;
@@ -96,6 +142,7 @@ public class PhysicsEngine {
 >>>>>>> Stashed changes
     }
 
+<<<<<<< Updated upstream
     private double yAcceleration(Ball ball, double xSlope, double ySlope, boolean mode) {
         double downHillForce = -G * ySlope;
         double kineticFrictionForce = G * terrain.kineticFriction;
@@ -104,6 +151,11 @@ public class PhysicsEngine {
             kineticFrictionForce *= ySlope / (xSlope * xSlope + ySlope * ySlope);
         } else {
             kineticFrictionForce *= ball.state.velocity.y / ball.state.velocity.length();
+=======
+    private double yAcceleration(Vector2 slope, Vector2 speed, double friction) {
+        double downHillForce = -G * slope.y;
+        double frictionForce = G * friction;
+>>>>>>> Stashed changes
 
         }
         return (downHillForce - kineticFrictionForce);
