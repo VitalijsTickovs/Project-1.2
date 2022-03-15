@@ -21,5 +21,4 @@ public class TerrainGenerator {
         }
         terrain.meshGrid2 = meshGrid;
     }
-
 }

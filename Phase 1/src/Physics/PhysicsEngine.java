@@ -1,27 +1,24 @@
 package Physics;
 
+import java.util.ArrayList;
+
 import Data_storage.*;
 
 public class PhysicsEngine {
 
     public double h = 0.05; // The step of the Euler's method
     public Terrain terrain;
-    public Ball[] ballsToSimulate;
+    public ArrayList<Ball> ballsToSimulate;
 
     private final double G = 9.81;
 
     public PhysicsEngine() {
-        ballsToSimulate = new Ball[0];
+        ballsToSimulate = new ArrayList<>();
         terrain = null;
     }
 
     public void addBall(Ball ball) {
-        Ball[] temp = new Ball[ballsToSimulate.length+1];
-        for (int i=0; i<ballsToSimulate.length; i++) {
-            temp[i] = ballsToSimulate[i];
-        }
-        temp[temp.length-1] = ball;
-        ballsToSimulate = temp;
+        ballsToSimulate.add(ball);
     }
 
     /**
@@ -54,9 +51,8 @@ public class PhysicsEngine {
     private Vector2 countNewVelocity(Ball ball) {
         Vector2 newVelocity = ball.state.velocity.copy();
         Vector2 ballPosition = ball.state.position;
-
-        double xSlope = terrain.terrainFunction.xDerivativeAt(ballPosition.x, ballPosition.y);
-        double ySlope = terrain.terrainFunction.yDerivativeAt(ballPosition.x, ballPosition.y);
+        double xSlope = getXSlopeAt(ballPosition.x, ballPosition.y);
+        double ySlope = getYSlopeAt(ballPosition.x, ballPosition.y);
 
         double xAcceleration = 0, yAcceleration = 0;
 
@@ -85,6 +81,23 @@ public class PhysicsEngine {
         newVelocity.translate(new Vector2(h * xAcceleration, h * yAcceleration));
 
         return newVelocity;
+    }
+    private double getXSlopeAt(double x, double y) {
+        double value = terrain.terrainFunction.valueAt(x, y);
+        if (value > 10 || value < -10) {
+            return 0;
+        } else {
+            return terrain.terrainFunction.xDerivativeAt(x, y);
+        }
+    }
+
+    private double getYSlopeAt(double x, double y) {
+        double value = terrain.terrainFunction.valueAt(x, y);
+        if (value > 10 || value < -10) {
+            return 0;
+        } else {
+            return terrain.terrainFunction.yDerivativeAt(x, y);
+        }
     }
 
     private double xAcceleration(Ball ball, Vector2 slope, Vector2 speed, double friction) {

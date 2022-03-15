@@ -3,7 +3,7 @@ package Data_storage;
 public class Terrain {
     //This is generated after Terrain is created
     public double[][] meshGrid2;
-    public double[] meshGrid;
+    public float[] meshGrid;
 
     public float[] heightmap;
 
@@ -11,7 +11,7 @@ public class Terrain {
     public Zone zones[];
     public IObstacle[] obstacles;
     public Target target;
-    public Vector2 ballStartingPoisition;
+    public Vector2 ballStartingPosition;
     
     //The corners of the whole map. The function is evaluated in this rectangle
     public Vector2 startingCorner;
@@ -23,6 +23,10 @@ public class Terrain {
     public TerrainFunction terrainFunction;
 
     public int xRes, yRes;
+
+    public Terrain(){
+
+    }
 
     public Terrain(String function, Vector2 startingCorner, Vector2 limitingCorner, double staticFriction, double kineticFriction, int xRes, int yRes) {
         this.terrainFunction = new TerrainFunction1(function);
@@ -46,9 +50,7 @@ public class Terrain {
             for (int y = 0; y < numVertecesY; y++) {
                 double xx = startingCorner.x + x * xOff;
                 double yy = startingCorner.y + y * yOff;
-                long start = System.nanoTime();
                 float val = (float) terrainFunction.valueAt(xx, yy);
-                System.out.println("Time: " + ((System.nanoTime() - start) / 1000000.0) + " ms");
                 if (val > maxVal) {
                     maxVal = val;
                 }
@@ -69,7 +71,7 @@ public class Terrain {
     public void print(){
         System.out.println("Mesh grid:");
         System.out.print("Starting position: ");
-        System.out.println(ballStartingPoisition);
+        System.out.println(ballStartingPosition);
         System.out.print("Starting corner: ");
         System.out.println(startingCorner);
         System.out.print("Limiting corner: ");

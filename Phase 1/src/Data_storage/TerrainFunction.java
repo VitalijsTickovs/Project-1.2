@@ -6,4 +6,5 @@ public abstract class TerrainFunction {
     public abstract double xDerivativeAt(double x, double y);
 
     public abstract double yDerivativeAt(double x, double y);
+
 }

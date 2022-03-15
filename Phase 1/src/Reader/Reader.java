@@ -6,16 +6,19 @@ import java.util.Scanner;
 
 import Data_storage.IObstacle;
 import Data_storage.ObstacleTree;
-import Data_storage.SandZone;
 import Data_storage.Target;
 import Data_storage.Terrain;
 import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
+import Data_storage.Zone;
 
 public class Reader {
 
    private static final String delimiter = ";";
    private static Scanner scanner;
+
+   private static int xDim = 500;
+   private static int yDim = 500;
 
    // region private Variables
    // Singular values
@@ -90,9 +93,10 @@ public class Reader {
 
    // endregion
 
-   public static void main() {
-      String csvFile = "UserInput.csv";
-      Reader.readFile(csvFile);
+   public static void main(String[] args) {
+      String csvFile = "C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv";
+      Terrain terrain = Reader.readFile(csvFile);
+      terrain.print();
    }
 
    public static Terrain readFile(String csvFile) {
@@ -162,10 +166,10 @@ public class Reader {
          terrainY1 = readDouble(line);
       }
       if (line.contains("greenKineticFriction")) {
-         terrainY1 = readDouble(line);
+         greenKineticFriction = readDouble(line);
       }
       if (line.contains("greenStaticFriction")) {
-         terrainY1 = readDouble(line);
+         greenStaticFriction = readDouble(line);
       }
       if (line.contains("terrainFunction")) {
          terrainFunction = readString(line);
@@ -201,7 +205,7 @@ public class Reader {
       if (line.contains("sandKineticFriction")) {
          sandKineticFriction.add(readDouble(line));
       }
-      if (line.contains("sandKineticFriction")) {
+      if (line.contains("sandStaticFriction")) {
          sandStaticFriction.add(readDouble(line));
       }
       // Tree
@@ -274,6 +278,7 @@ public class Reader {
 
    // region Create Terrain
    private static Terrain saveDataIntoObject() {
+      terrain = new Terrain();
       // Singular values
       defineGreen();
       defineTarget();
@@ -312,6 +317,7 @@ public class Reader {
       } else {
          terrain.terrainFunction = new TerrainFunction1(terrainFunction);
       }
+      terrain.calculateHeightMap(xDim, yDim, 1.0);
    }
 
    private static void defineTarget() {
@@ -331,9 +337,9 @@ public class Reader {
    
    private static void defineStartingPoint() {
       if (ballStartPointX == 0 && ballStartPointY == 0) {
-         terrain.ballStartingPoisition = new Vector2(defballStartPointX, defballStartPointY);
+         terrain.ballStartingPosition = new Vector2(defballStartPointX, defballStartPointY);
       } else {
-         terrain.ballStartingPoisition = new Vector2(ballStartPointX, ballStartPointY);
+         terrain.ballStartingPosition = new Vector2(ballStartPointX, ballStartPointY);
       }
    }
 
@@ -392,15 +398,15 @@ public class Reader {
 
    // region Zones
    private static void defineZones() {
-      ArrayList<SandZone> sandZones = new ArrayList<>();
+      ArrayList<Zone> zones = new ArrayList<>();
 
-      sandZones.addAll(createSandZones());
+      zones.addAll(createZones());
 
-      terrain.zones = sandZones.toArray(new SandZone[0]);
+      terrain.zones = zones.toArray(new Zone[0]);
    }
 
-   private static ArrayList<SandZone> createSandZones() {
-      ArrayList<SandZone> sandZones = new ArrayList<>();
+   private static ArrayList<Zone> createZones() {
+      ArrayList<Zone> sandZones = new ArrayList<>();
       while (hasSandZone()) {
          sandZones.add(createSandZone());
       }
@@ -412,8 +418,8 @@ public class Reader {
             || sandZoneX1.size() > 0 || sandZoneY0.size() > 0 || sandZoneY1.size() > 0;
    }
 
-   private static SandZone createSandZone() {
-      SandZone sandZone = new SandZone();
+   private static Zone createSandZone() {
+      Zone zone = new Zone();
       // Position
       Vector2 position0 = new Vector2();
       Vector2 position1 = new Vector2();
@@ -443,20 +449,20 @@ public class Reader {
       }
       // Friction
       if (sandKineticFriction.size() > 0) {
-         sandZone.kineticFriction = sandKineticFriction.get(0);
+         zone.kineticFriction = sandKineticFriction.get(0);
          sandKineticFriction.remove(0);
       } else {
-         sandZone.kineticFriction = defsandKineticFriction;
+         zone.kineticFriction = defsandKineticFriction;
       }
       if (sandStaticFriction.size() > 0) {
-         sandZone.staticFriction = sandStaticFriction.get(0);
+         zone.staticFriction = sandStaticFriction.get(0);
          sandStaticFriction.remove(0);
       } else {
-         sandZone.staticFriction = defsandStaticFriction;
+         zone.staticFriction = defsandStaticFriction;
       }
-      sandZone.downLeftCorner = position0;
-      sandZone.topRightCorner = position1;
-      return sandZone;
+      zone.downLeftCorner = position0;
+      zone.topRightCorner = position1;
+      return zone;
    }
    // endregion
    // endregion

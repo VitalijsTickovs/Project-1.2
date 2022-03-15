@@ -6,8 +6,6 @@ import java.awt.image.*;
 import Data_storage.*;
 import Physics.PhysicsEngine;
 
-import java.util.ArrayList;
-
 public class Game extends Canvas implements Runnable, GameObject {
     private final int FPS;
     private boolean running;
@@ -49,7 +47,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         frame.add(this);
         frame.setVisible(true);
 
-        ball = new Ball(new Vector2(0, 0), new Vector2(0, -5));
+        ball = new Ball(new Vector2(0, 0), new Vector2(3, -10));
         engine = new PhysicsEngine();
         engine.terrain = terrain;
         engine.addBall(ball);
@@ -60,7 +58,7 @@ public class Game extends Canvas implements Runnable, GameObject {
      */
     public void run() {
         long last = System.nanoTime();
-        final double ns = 1000000000.0 / FPS; // How many nanoseconds should pass between game steps
+        final double nanosPerFrame = 1000000000.0 / FPS; // How many nanoseconds should pass between frames
         long now = System.nanoTime();
 
         double numUpdates = 0;
@@ -68,17 +66,16 @@ public class Game extends Canvas implements Runnable, GameObject {
         while (running) {
             now = System.nanoTime();
 
-            numUpdates += (now - last) / ns;
+            numUpdates += Math.floor((now - last) / nanosPerFrame);
 
             while (numUpdates >= 1) {
                 update();
                 render();
+                //gui.renderBall();
+                last += nanosPerFrame;
                 numUpdates--;
             }
-
-            last = now;
         }
-
     }
 
     public void fillTerrain(Graphics2D g2) {
