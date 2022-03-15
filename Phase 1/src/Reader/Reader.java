@@ -93,7 +93,7 @@ public class Reader {
 
    // endregion
 
-   public static void main(String[] args) {
+   public static void main() {
       String csvFile = "C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv";
       Terrain terrain = Reader.readFile(csvFile);
       terrain.print();

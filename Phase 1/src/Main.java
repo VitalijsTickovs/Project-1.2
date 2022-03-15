@@ -1,4 +1,6 @@
 import Data_storage.TerrainFunction1;
+import Data_storage.Terrain;
+import Data_storage.Vector2;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
@@ -12,22 +14,15 @@ import com.jme3.util.TangentBinormalGenerator;
 
 public class Main extends Cam {
 
-    float[] HeightMap;
-
-    TerrainQuad terrain;
-    TerrainFunction1 generator;
+    TerrainQuad terrainQuad;
+    Terrain terrain;
 
     /**
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
-<<<<<<< HEAD
-        generator = new TerrainFunction1("sin((x+y)/7)");
-        this.HeightMap = generator.getHeightMap(64, 64, 20);
-=======
-        generator = new TerrainFunction1("x+y");
-        this.HeightMap = generator.getHeightMap(128, 128, 50);
->>>>>>> 35fd7a6da86eea90e16adcfed1c51cec44245400
+        terrain = new Terrain("sin(x+y)", new Vector2(-10, -10), new Vector2(10, 10), 0.1, 0.1, 128, 128, 20);
+        //this.HeightMap = generator.getHeightMap(128, 128, 50);
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,
@@ -35,10 +30,10 @@ public class Main extends Cam {
         Texture grass = assetManager.loadTexture("Terrain/grass.jpeg");
         mat1.setTexture("ColorMap",grass);
         
-        this.terrain = new TerrainQuad("Course", 65, 129, this.HeightMap);
-        terrain.setMaterial(mat1);
+        this.terrainQuad = new TerrainQuad("Course", 65, 129, terrain.heightmap);
+        terrainQuad.setMaterial(mat1);
         
-        rootNode.attachChild(terrain);
+        rootNode.attachChild(terrainQuad);
     }
 
 
@@ -75,9 +70,9 @@ public class Main extends Cam {
         this.x = x;
         this.y = y;
 
-        this.val = this.HeightMap[ ((Math.round(x) + Math.round(y)*10))];
+        this.val = terrain.heightmap[ ((Math.round(x) + Math.round(y)*10))];
 
-        this.val = (float) generator.valueAt( this.x, this.y);
+        this.val = (float) terrain.terrainFunction.valueAt( this.x, this.y);
 
         // Ensure min is 0
         val += Math.abs(-10);
@@ -97,9 +92,10 @@ public class Main extends Cam {
     }
 
     public void InitSky(){
-        getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.CubeMap));
+        getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.SphereMap));
     }
 
+    //Reader reader = new Reader();
     @Override
     public void simpleInitApp() {
         //builds terrain based on function given
@@ -112,21 +108,12 @@ public class Main extends Cam {
         //setting sky background to Sky.jpg
         InitSky();
 
-<<<<<<< HEAD
-        Reader.main();
-        float x = Float.parseFloat(String.valueOf(Reader.terrainX0));
-        float y = Float.parseFloat(String.valueOf(Reader.terrainY0));
-        //moveBall(x,y);
-
-        moveBall(0, 1);
-=======
         //reading from input file and assigning ball x and y positions
-        reader.main();
-        float x = Float.parseFloat(String.valueOf(reader.getBallX()));
-        float y = Float.parseFloat(String.valueOf(reader.getBallY()));
+        //Reader.main();
+        float x = 0;//Float.parseFloat(String.valueOf(reader.getBallX()));
+        float y = 0;//Float.parseFloat(String.valueOf(reader.getBallY()));
         //moving the ball according to input file
         moveBall(x,y);
->>>>>>> 35fd7a6da86eea90e16adcfed1c51cec44245400
     }
 
 
