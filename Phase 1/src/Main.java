@@ -1,6 +1,7 @@
 import Data_storage.TerrainFunction1;
 import Reader.Reader;
 import com.jme3.app.SimpleApplication;
+import com.jme3.input.ChaseCamera;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -12,14 +13,15 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.HillHeightMap;
 import com.jme3.texture.Texture;
+import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 
-public class Main extends SimpleApplication {
+public class Main extends Cam {
 
     float[] HeightMap;
 
     public void initTerrain(){
-        TerrainFunction1 generator = new TerrainFunction1("sin(x + y)");
+        TerrainFunction1 generator = new TerrainFunction1("sin(x+y)");
         this.HeightMap = generator.getHeightMap(128, 128, 50);
 
         Material mat1 = new Material(assetManager,
@@ -36,31 +38,38 @@ public class Main extends SimpleApplication {
     protected Geometry player;
     float x, y, z;
     public void InitBall(){
-        Sphere ball = new Sphere(200, 120, 0.1f);
+        Sphere ball = new Sphere(200, 120, 1f);
         TangentBinormalGenerator.generate(ball);
         player = new Geometry("Ball", ball);
 
         Texture sphereTex = assetManager.loadTexture(
                 "Ball/Golfball.jpeg");
 
-        Material mat = new Material(assetManager,"Common/MatDefs/Light/Lighting.j3md");
+        Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
 
-        mat.setTexture("NormalMap", sphereTex);
-        mat.setBoolean("UseMaterialColors", true);
-        mat.setColor("Diffuse",ColorRGBA.White);
-        mat.setColor("Specular",ColorRGBA.White);
-        mat.setFloat("Shininess", 64f);
+        //mat.setTexture("NormalMap", sphereTex);
+        mat.setColor("Color", ColorRGBA.Red);
+        //mat.setBoolean("UseMaterialColors", true);
+        //mat.setColor("Diffuse",ColorRGBA.White);
+        //mat.setColor("Specular",ColorRGBA.White);
+        //mat.setFloat("Shininess", 64f);
         player.setMaterial(mat);
         rootNode.attachChild(player);
     }
 
     public void moveBall(Double x, Double y){
         this.x = Float.parseFloat(String.valueOf(x));
-        this.z = Float.parseFloat(String.valueOf(y));
+        this.y = Float.parseFloat(String.valueOf(y));
 
-        this.y = this.HeightMap[(int) ((Math.round(z)*10) + Math.round(x))] + 1f ;
+        this.z = this.HeightMap[(int) ((Math.round(y)*10) + Math.round(x))];
 
-        player.move( this.x, this.y, this.z);
+
+        player.move( this.x, this.z, this.y);
+    }
+
+    public void InitSky(){
+        getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), assetManager.loadTexture(
+                "Sky/Sky.jpg"), SkyFactory.EnvMapType.CubeMap));
     }
 
 
@@ -69,6 +78,8 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
         initTerrain();
         InitBall();
+        ChaseCamera chaseCam = new ChaseCamera(cam, player, inputManager);
+        InitCam(chaseCam);
 
         reader.main();
         moveBall(reader.x0,reader.y0);
