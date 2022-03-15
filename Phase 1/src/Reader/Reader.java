@@ -80,6 +80,14 @@ public class Reader {
    private final static double deftreeRadius = 0.5;
    private final static double deftreeBounciness = 1;
 
+   public double getBallX(){
+      return defx0;
+   }
+
+   public double getBallY(){
+      return defy0;
+   }
+
    // endregion
 
    public static void main() {
