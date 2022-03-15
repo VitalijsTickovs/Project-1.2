@@ -30,6 +30,7 @@ public class ObstacleTree extends Circle implements IObstacle {
     }
     @Override
     public void print(){
+        System.out.println("Tree: ");
         System.out.print("Position: ");
         System.out.println(originPosition);
         System.out.print("Radius: ");

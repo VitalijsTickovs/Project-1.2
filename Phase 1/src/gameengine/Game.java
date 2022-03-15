@@ -7,6 +7,11 @@ public class Game implements Runnable, GameObject {
     private boolean running;
     private ArrayList<GameObject> gameObjects;
 
+    public static void main(String[] args) {
+        Game game = new Game(2);
+        game.start();
+    }
+
     /**
      * Constructor.
      * 
@@ -22,7 +27,7 @@ public class Game implements Runnable, GameObject {
      */
     public void run() {
         long last = System.nanoTime();
-        final double ns = 1000000000.0 / FPS; // How many nanoseconds should pass between game steps
+        final double nanosPerFrame = 1000000000.0 / FPS; // How many nanoseconds should pass between frames
         long now = System.nanoTime();
 
         double numUpdates = 0;
@@ -30,17 +35,17 @@ public class Game implements Runnable, GameObject {
         while (running) {
             now = System.nanoTime();
 
-            numUpdates += (now - last) / ns;
+            numUpdates += Math.floor((now - last) / nanosPerFrame);
 
             while (numUpdates >= 1) {
-                update();
-                render();
+                // update();
+                // render();
+                //gui.renderBall();
+                last += nanosPerFrame;
                 numUpdates--;
+                System.out.print(".");
             }
-
-            last = now;
         }
-
     }
 
     /**

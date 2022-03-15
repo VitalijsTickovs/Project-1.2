@@ -40,8 +40,8 @@ public class PhysicsEngine {
     private Vector2 countNewVelocity(Ball ball) {
         Vector2 newVelocity = ball.state.velocity;
         Vector2 ballPosition = ball.state.position;
-        double xSlope = terrain.terrainFunction.xDerivativeAt(ballPosition.x, ballPosition.y);
-        double ySlope = terrain.terrainFunction.yDerivativeAt(ballPosition.x, ballPosition.y);
+        double xSlope = getXSlopeAt(ballPosition.x, ballPosition.y);
+        double ySlope = getYSlopeAt(ballPosition.x, ballPosition.y);
 
         boolean ballInMotion = newVelocity.length() != 0;
         if (ballInMotion) {
@@ -49,6 +49,24 @@ public class PhysicsEngine {
         }
 
         return ballStopped(ball);
+    }
+
+    private double getXSlopeAt(double x, double y) {
+        double value = terrain.terrainFunction.valueAt(x, y);
+        if (value > 10 || value < -10) {
+            return 0;
+        } else {
+            return terrain.terrainFunction.xDerivativeAt(x, y);
+        }
+    }
+
+    private double getYSlopeAt(double x, double y) {
+        double value = terrain.terrainFunction.valueAt(x, y);
+        if (value > 10 || value < -10) {
+            return 0;
+        } else {
+            return terrain.terrainFunction.yDerivativeAt(x, y);
+        }
     }
 
     private Vector2 countBallMotion(Ball ball, double xSlope, double ySlope) {
