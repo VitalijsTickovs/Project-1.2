@@ -11,25 +11,38 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.HillHeightMap;
+import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class Main extends SimpleApplication {
 
     float[] HeightMap;
 
     public void initTerrain(){
-        TerrainFunction1 generator = new TerrainFunction1("sin(x + y)");
-        this.HeightMap = generator.getHeightMap(128, 128, 50);
+        TerrainFunction1 generator = new TerrainFunction1("sin((x - y)/7) + 0.5");
+        this.HeightMap = generator.getHeightMap(128, 128, 5.0);
 
         Material mat1 = new Material(assetManager,
-                "Common/MatDefs/Misc/Unshaded.j3md");  // create a simple material
-        mat1.setColor("Color", ColorRGBA.Blue);
+                "Common/MatDefs/Light/Lighting.j3md");  // create a simple material
+        //mat1.setColor("Color", ColorRGBA.Green);
 
         TerrainQuad terrain = new TerrainQuad("Course", 65, 129, this.HeightMap);
         terrain.setMaterial(mat1);
-        terrain.move(0,-10,0);
+        terrain.move(0,-5,0);
+
+        DirectionalLight light = new DirectionalLight();
+        light.setColor(ColorRGBA.White);
+        light.setDirection(new Vector3f(-10.0f, -1.0f, -1.0f).normalize());
+
         rootNode.attachChild(terrain);
+        rootNode.addLight(light);
+
     }
 
 
