@@ -25,7 +25,7 @@ public class Terrain {
     public int xRes, yRes;
 
     public Terrain(){
-        
+
     }
 
     public Terrain(String function, Vector2 startingCorner, Vector2 limitingCorner, double staticFriction, double kineticFriction, int xRes, int yRes) {
@@ -50,9 +50,7 @@ public class Terrain {
             for (int y = 0; y < numVertecesY; y++) {
                 double xx = startingCorner.x + x * xOff;
                 double yy = startingCorner.y + y * yOff;
-                long start = System.nanoTime();
                 float val = (float) terrainFunction.valueAt(xx, yy);
-                System.out.println("Time: " + ((System.nanoTime() - start) / 1000000.0) + " ms");
                 if (val > maxVal) {
                     maxVal = val;
                 }

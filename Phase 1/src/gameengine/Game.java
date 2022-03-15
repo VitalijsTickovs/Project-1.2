@@ -47,7 +47,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         frame.add(this);
         frame.setVisible(true);
 
-        ball = new Ball(new Vector2(0, 0), new Vector2(0, -5));
+        ball = new Ball(new Vector2(0, 0), new Vector2(3, -10));
         engine = new PhysicsEngine();
         engine.terrain = terrain;
         engine.addBall(ball);
@@ -69,12 +69,11 @@ public class Game extends Canvas implements Runnable, GameObject {
             numUpdates += Math.floor((now - last) / nanosPerFrame);
 
             while (numUpdates >= 1) {
-                // update();
-                // render();
+                update();
+                render();
                 //gui.renderBall();
                 last += nanosPerFrame;
                 numUpdates--;
-                System.out.print(".");
             }
         }
     }
