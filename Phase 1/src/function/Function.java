@@ -7,6 +7,7 @@ public class Function {
     /**
      * Constructor.
      * Creates a new function
+     * 
      * @param function The string representing the function
      */
     public Function(String function) {
@@ -17,7 +18,8 @@ public class Function {
 
     /**
      * Evaluates the function for a certain input of variables
-     * @param varNames The array of names of variables
+     * 
+     * @param varNames  The array of names of variables
      * @param varValues The array of corresponding variable values
      * @return The result of the computation
      */
@@ -31,15 +33,16 @@ public class Function {
 
     /**
      * Assigns the values of variables to the function
-     * @param root The node of the parser tree of the function to check
-     * @param varNames The array of names of variables
+     * 
+     * @param root      The node of the parser tree of the function to check
+     * @param varNames  The array of names of variables
      * @param varValues The array of variable values
      */
     private void assignValues(ParserNode root, String[] varNames, double[] varValues) {
         if (root.getElement().getType() == Token.Type.WORD) {
             boolean found = false;
             // Find the correct variable and set it to the corresponding value
-            for (int i=0; i<varNames.length; i++) {
+            for (int i = 0; i < varNames.length; i++) {
                 if (root.getElement().getText().equals(varNames[i])) {
                     root.setReplaceValue(varValues[i]);
                     found = true;
@@ -63,15 +66,18 @@ public class Function {
 
     /**
      * Gets the text of the function.
+     * 
      * @return The text
      */
     public String getText() {
         return functionString;
     }
 
-    /**                                                     
+    /**
      * Gets the derivative of this function with respect to a variable
-     * @param varName The name of the variable to take the derivative with respect to
+     * 
+     * @param varName The name of the variable to take the derivative with respect
+     *                to
      * @return The derivative
      */
     public Function getDerivative(String varName) {
@@ -80,9 +86,12 @@ public class Function {
     }
 
     /**
-     * Takes the derivative at a node, returning a String representation of the derivative function.
-     * @param node The node to take the derivative at
-     * @param varName The name of the variable to take the derivative with respect to
+     * Takes the derivative at a node, returning a String representation of the
+     * derivative function.
+     * 
+     * @param node    The node to take the derivative at
+     * @param varName The name of the variable to take the derivative with respect
+     *                to
      * @return The String representation of the derivative
      */
     private String derive(ParserNode node, String varName) {
@@ -101,77 +110,84 @@ public class Function {
         // Number/constant
         if (type == Token.Type.NUM || type == Token.Type.PI || type == Token.Type.E) {
             result = "0";
-        // Variable
+            // Variable
         } else if (type == Token.Type.WORD) {
             // Variable taking the derivative with respect to
             if (node.getElement().getText().equals(varName)) {
                 result = "1";
-            // Other variable
+                // Other variable
             } else {
                 result = "0";
             }
-        // Addition
+            // Addition
         } else if (type == Token.Type.PLUS) {
-            result = "("+derive(node.getLeftChild(), varName)+"+"+derive(node.getRightChild(), varName)+")";
-        // Subtraction
+            result = "(" + derive(node.getLeftChild(), varName) + "+" + derive(node.getRightChild(), varName) + ")";
+            // Subtraction
         } else if (type == Token.Type.MINUS) {
-            result = "("+derive(node.getLeftChild(), varName)+"-"+derive(node.getRightChild(), varName)+")";
-        // Multiplication
+            result = "(" + derive(node.getLeftChild(), varName) + "-" + derive(node.getRightChild(), varName) + ")";
+            // Multiplication
         } else if (type == Token.Type.MULT) {
             String df = derive(node.getLeftChild(), varName);
             String f = node.getLeftChild().toString();
             String dg = derive(node.getRightChild(), varName);
             String g = node.getRightChild().toString();
-            result = "("+df+"*"+g+"+"+f+"*"+dg+")";
-        // Division
+            result = "(" + df + "*" + g + "+" + f + "*" + dg + ")";
+            // Division
         } else if (type == Token.Type.DIV) {
             String df = derive(node.getLeftChild(), varName);
             String f = node.getLeftChild().toString();
             String dg = derive(node.getRightChild(), varName);
             String g = node.getRightChild().toString();
-            result = "(("+df+"*"+g+"-"+f+"*"+dg+")/"+g+"**2)";
-        // Power
+            result = "((" + df + "*" + g + "-" + f + "*" + dg + ")/" + g + "**2)";
+            // Power
         } else if (type == Token.Type.POW) {
             // x**a
             if (leftHasVar && !rightHasVar) {
                 String r = node.getRightChild().toString();
                 String f = node.getLeftChild().toString();
                 String df = derive(node.getLeftChild(), varName);
-                result = "("+r+"*"+df+"*"+f+"**"+"("+r+"-1)"+")";
-            // a**x
+                result = "(" + r + "*" + df + "*" + f + "**" + "(" + r + "-1)" + ")";
+                // a**x
             } else if (!leftHasVar && rightHasVar) {
                 String f = node.getRightChild().toString();
                 String df = derive(node.getRightChild(), varName);
                 String l = node.getLeftChild().toString();
-                result = "("+l+"**"+f+"*"+df+"*ln("+l+"))";
+                result = "(" + l + "**" + f + "*" + df + "*ln(" + l + "))";
                 System.out.println(result);
-            // a**b (both are numbers)
+                // a**b (both are numbers)
             } else if (!leftHasVar) {
                 result = "0";
             }
-        // Function
+            // Function
         } else if (type == Token.Type.FUNCTION) {
             String f = node.getLeftChild().toString();
             String df = derive(node.getLeftChild(), varName);
-            result = switch (node.getElement().getText()) {
-                // sin
-                case "sin" -> "(" + df + "*cos(" + f + "))";
-                // cos
-                case "cos" -> "(" + df + "*-sin(" + f + "))";
-                // tan
-                case "tan" -> "(" + df + "*(1+tan(" + f + ")**2))";
-                // sqrt
-                case "sqrt" -> "(" + df + "*0.5/sqrt(" + f + "))";
-                default -> result;
-            };
-            
+            switch (node.getElement().getText()) {
+                case "sin":
+                    result = "(" + df + "*cos(" + f + "))";
+                    break;
+                case "cos":
+                    result = "(" + df + "*-sin(" + f + "))";
+                    break;
+                case "tan":
+                    result = "(" + df + "*(1+tan(" + f + ")**2))";
+                    break;
+                case "sqrt":
+                    result = "(" + df + "*0.5/sqrt(" + f + "))";
+                    break;
+
+                default:
+                    break;
+            }
+
         }
         return result;
     }
 
     /**
      * Checks if a parser subtree contains a variable
-     * @param root The root of the subtree to check
+     * 
+     * @param root    The root of the subtree to check
      * @param varName The name of the variable to check
      * @return {@code true} if it does and {@code false} otherwise
      */
@@ -208,7 +224,9 @@ public class Function {
      * n**1 = n
      * 0**n = 0 (check if n=0 -> error)
      * 1**n = 1
-     * n**m where n,m are numbers (check if n=0 and m=0 || n<0 and m not an integer -> error)
+     * n**m where n,m are numbers (check if n=0 and m=0 || n<0 and m not an integer
+     * -> error)
+     * 
      * @param node The starting node to remove rendundancies from.
      */
     private void removeRendundantOperations(ParserNode node) {
@@ -224,11 +242,12 @@ public class Function {
         // Redundant multiplication
         if (node.getElement().getType() == Token.Type.MULT) {
             // Multiplication with 0
-            if (node.getLeftChild().getElement().getText().equals("0") || node.getRightChild().getElement().getText().equals("0")) {
+            if (node.getLeftChild().getElement().getText().equals("0")
+                    || node.getRightChild().getElement().getText().equals("0")) {
                 node.setLeftChild(null);
                 node.setRightChild(null);
                 node.setElement(new Token(Token.Type.NUM, "0", -1));
-            // Multiplication with 1
+                // Multiplication with 1
             } else if (node.getLeftChild().getElement().getText().equals("1")) {
                 node.getRightChild().setParent(node.getParent());
                 if (node.getParent() != null) {
@@ -253,16 +272,17 @@ public class Function {
                 } else {
                     root = node.getLeftChild();
                 }
-            // Both children are numbers
-            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM && node.getRightChild().getElement().getType() == Token.Type.NUM) {
+                // Both children are numbers
+            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM
+                    && node.getRightChild().getElement().getType() == Token.Type.NUM) {
                 double left = Double.parseDouble(node.getLeftChild().getElement().getText());
                 double right = Double.parseDouble(node.getRightChild().getElement().getText());
-                double val = left*right;
-                node.setElement(new Token(Token.Type.NUM, val+"", -1));
+                double val = left * right;
+                node.setElement(new Token(Token.Type.NUM, val + "", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
             }
-        // Addition
+            // Addition
         } else if (node.getElement().getType() == Token.Type.PLUS) {
             // Adding with 0
             if (node.getLeftChild().getElement().getText().equals("0")) {
@@ -287,16 +307,17 @@ public class Function {
                 } else {
                     root = node.getLeftChild();
                 }
-            // Adding 2 numbers
-            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM && node.getRightChild().getElement().getType() == Token.Type.NUM) {
+                // Adding 2 numbers
+            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM
+                    && node.getRightChild().getElement().getType() == Token.Type.NUM) {
                 double left = Double.parseDouble(node.getLeftChild().getElement().getText());
                 double right = Double.parseDouble(node.getRightChild().getElement().getText());
                 double val = left + right;
-                node.setElement(new Token(Token.Type.NUM, val+"", -1));
+                node.setElement(new Token(Token.Type.NUM, val + "", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
             }
-        // Subtraction
+            // Subtraction
         } else if (node.getElement().getType() == Token.Type.MINUS) {
             // n-0
             if (node.getRightChild().getElement().getText().equals("0")) {
@@ -310,16 +331,17 @@ public class Function {
                 } else {
                     root = node.getLeftChild();
                 }
-            // Both are numbers
-            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM && node.getRightChild().getElement().getType() == Token.Type.NUM) {
+                // Both are numbers
+            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM
+                    && node.getRightChild().getElement().getType() == Token.Type.NUM) {
                 double left = Double.parseDouble(node.getLeftChild().getElement().getText());
                 double right = Double.parseDouble(node.getRightChild().getElement().getText());
                 double val = left - right;
-                node.setElement(new Token(Token.Type.NUM, val+"", -1));
+                node.setElement(new Token(Token.Type.NUM, val + "", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
             }
-        // Division
+            // Division
         } else if (node.getElement().getType() == Token.Type.DIV) {
             // Division with 1
             if (node.getRightChild().getElement().getText().equals("1")) {
@@ -333,7 +355,7 @@ public class Function {
                 } else {
                     root = node.getLeftChild();
                 }
-            // Dividing 0
+                // Dividing 0
             } else if (node.getLeftChild().getElement().getText().equals("0")) {
                 // Check for division with 0
                 if (node.getRightChild().getElement().getText().equals("0")) {
@@ -342,8 +364,9 @@ public class Function {
                 node.setElement(new Token(Token.Type.NUM, "0", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
-            // Dividing 2 numbers
-            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM && node.getRightChild().getElement().getType() == Token.Type.NUM) {
+                // Dividing 2 numbers
+            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM
+                    && node.getRightChild().getElement().getType() == Token.Type.NUM) {
                 double left = Double.parseDouble(node.getLeftChild().getElement().getText());
                 double right = Double.parseDouble(node.getRightChild().getElement().getText());
                 // Check for division with 0
@@ -351,11 +374,11 @@ public class Function {
                     throw new RuntimeException("Error. Division with 0.");
                 }
                 double val = left / right;
-                node.setElement(new Token(Token.Type.NUM, val+"", -1));
+                node.setElement(new Token(Token.Type.NUM, val + "", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
             }
-        // Power
+            // Power
         } else if (node.getElement().getType() == Token.Type.POW) {
             // n**0
             if (node.getRightChild().getElement().getText().equals("0")) {
@@ -366,7 +389,7 @@ public class Function {
                 node.setElement(new Token(Token.Type.NUM, "1", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
-            // n**1
+                // n**1
             } else if (node.getRightChild().getElement().getText().equals("1")) {
                 node.getLeftChild().setParent(node.getParent());
                 if (node.getParent() != null) {
@@ -378,27 +401,28 @@ public class Function {
                 } else {
                     root = node.getLeftChild();
                 }
-            // 0**n
+                // 0**n
             } else if (node.getLeftChild().getElement().getText().equals("0")) {
                 // No need to check for 0**0, it would already have been checked
                 node.setElement(new Token(Token.Type.NUM, "0", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
-            // 1**n
+                // 1**n
             } else if (node.getLeftChild().getElement().getText().equals("1")) {
                 node.setElement(new Token(Token.Type.NUM, "1", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
-            // number**number
-            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM && node.getRightChild().getElement().getType() == Token.Type.NUM) {
+                // number**number
+            } else if (node.getLeftChild().getElement().getType() == Token.Type.NUM
+                    && node.getRightChild().getElement().getType() == Token.Type.NUM) {
                 double left = Double.parseDouble(node.getLeftChild().getElement().getText());
                 double right = Double.parseDouble(node.getRightChild().getElement().getText());
                 // Check for left being negative and right non-integer
                 if (left < 0 && (int) right == right) {
-                    throw new RuntimeException("Error. Impossible power operator "+left+"**"+right);
+                    throw new RuntimeException("Error. Impossible power operator " + left + "**" + right);
                 }
                 double val = Math.pow(left, right);
-                node.setElement(new Token(Token.Type.NUM, val+"", -1));
+                node.setElement(new Token(Token.Type.NUM, val + "", -1));
                 node.setLeftChild(null);
                 node.setRightChild(null);
             }
