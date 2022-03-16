@@ -24,18 +24,14 @@ public class Main extends Cam {
     TerrainQuad terrainQuad;
     Terrain terrain;
     final float unitPixelSize = 0.5f;
-    String function = "x+y";
-    float xSize, ySize;
-
+    String function = "sin(x+y)";
+    float totalSize = 1024;
     /**
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
-        terrain = new Terrain(function,0.2, 0.1, new Vector2(0,0), new Vector2(1024,1024));
-        terrain.calculateHeightMap(1024, 20);
-
-        this.xSize = 1024;
-        this.ySize = 1024;
+        terrain = new Terrain(function,0.2, 0.1, new Vector2(-10,-10), new Vector2(totalSize-10,totalSize-10));
+        terrain.calculateHeightMap((int) totalSize, 20);
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
@@ -44,18 +40,16 @@ public class Main extends Cam {
         //Adding grass texture to terrain
         mat1.setTexture("ColorMap",grass);
 
-        float[] height = terrain.heightmap;
-
         //Setting terrain using heightmap
-        this.terrainQuad = new TerrainQuad("Course", 65, 1025, height);
-//        float minDim = (float) Math.min(terrain.limitingCorner.x-terrain.startingCorner.x, terrain.limitingCorner.y-terrain.startingCorner.y);
-//        float xDim = (float) ((terrain.limitingCorner.x-terrain.startingCorner.x)/minDim);
-//        float yDim = (float) ((terrain.limitingCorner.y-terrain.startingCorner.y)/minDim);
-//
-//        float xScale = (float) (xDim*(terrain.limitingCorner.x-terrain.startingCorner.x)/512/(terrainQuad.getTerrainSize()/512.0));
-//        float yScale = (float) (yDim*(terrain.limitingCorner.y-terrain.startingCorner.y)/512/(terrainQuad.getTerrainSize()/512.0));
+        this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
+        float minDim = (float) Math.min(terrain.limitingCorner.x-terrain.startingCorner.x, terrain.limitingCorner.y-terrain.startingCorner.y);
+        float xDim = (float) ((terrain.limitingCorner.x-terrain.startingCorner.x)/minDim);
+        float yDim = (float) ((terrain.limitingCorner.y-terrain.startingCorner.y)/minDim);
 
-        //terrainQuad.setLocalScale(new Vector3f(xDim, 1.0f, yDim));
+        float xScale = (float) (xDim*(terrain.limitingCorner.x-terrain.startingCorner.x)/512/(terrainQuad.getTerrainSize()/512.0));
+        float yScale = (float) (yDim*(terrain.limitingCorner.y-terrain.startingCorner.y)/512/(terrainQuad.getTerrainSize()/512.0));
+
+        terrainQuad.setLocalScale(new Vector3f(xDim, 1.0f, yDim));
         terrainQuad.getTerrainSize();
         terrainQuad.setMaterial(mat1);
         
@@ -91,16 +85,48 @@ public class Main extends Cam {
         this.target.setMaterial(mat);
         this.target.move(0, 0, 0);
 
-
-
         rootNode.attachChild(target);
+    }
+
+    public void findTangent(){
+        double XPosition;
+        double YPosition;
+        double ZPosition;
+        float BallatX;
+        float BallatY;
+        float BallatZ;
+
+        XPosition=terrain.terrainFunction.xDerivativeAt(x, y);
+        YPosition=terrain.terrainFunction.yDerivativeAt(x, y);
+        ZPosition=terrain.terrainFunction.valueAt(x,y); //height
+        BallatX=getBallX();
+        BallatY=getBallY();
+        BallatZ=getBallZ();
+
+        Vector3f normal = this.terrainQuad.getNormal(new Vector2f(x,y));
+
+        float XDifference=BallatX-(float)normal.x;
+        float YDifference=BallatY-(float)normal.z;
+        float ZDifference=BallatZ-(float)normal.y;
+
+        //Just put 0.2 as a threshold, like if the difference is above that, is gonna be visible
+        if(XDifference<this.ballRadius) {
+            ball.move(this.ballRadius - XDifference + this.ballRadius ,0,0);
+        }
+
+        if(YDifference<this.ballRadius){
+            ball.move(0,0,this.ballRadius - YDifference + this.ballRadius);
+        }
+        if(ZDifference <this.ballRadius){
+            ball.move(0, this.ballRadius - ZDifference + this.ballRadius, 0);
+        }
     }
 
     /**
      * Moves ball according to x & y coordinates
      */
-    float x=0;
-    float y=0;
+    float x=512;
+    float y=512;
     float val = 0;
 
     public float getBallX(){
@@ -119,12 +145,10 @@ public class Main extends Cam {
         this.x = x;
         this.y = y;
         //Getting height value corresponding to x and y values
-        double xOff = 1;
-        double yOff = 1;
         float val;
         float minVal = -10;
         float maxVal = 10;
-        val = (float) funct.valueAt(x*xOff, y*yOff);
+        val = (float) funct.valueAt(x, y);
         if (val > maxVal) {
             maxVal = val;
         }
@@ -142,11 +166,10 @@ public class Main extends Cam {
         }
         val *= 20;
         this.val = val;
-
-//        float val = terrain.heightmap[Math.round((x*10) + y)];
+        this.val = terrain.heightmap[Math.round(x+y)];
         //Moving the ball object to specified position
-        //ball.move(x, val, y);
-        ball.setLocalTranslation(x,val, y);
+        ball.setLocalTranslation(y - this.totalSize/2,val,x - this.totalSize/2);
+        findTangent();
     }
 
     public void InitSky(String path){
@@ -164,7 +187,7 @@ public class Main extends Cam {
         waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
 
         viewPort.addProcessor(waterProcessor);
-        Quad waveSize = new Quad(this.xSize +200,this.ySize +200);
+        Quad waveSize = new Quad(1024 +200,1024 +200);
         waveSize.scaleTextureCoordinates(new Vector2f(6f,6f));
 
         Geometry water=new Geometry("water", waveSize);
@@ -183,7 +206,6 @@ public class Main extends Cam {
         initTerrain();
         // generates a ball into the world
         InitBall();
-        //moveBall(0,0);
         //InitTarget();
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
@@ -204,7 +226,7 @@ public class Main extends Cam {
     float movex = 0;
     @Override
     public void simpleUpdate(float tpf) {
-        moveBall(movex, 0);
+        moveBall(movex,movex);
         movex+=0.1f;
     }
 
