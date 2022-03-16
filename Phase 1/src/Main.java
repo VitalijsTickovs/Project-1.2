@@ -21,6 +21,7 @@ import com.jme3.water.SimpleWaterProcessor;
 
 public class Main extends Cam {
 
+    private boolean inTarget;
     TerrainQuad terrainQuad;
     Terrain terrain;
     final float unitPixelSize = 0.5f;
@@ -86,6 +87,22 @@ public class Main extends Cam {
         this.target.move(0, 0, 0);
 
         rootNode.attachChild(target);
+    }
+    
+    /**      
+     *checks if final ball position is within the target radius      
+    */     
+    public boolean isInTarget(Ball ball, Target t){
+        
+        // target position(120,120), and target radius is 10
+        // the range of target is between 110 and 130
+        if (ball.state.position.x >= t.position.x - t.radius && ball.state.position.x <= t.position.x + t.radius && ball.state.position.y >= t.position.y - t.radius && ball.state.position.y <= t.position.y + t.radius){ 
+            inTarget = true;
+        }
+        else inTarget = false; 
+        
+        return inTarget;
+        
     }
 
     public void findTangent(){
