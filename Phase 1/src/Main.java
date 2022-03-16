@@ -21,7 +21,6 @@ import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
 public class Main extends Cam {
-
     TerrainQuad terrainQuad;
     Terrain terrain;
     final float unitPixelSize = 0.5f;
