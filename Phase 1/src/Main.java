@@ -1,15 +1,15 @@
 import Data_storage.Terrain;
 import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
+import Physics.MeshGenerator;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.math.*;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
+import com.jme3.scene.*;
+import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
@@ -89,9 +89,12 @@ public class Main extends Cam {
 
     Geometry target;
     public void InitTarget(){
-        Cylinder tar = new Cylinder(120, 120, 10, 2, true);
+        Cylinder tar = new Cylinder(120, 120, 10, 50, true);
         this.target = new Geometry("Target", tar);
-        this.target.rotate(48,0,0);
+        Quaternion roll180 = new Quaternion();
+        roll180.fromAngleAxis(FastMath.PI/2, new Vector3f(1,0,0));
+        target.setLocalRotation(roll180);
+      //  this.target.rotate(48,0,0);
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.White);
 
@@ -155,28 +158,58 @@ public class Main extends Cam {
         rootNode.attachChild(waterPlane);
     }
 
+    public void findTangent(){
+        /*
+        -FInd tangent
+        -FInd difference between ball position and tangente for each values
+        -if difference is smaller than radius, than add the difference between tangente and one
+         */
+
+
+        terrain.terrainFunction.xDerivativeAt(x, y);
+        terrain.terrainFunction.yDerivativeAt(x, y);
+        terrain.terrainFunction.valueAt(x,y);
+    }
+
     Reader reader = new Reader();
     @Override
     public void simpleInitApp() {
         //builds terrain based on function given
-        initTerrain();
+      //  initTerrain();
+        meshRender();
         //generates a ball into the world
-        InitBall();
-        InitTarget();
+       // InitBall();
+        //InitTarget();
         //creating and attaching camera to ball
-        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
-        InitCam(chaseCam);
+      //  ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
+       // InitCam(chaseCam);
         //flyCam.setMoveSpeed(100);
         //setting sky background to Sky.jpg
-        InitSky();
+      //  InitSky();
 
         //reading from input file and assigning ball x and y positions
-        float x = Float.parseFloat(String.valueOf(reader.getBallX()));
-        float y = Float.parseFloat(String.valueOf(reader.getBallY()));
+      //  float x = Float.parseFloat(String.valueOf(reader.getBallX()));
+      //  float y = Float.parseFloat(String.valueOf(reader.getBallY()));
         //moving the ball according to input file
         //moveBall(x,y);
-        moveBall(0,0);
+     //   moveBall(0,0);
     }
+
+
+    public void meshRender(){
+        TerrainFunction1 t = new TerrainFunction1("sin(x+y");
+        Mesh mesh = new Mesh();
+        mesh = MeshGenerator.createTerrainMesh(t);
+     //   Box cube1mesh = new Box(1f,1f,1f);
+        Geometry cube1Geo = new Geometry("Box", mesh);
+        Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", ColorRGBA.White);
+        cube1Geo.setMaterial(mat);
+        rootNode.attachChild(cube1Geo);
+
+    }
+
+
 
 
     @Override
