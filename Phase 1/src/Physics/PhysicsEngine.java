@@ -51,7 +51,7 @@ public class PhysicsEngine {
         return newPosition;
     }
 
-    private boolean isTouchingAnObstacle(Vector2 position){
+    private boolean isTouchingAnObstacle(Vector2 position) {
         for (IObstacle obstacle : terrain.obstacles) {
             if (obstacle.isColliding(position)) {
                 return true;

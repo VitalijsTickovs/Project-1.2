@@ -21,12 +21,12 @@ public class Terrain {
     public double kineticFriction;
 
     public TerrainFunction terrainFunction;
-    public double scaleFactor;
+    public double scaleFactor = 1;
 
-    public int xRes, yRes;
+    public int xRes = 500;
+    public int yRes = 500;
 
     public Terrain(){
-
     }
 
     public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner, Vector2 limitingCorner) {
