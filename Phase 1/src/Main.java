@@ -1,6 +1,4 @@
-import Data_storage.Terrain;
-import Data_storage.TerrainFunction1;
-import Data_storage.Vector2;
+import Data_storage.*;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
