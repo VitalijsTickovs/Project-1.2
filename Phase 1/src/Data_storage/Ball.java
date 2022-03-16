@@ -19,7 +19,14 @@ public class Ball {
         ballStopped = false;
     }
 
-    public double getZCoordinate(Terrain terrain){
+    public double getZCoordinate(Terrain terrain) {
         return terrain.terrainFunction.valueAt(state.position.x, state.position.y);
+    }
+
+    public Ball copy() {
+        Ball newBall = new Ball(state.position, state.velocity);
+        newBall.mass = mass;
+        newBall.radius = radius;
+        return newBall;
     }
 }

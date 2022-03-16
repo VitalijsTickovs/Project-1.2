@@ -6,8 +6,13 @@ public class ObstacleTree extends Circle implements IObstacle {
     // This is basically friction for bounces
 
     @Override
-    public boolean isColliding(Vector2 ballPos) {
-        return isPositionInside(ballPos);
+    public boolean isBallColliding(Vector2 ballPos, double radius) {
+        return isBallInside(ballPos, radius);
+    }
+
+    @Override
+    public boolean isPositionColliding(Vector2 position) {
+        return isPositionInside(position);
     }
 
     @Override
@@ -24,12 +29,26 @@ public class ObstacleTree extends Circle implements IObstacle {
     }
 
     @Override
-    public Vector2 getCollisionNormal(Vector2 positiono, Vector2 velocity) {
-        // TODO Auto-generated method stub
-        return null;
+    public void bounceVector(Vector2 position, Vector2 velocity, double h, double ballRadius) {
+        Vector2 normal = getCollisionNormal(position);
+        // If bounciness equals 0.8, the returned velocity vector will be 20% shorter
+        Vector2 bouncedVelocity = velocity.reflect(normal).scale(bounciness);
+        velocity = bouncedVelocity;
+        Vector2 positionToBall = originPosition.translate(position.getOppositeVector());
+        double distanceToBall = positionToBall.length();
+        double moveBall = distanceToBall - ballRadius - radius;
+        Vector2 moveToObstacleVector = positionToBall.normalized().scale(moveBall * h);
+        position.translate(moveToObstacleVector);
+        Vector2 movePastObstacleVector = velocity.normalized().scale((distanceToBall - moveBall) * h);
+        position.translate(movePastObstacleVector);
     }
+
+    public Vector2 getCollisionNormal(Vector2 position) {
+        return position.translate(originPosition.getOppositeVector());
+    }
+
     @Override
-    public void print(){
+    public void print() {
         System.out.println("Tree: ");
         System.out.print("Position: ");
         System.out.println(originPosition);

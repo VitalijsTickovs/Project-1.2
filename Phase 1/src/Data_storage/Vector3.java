@@ -59,6 +59,14 @@ public class Vector3 {
         return normalizedVector;
     }
 
+    public Vector3 reflect(Vector3 normal) {
+        Vector3 vector = copy();
+        double dotProduct = dotProduct(vector, normal.normalized());
+        // vector - 2 * (dotProduct) * normal;
+        Vector3 reflection = vector.translate(normal.normalized().scale(2 * dotProduct).getOppositeVector());
+        return reflection;
+    }
+
     public Vector3 copy() {
         return new Vector3(x, y, z);
     }
@@ -66,6 +74,21 @@ public class Vector3 {
     @Override
     public String toString() {
         return "(" + x + ", " + y + ", " + z + ")";
+    }
+
+    public static double dotProduct(Vector3 vector1, Vector3 vector2) {
+        return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
+    }
+
+    /**
+     * 
+     * @param vector1
+     * @param vector2
+     * @return angle in range (0; Pi)
+     */
+    public static double angleBetween(Vector3 vector1, Vector3 vector2) {
+        double cos = dotProduct(vector1, vector2) / (vector1.length() * vector2.length());
+        return Math.acos(cos);
     }
 
 }

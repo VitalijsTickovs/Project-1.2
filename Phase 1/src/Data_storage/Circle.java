@@ -6,11 +6,22 @@ public class Circle extends Shape {
 
     @Override
     protected boolean isPositionInside(Vector2 objectPosition) {
-        Vector2 deltaPos = objectPosition.copy();
-        deltaPos.translate(originPosition.getOppositeVector());
+        Vector2 deltaPos = objectPosition.copy().translate(originPosition.getOppositeVector());
         double distance = deltaPos.length();
 
         boolean isInside = distance < radius;
+        if (isInside) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected boolean isBallInside(Vector2 objectPosition, double ballRadius) {
+        Vector2 deltaPos = objectPosition.copy().translate(originPosition.getOppositeVector());
+        double distance = deltaPos.length();
+
+        boolean isInside = distance < radius + ballRadius;
         if (isInside) {
             return true;
         }

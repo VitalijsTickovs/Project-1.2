@@ -15,7 +15,7 @@ public class Zone extends Rectangle {
     public void print(){
         System.out.println("Zone: ");
         System.out.print("Down left corner: ");
-        System.out.println(downLeftCorner);
+        System.out.println(bottomLeftCorner);
         System.out.print("Top right corner: ");
         System.out.println(topRightCorner);
         System.out.print("Static friction: ");

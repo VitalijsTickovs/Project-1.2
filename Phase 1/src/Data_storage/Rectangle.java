@@ -2,13 +2,23 @@ package Data_storage;
 
 public class Rectangle extends Shape {
 
-    public Vector2 downLeftCorner;
+    public Vector2 bottomLeftCorner;
     public Vector2 topRightCorner;
 
     @Override
     public boolean isPositionInside(Vector2 objectPosition) {
-        boolean isXInside = objectPosition.x > downLeftCorner.x && objectPosition.x < topRightCorner.x;
-        boolean isYInside = objectPosition.y > downLeftCorner.y && objectPosition.y < topRightCorner.y;
+        boolean isXInside = objectPosition.x > bottomLeftCorner.x && objectPosition.x < topRightCorner.x;
+        boolean isYInside = objectPosition.y > bottomLeftCorner.y && objectPosition.y < topRightCorner.y;
+        if (isXInside && isYInside) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected boolean isBallInside(Vector2 objectPosition, double ballRadius) {
+        boolean isXInside = objectPosition.x + ballRadius > bottomLeftCorner.x && objectPosition.x - ballRadius < topRightCorner.x;
+        boolean isYInside = objectPosition.y + ballRadius > bottomLeftCorner.y && objectPosition.y - ballRadius < topRightCorner.y;
         if (isXInside && isYInside) {
             return true;
         }
