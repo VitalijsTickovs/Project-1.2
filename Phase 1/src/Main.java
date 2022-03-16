@@ -1,5 +1,6 @@
-import Data_storage.*;
-import Physics.MeshGenerator;
+import Data_storage.Terrain;
+import Data_storage.TerrainFunction1;
+import Data_storage.Vector2;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
@@ -7,7 +8,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.math.*;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Quad;
@@ -19,7 +19,6 @@ import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
-import java.awt.*;
 public class Main extends Cam {
 
     private boolean inTarget;
@@ -31,18 +30,17 @@ public class Main extends Cam {
     /**
      * Initializes area terrain based on the function given in input file
      */
-    public void initTerrain(String texPath){
+    public void initTerrain(){
         terrain = new Terrain(function,0.2, 0.1, new Vector2(-10,-10), new Vector2(totalSize-10,totalSize-10));
         terrain.calculateHeightMap((int) totalSize, 20);
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
-        Texture tex = assetManager.loadTexture(texPath);
+        Texture grass = assetManager.loadTexture("Terrain/grass.jpeg");
 
-        //Adding texture to terrain
-        mat1.setTexture("ColorMap",tex);
+        //Adding grass texture to terrain
+        mat1.setTexture("ColorMap",grass);
 
-        this.terrainQuad = new TerrainQuad("Course", 65, 513, terrain.heightmap);
         //Setting terrain using heightmap
         this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
         float minDim = (float) Math.min(terrain.limitingCorner.x-terrain.startingCorner.x, terrain.limitingCorner.y-terrain.startingCorner.y);
@@ -54,7 +52,6 @@ public class Main extends Cam {
 
         terrainQuad.setLocalScale(new Vector3f(xDim, 1.0f, yDim));
         terrainQuad.getTerrainSize();
-        // adding texture to the ground (optional: needs to be changed for different levels: like Earth, Mars etc.)
         terrainQuad.setMaterial(mat1);
         
         rootNode.attachChild(terrainQuad);
@@ -103,6 +100,7 @@ public class Main extends Cam {
         else inTarget = false; 
         
         return inTarget;
+        
     }
 
     public void findTangent(){
@@ -220,9 +218,7 @@ public class Main extends Cam {
     @Override
     public void simpleInitApp() {
         // builds terrain based on function given
-        initTerrain("Terrain/grass.jpeg"); // changes based on level that is chosen
-        //initTerrain("Terrain/Mars_ground.jpg");
-        //initTerrain("Terrain/Moon_ground.png");
+        initTerrain();
         // generates a ball into the world
         InitBall();
         //InitTarget();
@@ -239,24 +235,10 @@ public class Main extends Cam {
         float x = Float.parseFloat(String.valueOf(reader.getBallX()));
         float y = Float.parseFloat(String.valueOf(reader.getBallY()));
         //moving the ball according to input file
-        //moveBall(x,y);
-     //   moveBall(0,0);
     }
 
 
     float movex = 0;
-    public void meshRender(){
-        TerrainFunction1 t = new TerrainFunction1("sin(x+y");
-        Mesh mesh = new Mesh();
-        mesh = MeshGenerator.createTerrainMesh(t);
-        //   Box cube1mesh = new Box(1f,1f,1f);
-        Geometry cube1Geo = new Geometry("Box", mesh);
-        Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.White);
-        cube1Geo.setMaterial(mat);
-        rootNode.attachChild(cube1Geo);
-    }
-
     @Override
     public void simpleUpdate(float tpf) {
         moveBall(movex,movex);
