@@ -94,8 +94,6 @@ public class Main extends Cam {
     */     
     public boolean isInTarget(Ball ball, Target t){
         
-        // target position(120,120), and target radius is 10
-        // the range of target is between 110 and 130
         if (ball.state.position.x >= t.position.x - t.radius && ball.state.position.x <= t.position.x + t.radius && ball.state.position.y >= t.position.y - t.radius && ball.state.position.y <= t.position.y + t.radius){ 
             inTarget = true;
         }
