@@ -4,12 +4,9 @@ import Data_storage.Vector2;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
-<<<<<<< HEAD
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-=======
 import com.jme3.math.*;
->>>>>>> 56026426440d410eeb77eb15eff6febfb65a386e
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -25,32 +22,16 @@ import com.jme3.water.SimpleWaterProcessor;
 
 public class Main extends Cam {
 
-<<<<<<< HEAD
     TerrainQuad terrainQuad;
     Terrain terrain;
     final float unitPixelSize = 0.5f;
-=======
-    float[] HeightMap;
-    float[] nextHeightMap;
-
-    TerrainQuad terrain;
-    Terrain generator;
->>>>>>> 56026426440d410eeb77eb15eff6febfb65a386e
 
     /**
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
-<<<<<<< HEAD
-        terrain = new Terrain("sin(x+y)", 0.1, 0.1, new Vector2(-10, -10), new Vector2(10, 10));
-        terrain.calculateHeightMap(512, 20.0);
-        //this.HeightMap = generator.getHeightMap(128, 128, 50);
-=======
-        generator = new Terrain("sin(x+y)", new Vector2(0,0), new Vector2(1024,1024), 0.1, 0.2, 1024, 1024, 20);
-
-        generator.calculateHeightMap(1024, 1024, 20);
-        this.HeightMap = this.generator.heightmap;
->>>>>>> 56026426440d410eeb77eb15eff6febfb65a386e
+        terrain = new Terrain("sin(x+y)",0.2, 0.1, new Vector2(0,0), new Vector2(1024,1024));
+        terrain.calculateHeightMap(1024, 20);
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,
@@ -58,8 +39,7 @@ public class Main extends Cam {
         Texture grass = assetManager.loadTexture("Terrain/grass.jpeg");
 
         mat1.setTexture("ColorMap",grass);
-        
-<<<<<<< HEAD
+
         this.terrainQuad = new TerrainQuad("Course", 65, 513, terrain.heightmap);
         float minDim = (float) Math.min(terrain.limitingCorner.x-terrain.startingCorner.x, terrain.limitingCorner.y-terrain.startingCorner.y);
         float xDim = (float) ((terrain.limitingCorner.x-terrain.startingCorner.x)/minDim);
@@ -71,21 +51,8 @@ public class Main extends Cam {
         terrainQuad.setLocalScale(new Vector3f(xDim, 1.0f, yDim));
         terrainQuad.getTerrainSize();
         terrainQuad.setMaterial(mat1);
-
-        /*for(int i=0;i<terrainQuad.getChildren().size();i++) {
-            for(int j=0;j<((TerrainQuad)terrainQuad.getChild(i)).getChildren().size();j++) {
-                for(int k=0;k<((TerrainQuad)((TerrainQuad)terrainQuad.getChild(i)).getChild(j)).getChildren().size();k++) {
-                    ((TerrainPatch)((TerrainQuad)((TerrainQuad)terrainQuad.getChild(i)).getChild(j)).getChild(k))
-                            .getMesh().scaleTextureCoordinates(new Vector2f(xDim,yDim));
-                }
-            }
-        }*/
-=======
-        this.terrain = new TerrainQuad("Course", 65, 1025, this.HeightMap);
-        terrain.setMaterial(mat1);
->>>>>>> 56026426440d410eeb77eb15eff6febfb65a386e
         
-        rootNode.attachChild(terrain);
+        rootNode.attachChild(terrainQuad);
     }
 
     public void newTerrain(){
@@ -142,7 +109,7 @@ public class Main extends Cam {
         this.x = x;
         this.y = y;
 
-        this.val = this.HeightMap[ ((Math.round(x) + Math.round(y)*10))];
+        this.val = this.terrain.heightmap[ ((Math.round(x) + Math.round(y)*10))];
 
         this.val = (float) funct.valueAt( this.x, this.y);
 
