@@ -4,19 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-<<<<<<< HEAD
-    <list default="true" id="06575b88-b907-4c35-bbae-157bf77177da" name="Changes" comment="Added target spawning">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/Rectangle.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/Rectangle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" afterDir="false" />
-=======
-    <list default="true" id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added Get method for ball">
+    <list default="true" id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added target spawning">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Main.java" afterDir="false" />
->>>>>>> 1145820bd280f9834c3de99562f40b283ee3d498
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,29 +20,6 @@
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
-  </component>
-<<<<<<< HEAD
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/assets/Sky" />
-    <property name="project.structure.last.edited" value="Libraries" />
-    <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.2" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/assets/Sky" />
-      <recent name="$PROJECT_DIR$/src/main/resources/Sky" />
-      <recent name="$PROJECT_DIR$/assets/Terrain" />
-      <recent name="$PROJECT_DIR$/src/main/resources/Ball" />
-    </key>
   </component>
   <component name="RunManager" selected="Application.Game">
     <configuration name="Game" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -66,9 +35,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-=======
-  <component name="RunManager">
->>>>>>> 1145820bd280f9834c3de99562f40b283ee3d498
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="Project-1.2" />
@@ -78,15 +44,8 @@
     </configuration>
     <recent_temporary>
       <list>
-<<<<<<< HEAD
         <item itemvalue="Application.Game" />
         <item itemvalue="Application.Main" />
-        <item itemvalue="Application.PhysicsEngine" />
-        <item itemvalue="Application.TerrainFunction1" />
-        <item itemvalue="Application.Print" />
-=======
-        <item itemvalue="Application.Main" />
->>>>>>> 1145820bd280f9834c3de99562f40b283ee3d498
       </list>
     </recent_temporary>
   </component>

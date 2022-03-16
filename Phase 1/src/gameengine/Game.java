@@ -60,7 +60,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         frame.setVisible(true);
         ball = new Ball(new Vector2(0, 0), new Vector2(3, -5));
         engine = new PhysicsEngine();
-        engine.terrain = terrainT;
+        engine.terrain = terrain;
         engine.addBall(ball);
     }
 
