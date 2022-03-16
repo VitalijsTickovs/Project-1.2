@@ -1,6 +1,9 @@
+import Data_storage.Target;
 import Data_storage.Terrain;
+import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
 import Reader.Reader;
+import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.math.*;
@@ -18,15 +21,14 @@ import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
 public class Main extends Cam {
-
+    private boolean inTarget;
     TerrainQuad terrainQuad;
     Terrain terrain;
     Geometry target;
     Geometry ball;
     float ballRadius = 1f;
-
     final float unitPixelSize = 0.5f;
-    String function = "sin(x) + sin(y)";
+    String function = "sin(x+y)";
     float totalSize = 1024;
     float xoff = 0;
     float yoff = 0;
@@ -42,7 +44,6 @@ public class Main extends Cam {
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
-
         this.xoff = (float) (this.ballStartx - this.totalSize/2);
         this.yoff = (float) (this.ballStarty - this.totalSize/2);
         terrain = new Terrain(function,0.2, 0.1, new Vector2(xoff,yoff), new Vector2(-xoff,-yoff));
@@ -57,11 +58,11 @@ public class Main extends Cam {
 
         //Setting terrain using heightmap
         this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
-        this.terrainQuad.setMaterial(mat1);
 
-        rootNode.attachChild(this.terrainQuad);
+        terrainQuad.setMaterial(mat1);
+        
+        rootNode.attachChild(terrainQuad);
     }
-
 
     /**
      * Creates golf ball, with textures
@@ -80,20 +81,14 @@ public class Main extends Cam {
         moveBall((float) this.ballStartx, (float) this.ballStarty);
     }
 
-
     public void InitTarget(){
-        Cylinder tar = new Cylinder(120, 120, (float) this.targetRadius, 0.1f, true);
+        Cylinder tar = new Cylinder(120, 120, 10, 0.1f, true);
         this.target = new Geometry("Target", tar);
-
-        Quaternion roll180 = new Quaternion();
-        roll180.fromAngleAxis(FastMath.PI/2, new Vector3f(1,0,0));
-        target.setLocalRotation(roll180);
-
+        //this.target.rotate(new Quaternion(0.26345053f, 0.6972198f, -0.5893796f, 0.31165418f));
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.White);
 
         this.target.setMaterial(mat);
-
         float val;
         val = (float) terrain.terrainFunction.valueAt(this.xoff + this.targetPos.x, this.yoff + this.targetPos.y);
         if(val > terrain.maxVal) val = terrain.maxVal;
@@ -103,6 +98,20 @@ public class Main extends Cam {
         this.target.setLocalTranslation((float) this.targetPos.x, 0, (float) this.targetPos.y);
 
         rootNode.attachChild(target);
+    }
+
+    /**
+     *checks if final ball position is within the target radius
+    */
+    public boolean isInTarget(Ball ball, Target t){
+
+        if (ball.state.position.x >= t.position.x - t.radius && ball.state.position.x <= t.position.x + t.radius && ball.state.position.y >= t.position.y - t.radius && ball.state.position.y <= t.position.y + t.radius){
+            inTarget = true;
+        }
+        else inTarget = false;
+
+        return inTarget;
+
     }
 
     public void findTangent(){
@@ -120,7 +129,7 @@ public class Main extends Cam {
         BallatY=getBallY();
         BallatZ=getBallZ();
 
-        Vector3f normal = this.terrainQuad.getNormal(new Vector2f(BallatX,BallatY));
+        Vector3f normal = this.terrainQuad.getNormal(new Vector2f(x,y));
 
         float XDifference=BallatX-normal.x;
         float YDifference=BallatY-normal.z;
@@ -194,7 +203,6 @@ public class Main extends Cam {
 
         viewPort.addProcessor(waterProcessor);
         Quad waveSize = new Quad(this.totalSize + 200,this.totalSize + 200);
-//        waveSize.scaleTextureCoordinates(new Vector2f(6f,6f));
 
         Geometry water=new Geometry("water", waveSize);
         water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
