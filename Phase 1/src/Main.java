@@ -1,12 +1,19 @@
-import Data_storage.TerrainFunction1;
 import Data_storage.Terrain;
+import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
+<<<<<<< HEAD
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+=======
+import com.jme3.math.*;
+>>>>>>> 56026426440d410eeb77eb15eff6febfb65a386e
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.terrain.geomipmap.TerrainPatch;
@@ -14,20 +21,36 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
+import com.jme3.water.SimpleWaterProcessor;
 
 public class Main extends Cam {
 
+<<<<<<< HEAD
     TerrainQuad terrainQuad;
     Terrain terrain;
     final float unitPixelSize = 0.5f;
+=======
+    float[] HeightMap;
+    float[] nextHeightMap;
+
+    TerrainQuad terrain;
+    Terrain generator;
+>>>>>>> 56026426440d410eeb77eb15eff6febfb65a386e
 
     /**
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
+<<<<<<< HEAD
         terrain = new Terrain("sin(x+y)", 0.1, 0.1, new Vector2(-10, -10), new Vector2(10, 10));
         terrain.calculateHeightMap(512, 20.0);
         //this.HeightMap = generator.getHeightMap(128, 128, 50);
+=======
+        generator = new Terrain("sin(x+y)", new Vector2(0,0), new Vector2(1024,1024), 0.1, 0.2, 1024, 1024, 20);
+
+        generator.calculateHeightMap(1024, 1024, 20);
+        this.HeightMap = this.generator.heightmap;
+>>>>>>> 56026426440d410eeb77eb15eff6febfb65a386e
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,
@@ -36,6 +59,7 @@ public class Main extends Cam {
 
         mat1.setTexture("ColorMap",grass);
         
+<<<<<<< HEAD
         this.terrainQuad = new TerrainQuad("Course", 65, 513, terrain.heightmap);
         float minDim = (float) Math.min(terrain.limitingCorner.x-terrain.startingCorner.x, terrain.limitingCorner.y-terrain.startingCorner.y);
         float xDim = (float) ((terrain.limitingCorner.x-terrain.startingCorner.x)/minDim);
@@ -56,8 +80,17 @@ public class Main extends Cam {
                 }
             }
         }*/
+=======
+        this.terrain = new TerrainQuad("Course", 65, 1025, this.HeightMap);
+        terrain.setMaterial(mat1);
+>>>>>>> 56026426440d410eeb77eb15eff6febfb65a386e
         
-        rootNode.attachChild(terrainQuad);
+        rootNode.attachChild(terrain);
+    }
+
+    public void newTerrain(){
+        if(this.x > 50 || this.y > 50){
+        }
     }
 
 
@@ -87,16 +120,31 @@ public class Main extends Cam {
         rootNode.attachChild(this.ball);
     }
 
+    Geometry target;
+    public void InitTarget(){
+        Cylinder tar = new Cylinder(120, 120, 10, 2, true);
+        this.target = new Geometry("Target", tar);
+        this.target.rotate(48,0,0);
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", ColorRGBA.White);
+
+        this.target.setMaterial(mat);
+        this.target.move(0, 20, 0);
+
+        rootNode.attachChild(target);
+    }
+
     /**
      * Moves ball according to x & y coordinates
      */
+    TerrainFunction1 funct = new TerrainFunction1("sin(x+y)");
     public void moveBall(float x, float y){
         this.x = x;
         this.y = y;
 
-        this.val = terrain.heightmap[ ((Math.round(x) + Math.round(y)*10))];
+        this.val = this.HeightMap[ ((Math.round(x) + Math.round(y)*10))];
 
-        this.val = (float) terrain.terrainFunction.valueAt( this.x, this.y);
+        this.val = (float) funct.valueAt( this.x, this.y);
 
         // Ensure min is 0
         val += Math.abs(-10);
@@ -109,7 +157,7 @@ public class Main extends Cam {
         if (val < 0) {
             val = 0;
         }
-        val*=50;
+        val*=20;
 
         ball.move(this.x, this.val+1, this.y);
 
@@ -119,25 +167,48 @@ public class Main extends Cam {
         getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.SphereMap));
     }
 
-    //Reader reader = new Reader();
+    SimpleWaterProcessor waterProcessor;
+    Spatial waterPlane;
+    Node sceneNode;
+    public void InitWater(){
+        waterProcessor = new SimpleWaterProcessor(assetManager);
+        waterProcessor.setReflectionScene(sceneNode);
+        waterProcessor.setDebug(true);
+        viewPort.addProcessor(waterProcessor);
+
+        waterProcessor.setLightPosition(new Vector3f(0, 0, 0));
+
+        //create water quad
+        waterPlane = waterProcessor.createWaterGeometry(100, 100);
+        waterPlane=  assetManager.loadModel("assets/WaterTest.mesh.xml");
+        waterPlane.setMaterial(waterProcessor.getMaterial());
+        waterPlane.setLocalScale(40);
+        waterPlane.setLocalTranslation(-5, 0, 5);
+
+        rootNode.attachChild(waterPlane);
+    }
+
+    Reader reader = new Reader();
     @Override
     public void simpleInitApp() {
         //builds terrain based on function given
         initTerrain();
         //generates a ball into the world
         InitBall();
+        InitTarget();
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
         InitCam(chaseCam);
+        //flyCam.setMoveSpeed(100);
         //setting sky background to Sky.jpg
         InitSky();
 
         //reading from input file and assigning ball x and y positions
-        //Reader.main();
-        float x = 0;//Float.parseFloat(String.valueOf(reader.getBallX()));
-        float y = 0;//Float.parseFloat(String.valueOf(reader.getBallY()));
+        float x = Float.parseFloat(String.valueOf(reader.getBallX()));
+        float y = Float.parseFloat(String.valueOf(reader.getBallY()));
         //moving the ball according to input file
-        moveBall(x,y);
+        //moveBall(x,y);
+        moveBall(0,0);
     }
 
 

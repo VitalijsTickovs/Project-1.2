@@ -8,8 +8,8 @@ public class Terrain {
     public float[] heightmap;
 
     //All of the data below should be included, when Terrain is created
-    public Zone zones[];
-    public IObstacle[] obstacles;
+    public Zone zones[] = new Zone[0];
+    public IObstacle[] obstacles = new IObstacle[0];
     public Target target;
     public Vector2 ballStartingPosition;
     
@@ -21,6 +21,7 @@ public class Terrain {
     public double kineticFriction;
 
     public TerrainFunction terrainFunction;
+    public double scaleFactor;
 
     public int xRes, yRes;
 

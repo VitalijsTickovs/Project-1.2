@@ -27,14 +27,16 @@ public class Vector2 {
         return Math.sqrt((x * x) + (y * y));
     }
 
-    public void translate(Vector2 vector) {
+    public Vector2 translate(Vector2 vector) {
         x += vector.x;
         y += vector.y;
+        return new Vector2(x,y);
     }
-
-    public void translate(double deltaX, double deltaY) {
+    
+    public Vector2 translate(double deltaX, double deltaY) {
         x += deltaX;
         y += deltaY;
+        return new Vector2(x,y);
     }
 
     public Vector2 getOppositeVector() {
