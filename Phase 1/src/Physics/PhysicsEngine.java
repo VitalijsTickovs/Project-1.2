@@ -40,10 +40,10 @@ public class PhysicsEngine {
 
     private Vector2 countNewPosition(BallState state) {
         Vector2 newPosition = state.position.copy();
-        double xVeolcity = state.velocity.x;
+        double xVelocity = state.velocity.x;
         double yVelocity = state.velocity.y;
 
-        newPosition.translate(new Vector2(h * xVeolcity, h * yVelocity));
+        newPosition.translate(new Vector2(h * xVelocity, h * yVelocity));
         if (isTouchingAnObstacle(newPosition)) {
             state.velocity = Vector2.zeroVector;
             return state.position;
@@ -65,16 +65,21 @@ public class PhysicsEngine {
         Vector2 ballPosition = ball.state.position;
         double xSlope = getXSlopeAt(ballPosition.x, ballPosition.y);
         double ySlope = getYSlopeAt(ballPosition.x, ballPosition.y);
-        Vector2 slope = new Vector2(xSlope, ySlope);
-        double xAcceleration;
-        double yAcceleration;
 
-        double velocity = ball.state.velocity.length();
-        boolean ballInMotion = velocity > 0.1;
+        double xAcceleration = 0, yAcceleration = 0;
+
+        boolean ballInMotion = newVelocity.length() > 0.01;
+
+        // Set velocity to max speed if too big
+        if (newVelocity.length() > Ball.maxSpeed) {
+            newVelocity = newVelocity.normalized().scale(Ball.maxSpeed);
+        }
+
+        Vector2 slope = new Vector2(xSlope, ySlope);
+
         if (ballInMotion) {
-            double kineticFriction = getKineticFrictionAtPosition(ball.state.position);
-            xAcceleration = xAcceleration(ball, slope, ball.state.velocity, kineticFriction);
-            yAcceleration = yAcceleration(ball, slope, ball.state.velocity, kineticFriction);
+            xAcceleration = xAcceleration(ball, slope, ball.state.velocity);
+            yAcceleration = yAcceleration(ball, slope, ball.state.velocity);
         } else {
             // Stop the ball first
             newVelocity = Vector2.zeroVector;
@@ -83,14 +88,22 @@ public class PhysicsEngine {
             boolean staticFrictionLessThanDownwardForce = staticFriction < slope.length();
 
             if (staticFrictionLessThanDownwardForce) {
-                xAcceleration = xAcceleration(ball, slope, slope, staticFriction);
-                yAcceleration = yAcceleration(ball, slope, slope, staticFriction);
+                xAcceleration = xAcceleration(ball, slope, slope);
+                yAcceleration = yAcceleration(ball, slope, slope);
             } else {
                 xAcceleration = 0;
                 yAcceleration = 0;
             }
         }
-        return newVelocity.translate(new Vector2(h * xAcceleration, h * yAcceleration));
+
+        newVelocity.translate(new Vector2(h * xAcceleration, h * yAcceleration));
+
+        // Set velocity to max speed if too big
+        if (newVelocity.length() > Ball.maxSpeed) {
+            newVelocity = newVelocity.normalized().scale(Ball.maxSpeed);
+        }
+
+        return newVelocity;
     }
 
     private double getXSlopeAt(double x, double y) {
@@ -131,17 +144,35 @@ public class PhysicsEngine {
         return maxFriction;
     }
 
-    private double xAcceleration(Ball ball, Vector2 slope, Vector2 speed, double friction) {
-        double downHillForce = -G * slope.x;
-        double frictionForce = G * friction;
-        frictionForce *= speed.x / speed.length();
-        return (downHillForce - frictionForce) / ball.mass;
+    private double xAcceleration(Ball ball, Vector2 slope, Vector2 speed) {
+        double downHillForce = -G * slope.x; // /(1 + slope.x*slope.x + slope.y*slope.y);
+        double frictionForce = G * terrain.kineticFriction * speed.x / speed.length();
+        //frictionForce /= Math.sqrt(1 + slope.x*slope.x + slope.y*slope.y);
+        //double expr = slope.x*speed.x + slope.y*speed.y;
+        //frictionForce /= Math.sqrt(speed.x*speed.x + speed.y*speed.y + expr*expr);
+
+
+        return (downHillForce - frictionForce);
     }
 
-    private double yAcceleration(Ball ball, Vector2 slope, Vector2 speed, double friction) {
-        double downHillForce = -G * slope.y;
-        double frictionForce = G * friction;
-        frictionForce *= speed.y / speed.length();
-        return (downHillForce - frictionForce) / ball.mass;
+    private double yAcceleration(Ball ball, Vector2 slope, Vector2 speed) {
+        double downHillForce = -G * slope.y; // /(1 + slope.x*slope.x + slope.y*slope.y);
+        double frictionForce = G * terrain.kineticFriction * speed.y / speed.length();
+        //frictionForce /= Math.sqrt(1 + slope.x*slope.x + slope.y*slope.y);
+        //double expr = slope.x*speed.x + slope.y*speed.y;
+        //frictionForce /= Math.sqrt(speed.x*speed.x + speed.y*speed.y + expr*expr);
+        return (downHillForce - frictionForce);
+    }
+
+    public static void main(String[] args) {
+        PhysicsEngine e = new PhysicsEngine();
+        e.terrain = new Terrain("e**(-(x**2 + y**2)/40)", 0.2, 0.1, new Vector2(-10, -10), new Vector2(10, 10));
+        System.out.println(e.terrain.terrainFunction);
+        Ball ball = new Ball(new Vector2(-1, -0.5), new Vector2(3, 0));
+        e.addBall(ball);
+        e.fixedUpdate();
+
+        System.out.println("Position: (x="+ball.state.position.x+", y="+ball.state.position.y+")");
+        System.out.println("Velocity: (v(x)="+ball.state.velocity.x+", v(y)="+ball.state.velocity.y+")");
     }
 }

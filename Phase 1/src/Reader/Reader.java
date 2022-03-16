@@ -307,7 +307,8 @@ public class Reader {
       } else {
          terrain.terrainFunction = new TerrainFunction1(terrainFunction);
       }
-      terrain.calculateHeightMap(xDim, yDim, 1.0);
+      //terrain.calculateHeightMap(xDim, yDim, 1.0);
+      //terrain.calculateHeightMap(xDim, yDim, 1.0);
    }
 
    private static void defineTarget() {

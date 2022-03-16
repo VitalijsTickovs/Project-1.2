@@ -1,13 +1,19 @@
 package Physics;
 
 import Data_storage.*;
+import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetManager;
+import com.jme3.material.Material;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Mesh;
+import com.jme3.texture.Texture;
 import com.jme3.util.BufferUtils;
 
 import java.util.Vector;
 
 import com.jme3.scene.VertexBuffer.Type;
 
-public class MeshGenerator {
+public class MeshGenerator extends SimpleApplication {
 
     public static Vector3[][] generateVertices(Terrain terrain, double resolution) {
         double xSpan = terrain.limitingCorner.x - terrain.startingCorner.x;
@@ -86,12 +92,12 @@ public class MeshGenerator {
     private static Vector3f[] translateTojMonke(Vector3[] vectorArr) {
         Vector3f[] vertices = new Vector3f[vectorArr.length];
         for (int i = 0; i < vectorArr.length; i++) {
-            vertices[i] = new Vector3f(vectorArr[i].x, vectorArr[i].y, vectorArr[i].z);
+            vertices[i] = new Vector3f((float)vectorArr[i].x,(float) vectorArr[i].y, (float)vectorArr[i].z);
         }
+        return vertices;
     }
 
-    public static void main(String[] args) {
-        TerrainFunction t = new TerrainFunction1("x + y + 1");
+    public static Mesh createTerrainMesh(TerrainFunction1 t) {
         Terrain terrain = new Terrain();
         terrain.terrainFunction = t;
         terrain.startingCorner = new Vector2(0, 0);
@@ -101,14 +107,22 @@ public class MeshGenerator {
 
         int[] triangles = generateTriangles(vertices);
         Vector3[] vectorArr = make2DVectorArray(vertices);
-        Print.printSquare(triangles);
+     //   Print.printSquare(triangles);
 
         // Translate into jMonkey vectors
         Vector3f[] translatedVectors = translateTojMonke(vectorArr);
 
-        Mesh mesh = new Mesh();
+       Mesh mesh = new Mesh();
         mesh.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(translatedVectors));
         mesh.setBuffer(Type.Index, 3, BufferUtils.createIntBuffer(triangles));
+
         mesh.updateBound();
+
+        return  mesh;
+    }
+
+    @Override
+    public void simpleInitApp() {
+
     }
 }

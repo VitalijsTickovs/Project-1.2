@@ -35,6 +35,7 @@ public class TerrainFunction1 extends TerrainFunction {
         return f.evaluate(new String[] { "x", "y" }, new double[] { x, y });
     }
 
+
     @Override
     public double xDerivativeAt(double x, double y) {
         /*
@@ -59,6 +60,8 @@ public class TerrainFunction1 extends TerrainFunction {
 
     @Override
     public String toString() {
-        return f.toString();
+        return "h(x,y) = " + f.toString() + "\n" +
+                "dh/dx = " + dfx.toString() + "\n" +
+                "dh/dy = " + dfy.toString();
     }
 }
