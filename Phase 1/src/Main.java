@@ -2,14 +2,13 @@ import Data_storage.Terrain;
 import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
 import Reader.Reader;
-import com.jme3.light.Light;
+import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.math.*;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
@@ -26,6 +25,7 @@ public class Main extends Cam {
     Terrain terrain;
     final float unitPixelSize = 0.5f;
     String function = "sin(x+y)";
+    float xSize, ySize;
 
     /**
      * Initializes area terrain based on the function given in input file
@@ -34,24 +34,18 @@ public class Main extends Cam {
         terrain = new Terrain(function,0.2, 0.1, new Vector2(0,0), new Vector2(1024,1024));
         terrain.calculateHeightMap(1024, 20);
 
+        this.xSize = 1024;
+        this.ySize = 1024;
+
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
         Texture grass = assetManager.loadTexture("Terrain/grass.jpeg");
-
-        float[] height = new float[1024];
-        for(int i=0; i< height.length; i++){
-            if(i<height.length/2){
-                height[i]= -5f;
-            }else{
-                height[i] = 5f;
-            }
-        }
 
         //Adding grass texture to terrain
         mat1.setTexture("ColorMap",grass);
 
         //Setting terrain using heightmap
-        this.terrainQuad = new TerrainQuad("Course", 65, 1025, height);
+        this.terrainQuad = new TerrainQuad("Course", 65, 513, terrain.heightmap);
         float minDim = (float) Math.min(terrain.limitingCorner.x-terrain.startingCorner.x, terrain.limitingCorner.y-terrain.startingCorner.y);
         float xDim = (float) ((terrain.limitingCorner.x-terrain.startingCorner.x)/minDim);
         float yDim = (float) ((terrain.limitingCorner.y-terrain.startingCorner.y)/minDim);
@@ -68,7 +62,6 @@ public class Main extends Cam {
 
 
     protected Geometry ball;
-    float x, y, val;
 
     /**
      * Creates golf ball, with textures
@@ -105,28 +98,12 @@ public class Main extends Cam {
      */
     TerrainFunction1 funct = new TerrainFunction1(function);
     public void moveBall(float x, float y){
-        this.x = x;
-        this.y = y;
+        //Getting height value corresponding to x and y values
+        float val = this.terrain.heightmap[ ((Math.round(x)*10 + Math.round(y)))];
 
-        this.val = this.terrain.heightmap[ ((Math.round(x) + Math.round(y)*10))];
-
-        this.val = (float) funct.valueAt( this.x, this.y);
-
-        // Ensure min is 0
-        val += Math.abs(-10);
-        // Normalize values
-        val /= 10-(-10);
-        // Clamp out of range
-        if (val > 1) {
-            val = 1;
-        }
-        if (val < 0) {
-            val = 0;
-        }
-        val*=20;
-
-        ball.move(this.x, this.val+1, this.y);
-
+        //Moving the ball object to specified position
+        //ball.move(x, val, y);
+        ball.setLocalTranslation(x,val+1,y);
     }
 
     public void InitSky(){
@@ -141,11 +118,11 @@ public class Main extends Cam {
         waterProcessor.setLightPosition(new Vector3f(0.55f, -0.82f, 0.15f));
         waterProcessor.setReflectionScene(mainScene);
 
-        Vector3f waterLocation=new Vector3f(0,-5,0);
+        Vector3f waterLocation=new Vector3f(0,0,0);
         waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
 
         viewPort.addProcessor(waterProcessor);
-        Quad waveSize = new Quad(1024,1024);
+        Quad waveSize = new Quad(this.xSize +200,this.ySize +200);
         waveSize.scaleTextureCoordinates(new Vector2f(6f,6f));
 
         Geometry water=new Geometry("water", waveSize);
@@ -156,7 +133,6 @@ public class Main extends Cam {
         rootNode.attachChild(water);
     }
 
-
     Reader reader = new Reader();
     @Override
     public void simpleInitApp() {
@@ -164,11 +140,11 @@ public class Main extends Cam {
         initTerrain();
         //generates a ball into the world
         InitBall();
-        InitTarget();
+        //InitTarget();
         //creating and attaching camera to ball
-        //ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
-        //InitCam(chaseCam);
-        flyCam.setMoveSpeed(100);
+        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
+        InitCam(chaseCam);
+        //flyCam.setMoveSpeed(100);
 
         //setting sky background to Sky.jpg
         InitSky();
@@ -178,12 +154,14 @@ public class Main extends Cam {
         float x = Float.parseFloat(String.valueOf(reader.getBallX()));
         float y = Float.parseFloat(String.valueOf(reader.getBallY()));
         //moving the ball according to input file
-        //moveBall(x,y);
     }
 
 
+    float movex = 0;
     @Override
     public void simpleUpdate(float tpf) {
+        moveBall(movex, 0);
+        movex+=1;
     }
 
     public static void main(String[] args){
