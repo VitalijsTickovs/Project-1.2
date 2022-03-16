@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import Data_storage.*;
 import Data_storage.Rectangle;
 import Physics.PhysicsEngine;
+import Reader.*;
 
 public class Game extends Canvas implements Runnable, GameObject {
     private final int FPS;
@@ -29,6 +30,9 @@ public class Game extends Canvas implements Runnable, GameObject {
      * @param fps The wanted FPS (frames per second) of the game
      */
     public Game(int fps) {
+        // Your path to GitHub here
+        String csvFile = "C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv";
+        Terrain terrainT = Reader.readFile(csvFile);
         this.FPS = fps;
         this.running = false;
 
@@ -56,7 +60,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         frame.setVisible(true);
         ball = new Ball(new Vector2(0, 0), new Vector2(3, -5));
         engine = new PhysicsEngine();
-        engine.terrain = terrain;
+        engine.terrain = terrainT;
         engine.addBall(ball);
     }
 

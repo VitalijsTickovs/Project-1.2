@@ -1,10 +1,10 @@
-terrainX0 = -1;
-terrainY0 = -1;
-terrainX1 = 4;
-terrainY1 = 4;
-greenKineticFriction = 0.1;
-greenStaticFriction = 0.2;
-terrainFunction = sin(x+y)
+terrainX0 = -50;
+terrainY0 = -50;
+terrainX1 = 50;
+terrainY1 = 50;
+greenKineticFriction = 0.01;
+greenStaticFriction = 0.05;
+terrainFunction = sin(x) + sin(y);
 
 ballStartPointX = 0.1;
 ballStartPointY = 0.1;

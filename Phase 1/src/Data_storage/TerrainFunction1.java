@@ -35,6 +35,7 @@ public class TerrainFunction1 extends TerrainFunction {
         return f.evaluate(new String[] { "x", "y" }, new double[] { x, y });
     }
 
+
     @Override
     public double xDerivativeAt(double x, double y) {
         /*
