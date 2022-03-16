@@ -15,7 +15,7 @@ import com.jme3.scene.VertexBuffer.Type;
 
 public class MeshGenerator extends SimpleApplication {
 
-    public static Vector3[][] generateVertices(Terrain terrain, double resolution) {
+    private static Vector3[][] generateVertices(Terrain terrain, double resolution) {
         double xSpan = terrain.limitingCorner.x - terrain.startingCorner.x;
         double ySpan = terrain.limitingCorner.y - terrain.startingCorner.y;
         int xRepetitions = (int) (xSpan / resolution) + 1;
@@ -33,7 +33,7 @@ public class MeshGenerator extends SimpleApplication {
         return vertices;
     }
 
-    public static int[] generateTriangles(Vector3[][] vertices) {
+    private static int[] generateTriangles(Vector3[][] vertices) {
         int xRepetitions = vertices[0].length - 1;
         int yRepetitions = vertices.length - 1;
         int triangleCount = (xRepetitions) * (yRepetitions) * 2;

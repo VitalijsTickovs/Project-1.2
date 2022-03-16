@@ -1,13 +1,13 @@
-import Data_storage.Terrain;
-import Data_storage.TerrainFunction1;
-import Data_storage.Vector2;
-import Reader.Reader;
+import Data_storage.*;
+import Physics.MeshGenerator;
+import Reader.*;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.math.*;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Quad;
@@ -188,6 +188,7 @@ public class Main extends Cam {
     }
 
     public void InitSky(String path){
+
         mainScene.attachChild(SkyFactory.createSky(getAssetManager(), path, SkyFactory.EnvMapType.SphereMap));
         rootNode.attachChild(mainScene);
     }
@@ -223,13 +224,13 @@ public class Main extends Cam {
         InitBall();
         //InitTarget();
         //creating and attaching camera to ball
-        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
-        InitCam(chaseCam);
-        //flyCam.setMoveSpeed(100);
-
+        //ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
+        //InitCam(chaseCam);
+        flyCam.setMoveSpeed(10);
+        initMesh();
         //setting sky background to Sky.jpg
-        InitSky("Sky/Skysphere.jpeg");
-        //InitWater();
+        //InitSky("C:\\Users\\staso\\Documents\\GitHub\\Project-1.2\\assets\\Sky\\Skysphere.jpeg");
+        InitWater();
 
         // reading from input file and assigning ball x and y positions
         float x = Float.parseFloat(String.valueOf(reader.getBallX()));
@@ -237,12 +238,34 @@ public class Main extends Cam {
         //moving the ball according to input file
     }
 
+    public void initMesh(){
+        Mesh mesh = MeshGenerator.createTerrainMesh(new TerrainFunction1("sin(x+y"));
+        Geometry cube1Geo = new Geometry("Box", mesh);
+        cube1Geo.setMaterial(createTerrainMaterial());
+
+        rotateMesh(new Vector3f(1,0,2),cube1Geo);
+        rootNode.attachChild(cube1Geo);
+    }
+
+    private Material createTerrainMaterial(){
+        Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
+        Texture sphereTex = assetManager.loadTexture("Terrain/grass.jpeg");
+        mat.setColor("Color", ColorRGBA.White);
+        mat.setTexture("ColorMap", sphereTex);
+        return  mat;
+    }
+
+    private void rotateMesh(Vector3f rotation, Geometry geometry){
+        Quaternion roll180 = new Quaternion();
+        roll180.fromAngleAxis(FastMath.PI/2, new Vector3f(rotation.x,rotation.x,rotation.z));
+        geometry.setLocalRotation(roll180);
+    }
 
     float movex = 0;
     @Override
     public void simpleUpdate(float tpf) {
-        moveBall(movex,movex);
-        movex+=0.1f;
+//        moveBall(movex,movex);
+//        movex+=0.1f;
     }
 
     public static void main(String[] args) {
