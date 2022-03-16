@@ -10,8 +10,8 @@ public class TerrainFunction1 extends TerrainFunction {
      */
 
     private function.Function f;
-    private function.Function dfx;
-    private function.Function dfy;
+    public function.Function dfx;
+    public function.Function dfy;
 
     public TerrainFunction1(String function) {
         /*

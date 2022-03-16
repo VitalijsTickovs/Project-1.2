@@ -19,7 +19,7 @@ public class Cam extends SimpleApplication{
         chaseCam.setDefaultDistance(40f);       // default distance to the target (ball)
         chaseCam.setChasingSensitivity(5f);     // the lower the sensitivity the slower the camera will follow the target when it moves
         chaseCam.setRotationSensitivity(5f);
-        chaseCam.setMaxDistance(50f);
+        chaseCam.setMaxDistance(100f);
         chaseCam.setMinDistance(30f);
         //chaseCam.setDefaultVerticalRotation(-FastMath.PI/2);
         //chaseCam.setDefaultHorizontalRotation(-FastMath.PI/2);
