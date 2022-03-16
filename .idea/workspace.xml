@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06575b88-b907-4c35-bbae-157bf77177da" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Phase 1/src/Physics/MeshGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations.xml" beforeDir="false" />
+    <list default="true" id="06575b88-b907-4c35-bbae-157bf77177da" name="Changes" comment="Added new Sky">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Main.java" afterDir="false" />
     </list>
@@ -18,10 +16,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="26NIdRX8Q2XVz7jxi1PlBW1Yaeu" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -31,14 +37,17 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/assets/Sky" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\leahi\IdeaProjects\Project-1.2v2\Phase 1\src\Physics" />
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets/Sky" />
+      <recent name="$PROJECT_DIR$/src/main/resources/Sky" />
+      <recent name="$PROJECT_DIR$/assets/Terrain" />
+      <recent name="$PROJECT_DIR$/src/main/resources/Ball" />
     </key>
   </component>
   <component name="RunManager" selected="Application.Main">
@@ -119,8 +128,32 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1647257705984</updated>
-      <workItem from="1647428520650" duration="6077000" />
+      <workItem from="1647359433945" duration="1021000" />
+      <workItem from="1647422346387" duration="4236000" />
+      <workItem from="1647427069608" duration="4140000" />
     </task>
+    <task id="LOCAL-00001" summary="Added target spawning">
+      <created>1647357713481</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1647357713481</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Added target spawning">
+      <created>1647359572864</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1647359572864</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added new Sky">
+      <created>1647428675249</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1647428675249</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -136,5 +169,11 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Added target spawning" />
+    <MESSAGE value="Added new Sky" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added new Sky" />
   </component>
 </project>
