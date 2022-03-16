@@ -10,4 +10,12 @@ public class Target {
         System.out.print("Radius: ");
         System.out.println(radius);
     }
+    
+    public void setPosition(Vector2 position){
+        this.position = position;
+    }
+    
+    public void setRadius(double radius){
+        this.radius = radius;
+    }
 }
