@@ -94,18 +94,18 @@ public class Reader {
    // endregion
 
    public static void main() {
-      String csvFile = "C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv";
-      Terrain terrain = Reader.readFile(csvFile);
+      String fileName = "UserInput";
+      Terrain terrain = Reader.readFile(fileName);
       terrain.print();
    }
 
-   public static Terrain readFile(String csvFile) {
+   public static Terrain readFile(String fileName) {
 
-      if (!createBufferedReader(csvFile)) {
+      if (!createScanner(fileName)) {
          return null;
       }
 
-      String[] allLinesSplit = splitLines(csvFile);
+      String[] allLinesSplit = splitLines();
       readVariables(allLinesSplit);
 
       return saveDataIntoObject();
@@ -114,29 +114,25 @@ public class Reader {
    /**
     * Tries to create a buffered reader
     * 
-    * @param csvFile
+    * @param name
     * @return true, if the reader has been successfully created
     */
-   private static boolean createBufferedReader(String csvFile) {
+   private static boolean createScanner(String name) {
       try {
-         File file = new File(csvFile);
-         FileReader fr = new FileReader(file);
-         scanner = new Scanner(fr);
+         scanner = new Scanner(new FileReader(name));
          return true;
 
       } catch (FileNotFoundException e) {
          System.out.println("File not found");
-         e.printStackTrace();
          return false;
 
       } catch (NullPointerException e) {
          System.out.println("File was null");
-         e.printStackTrace();
          return false;
       }
    }
 
-   private static String[] splitLines(String csvFile) {
+   private static String[] splitLines() {
       String wholeLine = "";
       while (scanner.hasNextLine()) {
          wholeLine += scanner.nextLine();
@@ -233,15 +229,12 @@ public class Reader {
          }
       } catch (NullPointerException e) {
          System.out.println("String after = was null");
-         e.printStackTrace();
          return 0;
       } catch (NumberFormatException e) {
          System.out.println("String after = was not parsable into a double");
-         e.printStackTrace();
          return 0;
       } catch (IndexOutOfBoundsException e) {
          System.out.println("There was nothing after the = sign");
-         e.printStackTrace();
          return 0;
       }
    }
@@ -251,7 +244,6 @@ public class Reader {
          return (line.substring(line.lastIndexOf("=") + 1));
       } catch (IndexOutOfBoundsException e) {
          System.out.println("There was nothing after the = sign");
-         e.printStackTrace();
          return null;
       }
    }
@@ -267,11 +259,9 @@ public class Reader {
 
       } catch (IndexOutOfBoundsException e) {
          System.out.println("There was nothing after the = sign");
-         e.printStackTrace();
          return null;
       } catch (Exception e) {
          System.out.println("Pattern syntax was invalid");
-         e.printStackTrace();
          return null;
       }
    }

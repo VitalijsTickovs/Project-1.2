@@ -21,22 +21,20 @@ public class Terrain {
     public double kineticFriction;
 
     public TerrainFunction terrainFunction;
-    public double scaleFactor;
+    public double scaleFactor = 1;
 
-    public int xRes, yRes;
+    public int xRes = 500;
+    public int yRes = 500;
 
     public Terrain(){
-
     }
 
-    public Terrain(String function, Vector2 startingCorner, Vector2 limitingCorner, double staticFriction, double kineticFriction, int xRes, int yRes, double normalFactor) {
+    public Terrain(String function, Vector2 startingCorner, Vector2 limitingCorner, double staticFriction, double kineticFriction, double normalFactor) {
         this.terrainFunction = new TerrainFunction1(function);
         this.startingCorner = startingCorner;
         this.limitingCorner = limitingCorner;
         this.staticFriction = staticFriction;
         this.kineticFriction = kineticFriction;
-        this.xRes = xRes;
-        this.yRes = yRes;
         scaleFactor = normalFactor;
         calculateHeightMap(this.xRes, this.yRes, normalFactor);
     }

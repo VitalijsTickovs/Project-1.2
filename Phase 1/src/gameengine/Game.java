@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.image.*;
 import Data_storage.*;
 import Physics.PhysicsEngine;
+import Reader.*;
 
 public class Game extends Canvas implements Runnable, GameObject {
     private final int FPS;
@@ -26,6 +27,9 @@ public class Game extends Canvas implements Runnable, GameObject {
      * @param fps The wanted FPS (frames per second) of the game
      */
     public Game(int fps) {
+        // Your path to GitHub here
+        String csvFile = "C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv";
+        Terrain terrainT = Reader.readFile(csvFile);
         this.FPS = fps;
         this.running = false;
         xDim = 500;
@@ -34,22 +38,25 @@ public class Game extends Canvas implements Runnable, GameObject {
         yTop = -50;
         xBottom = 50;
         yBottom = 50;
-        unitSizePixelsX = (double)(xDim*scale)/(xBottom - xTop);
-        unitSizePixelsY = (double)(yDim*scale)/(yBottom - yTop);
-        terrainImage = new BufferedImage(xDim*scale, xDim*scale, BufferedImage.TYPE_4BYTE_ABGR);
-        terrain = new Terrain("sin((x+y)/7)", new Vector2(xTop, yTop), new Vector2(xBottom, yBottom), 0.15, 0.07, xDim, yDim, 1);
-        System.out.println(terrain.terrainFunction);
+        unitSizePixelsX = (double) (xDim * scale) / (xBottom - xTop);
+        unitSizePixelsY = (double) (yDim * scale) / (yBottom - yTop);
+        terrainImage = new BufferedImage(xDim * scale, xDim * scale, BufferedImage.TYPE_4BYTE_ABGR);
+        terrain = new Terrain("sin(x) + sin(y)", new Vector2(xTop, yTop), new Vector2(xBottom, yBottom), 0.3, 0.15, 1);
+        terrainT.xRes = xDim;
+        terrainT.yRes = yDim;
+
+        System.out.println(terrainT.terrainFunction);
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(xDim*scale, yDim*scale);
+        frame.setSize(xDim * scale, yDim * scale);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.add(this);
         frame.setVisible(true);
 
-        ball = new Ball(new Vector2(0, 0), new Vector2(3, -5));
+        ball = new Ball(terrainT.ballStartingPosition, new Vector2(4, 2));
         engine = new PhysicsEngine();
-        engine.terrain = terrain;
+        engine.terrain = terrainT;
         engine.addBall(ball);
     }
 
@@ -71,7 +78,7 @@ public class Game extends Canvas implements Runnable, GameObject {
             while (numUpdates >= 1) {
                 update();
                 render();
-                //gui.renderBall();
+                // gui.renderBall();
                 last += nanosPerFrame;
                 numUpdates--;
             }
@@ -79,17 +86,17 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     public void fillTerrain(Graphics2D g2) {
-        for (int i=0; i<terrain.heightmap.length-xDim; i++) {
-            if ((i+1)%xDim == 0) {
+        for (int i = 0; i < terrain.heightmap.length - xDim; i++) {
+            if ((i + 1) % xDim == 0) {
                 // Go next
             } else {
-                int x1 = i/xDim;
-                int y1 = i%yDim;
+                int x1 = i / xDim;
+                int y1 = i % yDim;
 
                 float val1 = terrain.heightmap[i];
-                float val2 = terrain.heightmap[i+1];
-                float val3 = terrain.heightmap[i+xDim];
-                float val4 = terrain.heightmap[i+1+xDim];
+                float val2 = terrain.heightmap[i + 1];
+                float val3 = terrain.heightmap[i + xDim];
+                float val4 = terrain.heightmap[i + 1 + xDim];
 
                 float val = Math.max(val1, val2);
                 val = Math.max(val, val3);
@@ -100,7 +107,7 @@ public class Game extends Canvas implements Runnable, GameObject {
                 } else {
                     g2.setColor(new Color(0, 0, val));
                 }
-                g2.fillRect(scale*x1, scale*y1, scale, scale);
+                g2.fillRect(scale * x1, scale * y1, scale, scale);
             }
         }
     }
@@ -129,8 +136,8 @@ public class Game extends Canvas implements Runnable, GameObject {
 
         // Render ball
 
-        int xx = (int) ((ball.state.position.x - xTop)*unitSizePixelsX);
-        int yy = (int) ((ball.state.position.y - yTop)*unitSizePixelsY);
+        int xx = (int) ((ball.state.position.x - xTop) * unitSizePixelsX);
+        int yy = (int) ((ball.state.position.y - yTop) * unitSizePixelsY);
         g2.setColor(Color.WHITE);
         g2.fillArc(xx, yy, (int) unitSizePixelsX, (int) unitSizePixelsY, 0, 360);
 
