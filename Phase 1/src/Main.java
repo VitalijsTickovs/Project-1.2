@@ -2,18 +2,18 @@ import Data_storage.Terrain;
 import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
 import Reader.Reader;
-import com.jme3.input.ChaseCamera;
+import com.jme3.light.Light;
 import com.jme3.material.Material;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.math.*;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Cylinder;
+import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
-import com.jme3.terrain.geomipmap.TerrainPatch;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
@@ -24,22 +24,33 @@ public class Main extends Cam {
     TerrainQuad terrainQuad;
     Terrain terrain;
     final float unitPixelSize = 0.5f;
+    String function = "sin(x+y)";
 
     /**
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
-        terrain = new Terrain("sin(x+y)",0.2, 0.1, new Vector2(0,0), new Vector2(1024,1024));
+        terrain = new Terrain(function,0.2, 0.1, new Vector2(0,0), new Vector2(1024,1024));
         terrain.calculateHeightMap(1024, 20);
 
         //Setting up the Texture of the ground
-        Material mat1 = new Material(assetManager,
-                "Common/MatDefs/Misc/Unshaded.j3md");  // create a simple material
+        Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
         Texture grass = assetManager.loadTexture("Terrain/grass.jpeg");
 
+        float[] height = new float[1024];
+        for(int i=0; i< height.length; i++){
+            if(i<height.length/2){
+                height[i]= -5f;
+            }else{
+                height[i] = 5f;
+            }
+        }
+
+        //Adding grass texture to terrain
         mat1.setTexture("ColorMap",grass);
 
-        this.terrainQuad = new TerrainQuad("Course", 65, 513, terrain.heightmap);
+        //Setting terrain using heightmap
+        this.terrainQuad = new TerrainQuad("Course", 65, 1025, height);
         float minDim = (float) Math.min(terrain.limitingCorner.x-terrain.startingCorner.x, terrain.limitingCorner.y-terrain.startingCorner.y);
         float xDim = (float) ((terrain.limitingCorner.x-terrain.startingCorner.x)/minDim);
         float yDim = (float) ((terrain.limitingCorner.y-terrain.startingCorner.y)/minDim);
@@ -54,11 +65,6 @@ public class Main extends Cam {
         rootNode.attachChild(terrainQuad);
     }
 
-    public void newTerrain(){
-        if(this.x > 50 || this.y > 50){
-        }
-    }
-
 
     protected Geometry ball;
     float x, y, val;
@@ -71,31 +77,24 @@ public class Main extends Cam {
         TangentBinormalGenerator.generate(ball);
         this.ball = new Geometry("Ball", ball);
 
-        Texture sphereTex = assetManager.loadTexture(
-                "Ball/Golfball.jpeg");
-
+        Texture sphereTex = assetManager.loadTexture("Ball/Golfball.jpeg");
         Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
 
         mat.setTexture("ColorMap", sphereTex);
-        //mat.setColor("Color", ColorRGBA.Red);
-        //mat.setBoolean("UseMaterialColors", true);
-        //mat.setColor("Diffuse",ColorRGBA.White);
-        //mat.setColor("Specular",ColorRGBA.White);
-        //mat.setFloat("Shininess", 64f);
         this.ball.setMaterial(mat);
         rootNode.attachChild(this.ball);
     }
 
     Geometry target;
     public void InitTarget(){
-        Cylinder tar = new Cylinder(120, 120, 10, 2, true);
+        Cylinder tar = new Cylinder(120, 120, 10, 0.1f, true);
         this.target = new Geometry("Target", tar);
-        this.target.rotate(48,0,0);
+        this.target.rotate(new Quaternion(0.26345053f, 0.6972198f, -0.5893796f, 0.31165418f));
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.White);
 
         this.target.setMaterial(mat);
-        this.target.move(0, 20, 0);
+        this.target.move(0, 10, 0);
 
         rootNode.attachChild(target);
     }
@@ -103,7 +102,7 @@ public class Main extends Cam {
     /**
      * Moves ball according to x & y coordinates
      */
-    TerrainFunction1 funct = new TerrainFunction1("sin(x+y)");
+    TerrainFunction1 funct = new TerrainFunction1(function);
     public void moveBall(float x, float y){
         this.x = x;
         this.y = y;
@@ -130,29 +129,32 @@ public class Main extends Cam {
     }
 
     public void InitSky(){
-        getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Sky.jpg", SkyFactory.EnvMapType.SphereMap));
+        mainScene.attachChild(SkyFactory.createSky(getAssetManager(), "Sky/Skysphere.jpeg", SkyFactory.EnvMapType.SphereMap));
     }
 
-    SimpleWaterProcessor waterProcessor;
-    Spatial waterPlane;
-    Node sceneNode;
+    Node mainScene = new Node("Test");
     public void InitWater(){
-        waterProcessor = new SimpleWaterProcessor(assetManager);
-        waterProcessor.setReflectionScene(sceneNode);
-        waterProcessor.setDebug(true);
+        rootNode.attachChild(mainScene);
+
+        SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
+        waterProcessor.setLightPosition(new Vector3f(0.55f, -0.82f, 0.15f));
+        waterProcessor.setReflectionScene(mainScene);
+
+        Vector3f waterLocation=new Vector3f(0,-5,0);
+        waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
+
         viewPort.addProcessor(waterProcessor);
+        Quad waveSize = new Quad(1024,1024);
+        waveSize.scaleTextureCoordinates(new Vector2f(6f,6f));
 
-        waterProcessor.setLightPosition(new Vector3f(0, 0, 0));
-
-        //create water quad
-        waterPlane = waterProcessor.createWaterGeometry(100, 100);
-        waterPlane=  assetManager.loadModel("assets/WaterTest.mesh.xml");
-        waterPlane.setMaterial(waterProcessor.getMaterial());
-        waterPlane.setLocalScale(40);
-        waterPlane.setLocalTranslation(-5, 0, 5);
-
-        rootNode.attachChild(waterPlane);
+        Geometry water=new Geometry("water", waveSize);
+        water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
+        water.setLocalTranslation(-200, -1, 250);
+        water.setShadowMode(RenderQueue.ShadowMode.Receive);
+        water.setMaterial(waterProcessor.getMaterial());
+        rootNode.attachChild(water);
     }
+
 
     Reader reader = new Reader();
     @Override
@@ -163,18 +165,19 @@ public class Main extends Cam {
         InitBall();
         InitTarget();
         //creating and attaching camera to ball
-        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
-        InitCam(chaseCam);
-        //flyCam.setMoveSpeed(100);
+        //ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
+        //InitCam(chaseCam);
+        flyCam.setMoveSpeed(100);
+
         //setting sky background to Sky.jpg
         InitSky();
+        InitWater();
 
         //reading from input file and assigning ball x and y positions
         float x = Float.parseFloat(String.valueOf(reader.getBallX()));
         float y = Float.parseFloat(String.valueOf(reader.getBallY()));
         //moving the ball according to input file
         //moveBall(x,y);
-        moveBall(0,0);
     }
 
 
@@ -191,7 +194,6 @@ public class Main extends Cam {
         settings.put("Height", 720);
         settings.put("Title", "Golf Game");
         settings.put("VSync", true);
-        //Anti-Aliasing
         settings.put("Samples", 4);
         game.setSettings(settings);
 
