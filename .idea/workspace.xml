@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added Get method for ball">
+    <list default="true" id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added target spawning">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +21,20 @@
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Game">
+    <configuration name="Game" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="gameengine.Game" />
+      <module name="Project-1.2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="gameengine.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="Project-1.2" />
@@ -30,6 +44,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Game" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>

@@ -18,7 +18,6 @@ import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
 public class Main extends Cam {
-
     private boolean inTarget;
     TerrainQuad terrainQuad;
     Terrain terrain;
