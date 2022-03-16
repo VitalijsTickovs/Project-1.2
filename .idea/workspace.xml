@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="06575b88-b907-4c35-bbae-157bf77177da" name="Changes" comment="Added target spawning">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Terrain/grass.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/Rectangle.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/Rectangle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +53,7 @@
       <recent name="$PROJECT_DIR$/src/main/resources/Ball" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="Application.Game">
     <configuration name="Game" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="gameengine.Game" />
       <module name="Project-1.2" />
@@ -113,8 +115,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Main" />
         <item itemvalue="Application.Game" />
+        <item itemvalue="Application.Main" />
         <item itemvalue="Application.PhysicsEngine" />
         <item itemvalue="Application.TerrainFunction1" />
         <item itemvalue="Application.Print" />
