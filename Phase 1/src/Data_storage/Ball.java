@@ -6,6 +6,8 @@ public class Ball {
     public double mass;
     public boolean ballStopped;
 
+    public static final double maxSpeed = 5.0;
+
     public Ball(Vector2 startPosition, Vector2 startVelocity) {
         state = new BallState(startPosition, startVelocity);
     }

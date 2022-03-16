@@ -59,6 +59,8 @@ public class TerrainFunction1 extends TerrainFunction {
 
     @Override
     public String toString() {
-        return f.toString();
+        return "h(x,y) = " + f.toString() + "\n" +
+                "dh/dx = " + dfx.toString() + "\n" +
+                "dh/dy = " + dfy.toString();
     }
 }

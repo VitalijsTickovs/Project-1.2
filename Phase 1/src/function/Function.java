@@ -144,7 +144,6 @@ public class Function {
                 String df = derive(node.getRightChild(), varName);
                 String l = node.getLeftChild().toString();
                 result = "("+l+"**"+f+"*"+df+"*ln("+l+"))";
-                System.out.println(result);
             // a**b (both are numbers)
             } else if (!leftHasVar) {
                 result = "0";

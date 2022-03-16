@@ -28,26 +28,24 @@ public class Terrain {
 
     }
 
-    public Terrain(String function, Vector2 startingCorner, Vector2 limitingCorner, double staticFriction, double kineticFriction, int xRes, int yRes, double normalFactor) {
+    public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner, Vector2 limitingCorner) {
         this.terrainFunction = new TerrainFunction1(function);
-        this.startingCorner = startingCorner;
-        this.limitingCorner = limitingCorner;
         this.staticFriction = staticFriction;
         this.kineticFriction = kineticFriction;
-        this.xRes = xRes;
-        this.yRes = yRes;
-        calculateHeightMap(this.xRes, this.yRes, normalFactor);
+        this.startingCorner = startingCorner;
+        this.limitingCorner = limitingCorner;
+        this.heightmap = null;
     }
 
-    public void calculateHeightMap(int numVertecesX, int numVertecesY, double normalFactor) {
-        heightmap = new float[numVertecesX * numVertecesY];
+    public void calculateHeightMap(int numVerteces, double normalFactor) {
+        heightmap = new float[numVerteces * numVerteces];
         int pos = 0;
         float minVal = -10;
         float maxVal = 10;
-        double xOff = (limitingCorner.x - startingCorner.x) / (double) numVertecesX;
-        double yOff = (limitingCorner.y - startingCorner.y) / (double) numVertecesY;
-        for (int x = 0; x < numVertecesX; x++) {
-            for (int y = 0; y < numVertecesY; y++) {
+        double xOff = (limitingCorner.x - startingCorner.x)/numVerteces;
+        double yOff = (limitingCorner.y - startingCorner.y)/numVerteces;
+        for (int x = 0; x < numVerteces; x++) {
+            for (int y = 0; y < numVerteces; y++) {
                 double xx = startingCorner.x + x * xOff;
                 double yy = startingCorner.y + y * yOff;
                 float val = (float) terrainFunction.valueAt(xx, yy);
