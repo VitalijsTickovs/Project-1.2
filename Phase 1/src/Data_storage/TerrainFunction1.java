@@ -9,7 +9,7 @@ public class TerrainFunction1 extends TerrainFunction {
      * private Function dfy;
      */
 
-    private function.Function f;
+    public function.Function f;
     private function.Function dfx;
     private function.Function dfy;
 

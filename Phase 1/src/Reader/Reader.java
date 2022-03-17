@@ -11,6 +11,7 @@ import Data_storage.Terrain;
 import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
 import Data_storage.Zone;
+import com.sun.tools.javac.Main;
 
 public class Reader {
 
@@ -91,17 +92,10 @@ public class Reader {
       return defy0;
    }
 
-   // endregion
 
-   public static void main() {
-      String fileName = "UserInput";
-      Terrain terrain = Reader.readFile(fileName);
-      terrain.print();
-   }
+   public static Terrain readFile() {
 
-   public static Terrain readFile(String fileName) {
-
-      if (!createScanner(fileName)) {
+      if (!createScanner()) {
          return null;
       }
 
@@ -114,12 +108,11 @@ public class Reader {
    /**
     * Tries to create a buffered reader
     * 
-    * @param name
     * @return true, if the reader has been successfully created
     */
-   private static boolean createScanner(String name) {
+   private static boolean createScanner() {
       try {
-         scanner = new Scanner(new FileReader(name));
+         scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/userInput.csv"));
          return true;
 
       } catch (FileNotFoundException e) {
@@ -277,7 +270,6 @@ public class Reader {
       // Multiple values
       defineObstacles();
       defineZones();
-
       return terrain;
    }
 
@@ -307,8 +299,6 @@ public class Reader {
       } else {
          terrain.terrainFunction = new TerrainFunction1(terrainFunction);
       }
-      //terrain.calculateHeightMap(xDim, yDim, 1.0);
-      //terrain.calculateHeightMap(xDim, yDim, 1.0);
    }
 
    private static void defineTarget() {
