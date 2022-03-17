@@ -98,7 +98,6 @@ public class Main extends Cam {
             val = 1;
         }
         val *= normalFactor;
-        //val = terrainQuad.getHeightMap()[Math.round((Math.round(Math.round(x)* (this.totalSize+1))) + y)];
         this.val = val;
 
         this.target.setLocalTranslation((float) this.targetPos.x, val, (float) this.targetPos.y);
@@ -178,12 +177,12 @@ public class Main extends Cam {
      * Moves ball according to x & y coordinates
      */
     public void moveBall(float x, float y){
-        if(x<(this.totalSize+1)/2 && y < (this.totalSize+1)/2) {
+        if(x<(this.totalSize)/2 && y < (this.totalSize)/2) {
             this.x = x;
             this.y = y;
             //Getting height value corresponding to x and y values
             float val;
-            val = (float) terrain.terrainFunction.valueAt( x, y);
+            val = (float) terrain.terrainFunction.valueAt( x* terrain.xOff, y * terrain.yOff);
             val += Math.abs(terrain.minVal);
             val /= terrain.maxVal - terrain.minVal;
             if (val < 0) {
@@ -193,10 +192,9 @@ public class Main extends Cam {
                 val = 1;
             }
             val *= normalFactor;
-            System.out.println(val);
             this.val = val;
             //Moving the ball object to specified position
-            ball.setLocalTranslation(x, val, y);
+            ball.setLocalTranslation((float) (x + terrain.xOff), (float) (val + terrain.xOff), (float) (y + terrain.xOff));
         }
     }
 
@@ -237,7 +235,7 @@ public class Main extends Cam {
         //System.out.println(terrain.heightmap);
         // generates a ball into the world
         InitBall();
-        moveBall(0,1);
+        moveBall(0,0);
         InitTarget();
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
@@ -250,9 +248,11 @@ public class Main extends Cam {
 
     }
 
-
+    float f;
     @Override
     public void simpleUpdate(float tpf) {
+//        moveBall(f,f);
+//        f+=0.1f;
     }
 
     public static void main(String[] args) {

@@ -49,6 +49,7 @@ public class Terrain {
         this.yOff = (limitingCorner.y - startingCorner.y)/numVerteces;
         for (int x = 0; x < numVerteces; x++) {
             for (int y = 0; y < numVerteces; y++) {
+
                 double xx = startingCorner.x + x * this.xOff;
                 double yy = startingCorner.y + y * this.yOff;
                 float val = (float) terrainFunction.valueAt(xx, yy);
