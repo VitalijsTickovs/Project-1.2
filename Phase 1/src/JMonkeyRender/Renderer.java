@@ -1,6 +1,7 @@
 package JMonkeyRender;
 
 import Data_storage.*;
+import GUI.MenuGUI;
 import Physics.PhysicsEngine;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
@@ -45,17 +46,17 @@ public class Renderer extends Cam {
     /**
      * Initializes area terrain based on the function given in input file
      */
-    public void initTerrain(){
+    public void initTerrain(String texPath){
         this.xoff = (float) (this.ballStartPos.x - this.totalSize/2);
         this.yoff = (float) (this.ballStartPos.y - this.totalSize/2);
         terrain.calculateHeightMap((int) totalSize+1, normalFactor);
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
-        Texture grass = assetManager.loadTexture("Terrain/grass.jpeg");
+        Texture tex = assetManager.loadTexture(texPath);
 
         //Adding grass texture to terrain
-        mat1.setTexture("ColorMap",grass);
+        mat1.setTexture("ColorMap",tex);
 
         //Setting terrain using heightmap
         this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
@@ -205,7 +206,7 @@ public class Renderer extends Cam {
         this.targetRadius = this.terrain.target.radius;
         this.targetPos = this.terrain.target.position;
         terrain.addZone(new Vector2(-5.24, -7.8), new Vector2(10.5, 10), 0.3, 0.2);
-        initTerrain();
+        initTerrain(MenuGUI.texPath);
 
 
         //terrain.target.position = new Vector2(4, 4);
@@ -222,10 +223,9 @@ public class Renderer extends Cam {
     public void simpleInitApp() {
         initPhysics();
 
-        initTerrain();
         // builds terrain based on function given
+        initTerrain(MenuGUI.getTexPath());
         InitBall();
-
         InitTarget();
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
