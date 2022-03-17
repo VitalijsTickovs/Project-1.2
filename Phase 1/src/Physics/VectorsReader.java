@@ -8,11 +8,6 @@ import java.util.*;
 
 public class VectorsReader {
 
-    public static void main(String[]args){
-        String csvFile ="C:/Users/leahi/IdeaProjects/Project-1.2v2/Phase 1/src/Physics/Vectors.csv";
-        read(csvFile);
-    }
-
     /*Take input from a csv file, and put it in 2d vectors*/
 
     public static final String delimiter = ";";
@@ -27,7 +22,7 @@ public class VectorsReader {
         Vector2 vector = new Vector2();
 
         try {
-            File file = new File(csvFile);
+            File file = new File(System.getProperty("user.dir") + csvFile);
             FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
             String line = "";

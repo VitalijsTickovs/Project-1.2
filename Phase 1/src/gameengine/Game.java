@@ -5,8 +5,9 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
 
-import Data_storage.*;
-import Data_storage.Rectangle;
+import Data_storage.Ball;
+import Data_storage.Terrain;
+import Data_storage.Vector2;
 import Physics.PhysicsEngine;
 import Reader.*;
 

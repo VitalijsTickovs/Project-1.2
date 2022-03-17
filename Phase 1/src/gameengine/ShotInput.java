@@ -1,5 +1,7 @@
 package gameengine;
 
+
+
 import Data_storage.Vector2;
 
 import javax.swing.*;
@@ -52,6 +54,7 @@ public class ShotInput {
                 try {
                     double x = Double.parseDouble(xTextField.getText());
                     double y = Double.parseDouble(yTextField.getText());
+
                     game.shot = new Vector2(x, y);
                     frame.setVisible(false);
                     frame.dispose();

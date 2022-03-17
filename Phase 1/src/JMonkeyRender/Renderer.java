@@ -3,6 +3,7 @@ package JMonkeyRender;
 import Data_storage.*;
 import GUI.MenuGUI;
 import Physics.PhysicsEngine;
+import Physics.VectorsReader;
 import Reader.Reader;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
@@ -24,6 +25,7 @@ import com.jme3.water.SimpleWaterProcessor;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Queue;
 
 public class Renderer extends Cam {
     TerrainQuad terrainQuad;
@@ -224,9 +226,11 @@ public class Renderer extends Cam {
     }
 
     Ball ball;
+    Queue<Vector2> q;
     @Override
     public void simpleInitApp() {
         setDisplayStatView(false);
+        q = VectorsReader.read("/Phase 1/src/Physics/Vectors.csv");
         initPhysics();
         InitText();
 
@@ -251,9 +255,8 @@ public class Renderer extends Cam {
     @Override
     public void simpleUpdate(float tpf) {
             if (!inTarget) {
-                if (points.size() == 0) {
-                    points = engine.simulateShot(new Vector2(Math.random() * 10 - 5, Math.random() * 10 - 5), ball);
-
+                if (points.size() == 0 && !q.isEmpty()) {
+                    points = engine.simulateShot(q.remove(), ball);
                 }
                 if (points.size() != 0) {
                     ball.state.position = points.get(0);
