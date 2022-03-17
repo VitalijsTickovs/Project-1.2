@@ -1,6 +1,7 @@
 package GUI;//package crazyPutting;
 
 import JMonkeyRender.Renderer;
+import gameengine.Game;
 
 public class MenuGUI extends javax.swing.JFrame {
     static boolean gameBoolean =true;//false =player game; true =bot game
@@ -218,12 +219,13 @@ public class MenuGUI extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
     Renderer render = new Renderer();
+    Game game = new Game(60);
     private void singleBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_singleBActionPerformed
   
         /////FETCH LEVEL INDEX
         /////OPEN PUTTING RENDER
-        render.start3d();
-        
+        //render.start3d();
+        game.start();
         this.setVisible(false);
     }//GEN-LAST:event_singleBActionPerformed
 
@@ -233,7 +235,6 @@ public class MenuGUI extends javax.swing.JFrame {
         ////FETCH PLAYER/BOT BOOLEAN
         /////OPEN PUTTING RENDER
         render.start3d();
-        
         this.setVisible(false);
     }//GEN-LAST:event_multiBActionPerformed
 

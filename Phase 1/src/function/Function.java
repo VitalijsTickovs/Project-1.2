@@ -154,19 +154,25 @@ public class Function {
             String df = derive(node.getLeftChild(), varName);
             switch (node.getElement().getText()) {
                 case "sin":
-                    result = "(" + df + "*cos(" + f + "))";
+                    result = "((" + df + ")*cos(" + f + "))";
                     break;
                 case "cos":
-                    result = "(" + df + "*-sin(" + f + "))";
+                    result = "((" + df + ")*(-sin(" + f + ")))";
                     break;
                 case "tan":
-                    result = "(" + df + "*(1+tan(" + f + ")**2))";
+                    result = "((" + df + ")*(1+tan(" + f + ")**2))";
                     break;
                 case "sqrt":
-                    result = "(" + df + "*0.5/sqrt(" + f + "))";
+                    result = "((" + df + ")*0.5/sqrt(" + f + "))";
+                    break;
+                case "ln":
+                    result = "((" + df + ")/(" + f + "))";
+                    break;
+                case "log":
+                    result = "((" + df + ")*log(e)/(" + f + "))";
                     break;
                 default:
-                    break;
+                    throw new RuntimeException("Unknown derivative formula. '"+node.getElement().getText()+"'");
             }
         }
         return result;

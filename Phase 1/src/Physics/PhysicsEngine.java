@@ -66,20 +66,20 @@ public class PhysicsEngine {
             reverseX = true;
             Vector2 tempPosition = findLinesIntersect(state.position, newPosition,
                     new Vector2(terrain.limitingCorner.x, 0), new Vector2(terrain.limitingCorner.x, 1));
-            if (tempPosition != null) {
-                newPosition = tempPosition;
-            } else {
+            //if (tempPosition != null) {
+            //    newPosition = tempPosition;
+            //} else {
                 newPosition = state.position;
-            }
+            //}
         } else if (newPosition.x < terrain.startingCorner.x) {
             reverseX = true;
             Vector2 tempPosition = findLinesIntersect(state.position, newPosition,
                     new Vector2(terrain.startingCorner.x, 0), new Vector2(terrain.startingCorner.x, 1));
-            if (tempPosition != null) {
-                newPosition = tempPosition;
-            } else {
+            //if (tempPosition != null) {
+            //    newPosition = tempPosition;
+            //} else {
                 newPosition = state.position;
-            }
+            //}
         }
 
         boolean reverseY = false;
@@ -87,20 +87,20 @@ public class PhysicsEngine {
             reverseY = true;
             Vector2 tempPosition = findLinesIntersect(state.position, newPosition,
                     new Vector2(0, terrain.limitingCorner.y), new Vector2(0, terrain.limitingCorner.y));
-            if (tempPosition != null) {
-                newPosition = tempPosition;
-            } else {
+            //if (tempPosition != null) {
+            //    newPosition = tempPosition;
+            //} else {
                 newPosition = state.position;
-            }
+            //}
         } else if (newPosition.y < terrain.startingCorner.y) {
             reverseY = true;
             Vector2 tempPosition = findLinesIntersect(state.position, newPosition,
                     new Vector2(0, terrain.startingCorner.y), new Vector2(0, terrain.startingCorner.y));
-            if (tempPosition != null) {
-                newPosition = tempPosition;
-            } else {
+            //if (tempPosition != null) {
+            //    newPosition = tempPosition;
+            //} else {
                 newPosition = state.position;
-            }
+            //}
         }
 
         if (reverseX) {
@@ -163,6 +163,11 @@ public class PhysicsEngine {
         Vector2 ballPosition = ball.state.position;
         double xSlope = getXSlopeAt(ballPosition.x, ballPosition.y);
         double ySlope = getYSlopeAt(ballPosition.x, ballPosition.y);
+
+        // Check if in water
+        if (terrain.terrainFunction.valueAt(ball.state.position.x, ball.state.position.y) <= 0) {
+            return Vector2.zeroVector;
+        }
 
         double kineticFriction = getKineticFrictionAtPosition(ball.state.position);
 
