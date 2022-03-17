@@ -93,9 +93,9 @@ public class Reader {
    }
 
 
-   public static Terrain readFile(String fileName) {
+   public static Terrain readFile() {
 
-      if (!createScanner(fileName)) {
+      if (!createScanner()) {
          return null;
       }
 
@@ -108,10 +108,9 @@ public class Reader {
    /**
     * Tries to create a buffered reader
     * 
-    * @param name
     * @return true, if the reader has been successfully created
     */
-   private static boolean createScanner(String name) {
+   private static boolean createScanner() {
       try {
          scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/userInput.csv"));
          return true;

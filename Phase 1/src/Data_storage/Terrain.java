@@ -38,17 +38,19 @@ public class Terrain {
         this.heightmap = null;
     }
 
-    public float minVal = -100;
-    public float maxVal = 100;
+    public float minVal = -10;
+    public float maxVal = 10;
+    public double xOff;
+    public double yOff;
     public void calculateHeightMap(int numVerteces, double normalFactor) {
         heightmap = new float[numVerteces * numVerteces];
         int pos = 0;
-        double xOff = (limitingCorner.x - startingCorner.x)/numVerteces;
-        double yOff = (limitingCorner.y - startingCorner.y)/numVerteces;
+        this.xOff = (limitingCorner.x - startingCorner.x)/numVerteces;
+        this.yOff = (limitingCorner.y - startingCorner.y)/numVerteces;
         for (int x = 0; x < numVerteces; x++) {
             for (int y = 0; y < numVerteces; y++) {
-                double xx = startingCorner.x + x * xOff;
-                double yy = startingCorner.y + y * yOff;
+                double xx = startingCorner.x + x * this.xOff;
+                double yy = startingCorner.y + y * this.yOff;
                 float val = (float) terrainFunction.valueAt(xx, yy);
                 if (val > maxVal) {
                     maxVal = val;
@@ -71,7 +73,6 @@ public class Terrain {
                 val = 1;
             }
             val *= normalFactor;
-
             heightmap[i] = val;
         }
     }

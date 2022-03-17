@@ -1,7 +1,4 @@
-import Data_storage.Target;
-import Data_storage.Terrain;
-import Data_storage.TerrainFunction1;
-import Data_storage.Vector2;
+import Data_storage.*;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
@@ -20,6 +17,8 @@ import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
+import java.util.Arrays;
+
 public class Main extends Cam {
     private boolean inTarget;
     TerrainQuad terrainQuad;
@@ -28,8 +27,7 @@ public class Main extends Cam {
     Geometry ball;
     float ballRadius = 1f;
     final float unitPixelSize = 0.5f;
-    String function = "sin(x+y)";
-    float totalSize = 1024;
+    float totalSize = 128;
     float xoff = 0;
     float yoff = 0;
     double ballStartx;
@@ -40,14 +38,14 @@ public class Main extends Cam {
     float x=totalSize/2;
     float y=totalSize/2;
     float val = 0;
+    int normalFactor = 50;
     /**
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
         this.xoff = (float) (this.ballStartx - this.totalSize/2);
         this.yoff = (float) (this.ballStarty - this.totalSize/2);
-        terrain = new Terrain(function,0.2, 0.1, new Vector2(xoff,yoff), new Vector2(-xoff,-yoff));
-        terrain.calculateHeightMap((int) totalSize+1, 20);
+        terrain.calculateHeightMap((int) totalSize+1, normalFactor);
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
@@ -82,20 +80,28 @@ public class Main extends Cam {
     }
 
     public void InitTarget(){
-        Cylinder tar = new Cylinder(120, 120, 10, 0.1f, true);
+        Cylinder tar = new Cylinder(120, 120, (float) targetRadius, 0.1f, true);
         this.target = new Geometry("Target", tar);
-        //this.target.rotate(new Quaternion(0.26345053f, 0.6972198f, -0.5893796f, 0.31165418f));
+        this.target.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.HALF_PI , new Vector3f(0,0,1)));
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.White);
 
         this.target.setMaterial(mat);
         float val;
-        val = (float) terrain.terrainFunction.valueAt(this.xoff + this.targetPos.x, this.yoff + this.targetPos.y);
-        if(val > terrain.maxVal) val = terrain.maxVal;
-        else if(val < terrain.minVal) val = terrain.minVal;
+        val = (float) terrain.terrainFunction.valueAt(targetPos.x * terrain.xOff,targetPos.y * terrain.yOff);
+        val += Math.abs(terrain.minVal);
+        val /= terrain.maxVal - terrain.minVal;
+        if (val < 0) {
+            val = 0;
+        }
+        if (val > 1) {
+            val = 1;
+        }
+        val *= normalFactor;
+        //val = terrainQuad.getHeightMap()[Math.round((Math.round(Math.round(x)* (this.totalSize+1))) + y)];
         this.val = val;
 
-        this.target.setLocalTranslation((float) this.targetPos.x, 0, (float) this.targetPos.y);
+        this.target.setLocalTranslation((float) this.targetPos.x, val, (float) this.targetPos.y);
 
         rootNode.attachChild(target);
     }
@@ -172,18 +178,25 @@ public class Main extends Cam {
      * Moves ball according to x & y coordinates
      */
     public void moveBall(float x, float y){
-        if(x< totalSize || y < totalSize) {
-
+        if(x<(this.totalSize+1)/2 && y < (this.totalSize+1)/2) {
             this.x = x;
             this.y = y;
             //Getting height value corresponding to x and y values
             float val;
-            val = (float) terrain.terrainFunction.valueAt(this.xoff + x, this.yoff + y);
-            if(val > terrain.maxVal) val = terrain.maxVal;
-            else if(val < terrain.minVal) val = terrain.minVal;
+            val = (float) terrain.terrainFunction.valueAt( x, y);
+            val += Math.abs(terrain.minVal);
+            val /= terrain.maxVal - terrain.minVal;
+            if (val < 0) {
+                val = 0;
+            }
+            if (val > 1) {
+                val = 1;
+            }
+            val *= normalFactor;
+            System.out.println(val);
             this.val = val;
             //Moving the ball object to specified position
-            ball.setLocalTranslation(x, val+ballRadius, y);
+            ball.setLocalTranslation(x, val, y);
         }
     }
 
@@ -214,20 +227,22 @@ public class Main extends Cam {
 
     @Override
     public void simpleInitApp() {
-        this.terrain = Reader.readFile("userInput.csv");
+        this.terrain = Reader.readFile();
         this.ballStartx = this.terrain.ballStartingPosition.x;
         this.ballStarty = this.terrain.ballStartingPosition.y;
         this.targetRadius = this.terrain.target.radius;
         this.targetPos = this.terrain.target.position;
         // builds terrain based on function given
         initTerrain();
+        //System.out.println(terrain.heightmap);
         // generates a ball into the world
         InitBall();
+        moveBall(0,1);
         InitTarget();
         //creating and attaching camera to ball
-        //ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
-        //InitCam(chaseCam);
-        flyCam.setMoveSpeed(100);
+        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
+        InitCam(chaseCam);
+        //flyCam.setMoveSpeed(100);
 
         //setting sky background to Sky.jpg
         InitSky("Sky/Skysphere.jpeg");
