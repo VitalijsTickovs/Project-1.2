@@ -45,7 +45,6 @@ public class PhysicsEngine {
         BallState newState = ball.state.copy();
         newState.position = countNewPosition(ball.state);
         newState.velocity = countNewVelocity(ball);
-        System.out.println(newState.velocity);
 
         return newState;
     }

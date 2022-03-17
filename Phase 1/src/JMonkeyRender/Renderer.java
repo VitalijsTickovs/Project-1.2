@@ -204,6 +204,9 @@ public class Renderer extends Cam {
         this.ballStartPos = this.terrain.ballStartingPosition;
         this.targetRadius = this.terrain.target.radius;
         this.targetPos = this.terrain.target.position;
+        terrain.addZone(new Vector2(-5.24, -7.8), new Vector2(10.5, 10), 0.3, 0.2);
+        initTerrain();
+
 
         //terrain.target.position = new Vector2(4, 4);
         //terrain.target.radius = 4;
