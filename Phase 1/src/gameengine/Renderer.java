@@ -14,6 +14,7 @@ public class Renderer {
     public int unitSizePixels;
     public Ball ball;
     public BufferedImage terrainImage;
+    public double heightRange;
 
     public void render(Graphics2D g2) {
         g2.setColor(Color.WHITE);
@@ -38,31 +39,31 @@ public class Renderer {
                 xTL = (int) ((camTLx - terrain.startingCorner.x)*unitSizePixels);
             }
 
-            if (camTLy < terrain.startingCorner.y) {
-                yTL = 0;
+            if (camTLy < terrain.startingCorner.y - heightRange/2) {
+                yTL = 0;//(int) (unitSizePixels * heightRange/2);
             } else {
                 // Calculate y top left
-                yTL = (int) ((camTLy - terrain.startingCorner.y)*unitSizePixels);
+                yTL = (int) ((camTLy - (terrain.startingCorner.y - heightRange/2))*unitSizePixels);
             }
 
             if (camBRx > terrain.limitingCorner.x) {
-                xBR = (int) terrainImage.getWidth();
+                xBR = terrainImage.getWidth();
             } else {
                 // Calculate x bottom right
                 xBR = (int) ((camBRx - terrain.startingCorner.x)*unitSizePixels);
             }
 
-            if (camBRy > terrain.limitingCorner.y) {
-                yBR = (int) terrainImage.getHeight();
+            if (camBRy > terrain.limitingCorner.y+heightRange/2) {
+                yBR = terrainImage.getHeight();
             } else {
                 // Calculate y bottom right
-                yBR = (int) ((camBRy - terrain.startingCorner.y)*unitSizePixels);
+                yBR = (int) ((camBRy - (terrain.startingCorner.y - heightRange/2))*unitSizePixels);
             }
         }
 
         if (xTL != -1) {
             int xDraw = (int) ((terrain.startingCorner.x - camTLx)*unitSizePixels);
-            int yDraw = (int) ((terrain.startingCorner.y - camTLy)*unitSizePixels);
+            int yDraw = (int) ((terrain.startingCorner.y-heightRange/2 - camTLy)*unitSizePixels);
             if (xDraw < 0) {
                 xDraw = 0;
             }
@@ -74,13 +75,17 @@ public class Renderer {
 
         // Render the ball
         double ballZ = ball.getZCoordinate(terrain);
+
         // Calculate ball render position
         int ballRenderX = (int) ((ball.state.position.x - camTLx) * unitSizePixels);
         int ballRenderY = (int) ((ball.state.position.y - ballZ - camTLy) * unitSizePixels);
         int ballWidth = unitSizePixels;
         int ballHeight = unitSizePixels;
+        // Ball shadow
+        g2.setColor(new Color(50, 50, 50, 50));
+        g2.fillArc(ballRenderX-3*ballWidth/4, ballRenderY-3*ballHeight/4, 3*ballWidth/2, 3*ballHeight/2, 0, 360);
         g2.setColor(Color.WHITE);
-        g2.fillArc(ballRenderX - ballWidth / 2, ballRenderY - ballHeight / 2, ballWidth, ballHeight, 0, 360);
+        g2.fillArc(ballRenderX - ballWidth / 2, ballRenderY - ballHeight, ballWidth, ballHeight, 0, 360);
 
         // Draw ball position
         g2.setFont(new Font("TimesRoman", Font.BOLD, 15));
@@ -96,7 +101,7 @@ public class Renderer {
     public void createTerrainImage() {
         terrainImage = new BufferedImage(
                 (int) ((terrain.limitingCorner.x-terrain.startingCorner.x)*unitSizePixels),
-                (int) ((terrain.limitingCorner.y-terrain.startingCorner.y)*unitSizePixels),
+                (int) ((terrain.limitingCorner.y-terrain.startingCorner.y)*unitSizePixels + heightRange*unitSizePixels),
                 BufferedImage.TYPE_4BYTE_ABGR
         );
         Graphics2D g2 = (Graphics2D) terrainImage.getGraphics();
@@ -105,6 +110,8 @@ public class Renderer {
         // Clear screen
         g2.setColor(Color.WHITE);
         g2.fillRect(0, 0, (int) (cam.width*unitSizePixels), (int) (cam.height*unitSizePixels));
+        //g2.setColor(new Color(96, 69, 38));
+        //g2.fillRect(0, 10*unitSizePixels, terrainImage.getWidth(), terrainImage.getHeight()-10*unitSizePixels);
         // Render the terrain
         int numVertices = (int) Math.sqrt(terrain.heightmap.length);
         double xStep = (terrain.limitingCorner.x - terrain.startingCorner.x) / numVertices;
@@ -119,35 +126,35 @@ public class Renderer {
                 // First point
                 double x1 = terrain.startingCorner.x + xx * xStep;
                 double y1 = terrain.startingCorner.y + yy * yStep;
-                double h1 = terrain.heightmap[i1] * 20 - 10;
+                double h1 = terrain.heightmap[i1] * heightRange - heightRange/2;
                 // Second point
                 double x2 = terrain.startingCorner.x + (xx+1) * xStep;
                 double y2 = terrain.startingCorner.y + yy * yStep;
-                double h2 = terrain.heightmap[i2] * 20 - 10;
+                double h2 = terrain.heightmap[i2] * heightRange - heightRange/2;
                 // Third point
                 double x3 = terrain.startingCorner.x + xx * xStep;
                 double y3 = terrain.startingCorner.y + (yy+1) * yStep;
-                double h3 = terrain.heightmap[i3] * 20 - 10;
+                double h3 = terrain.heightmap[i3] * heightRange - heightRange/2;
                 // Fourth point
                 double x4 = terrain.startingCorner.x + (xx+1) * xStep;
                 double y4 = terrain.startingCorner.y + (yy+1) * yStep;
-                double h4 = terrain.heightmap[i4] * 20 - 10;
+                double h4 = terrain.heightmap[i4] * heightRange - heightRange/2;
 
                 double maxHeight = Math.max(h1, h2);
                 maxHeight = Math.max(maxHeight, h3);
                 maxHeight = Math.max(maxHeight, h4);
 
                 int renderPixelX1 = (int) ((x1 - terrain.startingCorner.x) * unitSizePixels);
-                int renderPixelY1 = (int) ((y1 - h1 - terrain.startingCorner.y) * unitSizePixels);
+                int renderPixelY1 = (int) ((y1 - h1 - terrain.startingCorner.y + heightRange/2) * unitSizePixels);
 
                 int renderPixelX2 = (int) ((x2 - terrain.startingCorner.x) * unitSizePixels);
-                int renderPixelY2 = (int) ((y2 - h2 - terrain.startingCorner.y) * unitSizePixels);
+                int renderPixelY2 = (int) ((y2 - h2 - terrain.startingCorner.y + heightRange/2) * unitSizePixels);
 
                 int renderPixelX3 = (int) ((x3 - terrain.startingCorner.x) * unitSizePixels);
-                int renderPixelY3 = (int) ((y3 - h3 - terrain.startingCorner.y) * unitSizePixels);
+                int renderPixelY3 = (int) ((y3 - h3 - terrain.startingCorner.y + heightRange/2) * unitSizePixels);
 
                 int renderPixelX4 = (int) ((x4 - terrain.startingCorner.x) * unitSizePixels);
-                int renderPixelY4 = (int) ((y4 - h4 - terrain.startingCorner.y) * unitSizePixels);
+                int renderPixelY4 = (int) ((y4 - h4 - terrain.startingCorner.y + heightRange/2) * unitSizePixels);
 
                 double lighting = (maxHeight+10)/20;
                 int numBlockX = (int) ((x1-terrain.startingCorner.x)/sizeColored);
@@ -186,7 +193,7 @@ public class Renderer {
         // Render target
         double targetHeight = terrain.terrainFunction.valueAt(terrain.target.position.x, terrain.target.position.y);
         int targetRenderX = (int) ((terrain.target.position.x - terrain.startingCorner.x)*unitSizePixels);
-        int targetRenderY = (int) ((terrain.target.position.y - targetHeight - terrain.startingCorner.y)*unitSizePixels);
+        int targetRenderY = (int) ((terrain.target.position.y - targetHeight - terrain.startingCorner.y + heightRange/2)*unitSizePixels);
         double radius = terrain.target.radius;
         drawCircle(g2, terrain.target.position.x, terrain.target.position.y, radius, Color.BLACK, false);
         // Draw flag
@@ -219,7 +226,7 @@ public class Renderer {
             double yy = y+radius*Math.sin(deg/(2*Math.PI));
             double h = terrain.terrainFunction.valueAt(xx, yy);
             int renderX = (int) ((xx - terrain.startingCorner.x)*unitSizePixels);
-            int renderY = (int) ((yy - h - terrain.startingCorner.y)*unitSizePixels);
+            int renderY = (int) ((yy - h - terrain.startingCorner.y + heightRange/2)*unitSizePixels);
             xPoints[deg] = renderX;
             yPoints[deg] = renderY;
             if (firstPointX == -1) {
