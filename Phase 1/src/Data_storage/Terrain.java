@@ -56,20 +56,23 @@ public class Terrain {
                 if (val < minVal) {
                     minVal = val;
                 }
-
-                val += Math.abs(minVal);
-                val /= maxVal - minVal;
-                if (val < 0) {
-                    val = 0;
-                }
-                if (val > 1) {
-                    val = 1;
-                }
-                val *= normalFactor;
-
                 heightmap[pos] = val;
                 pos++;
             }
+        }
+        for (int i=0; i<heightmap.length; i++) {
+            float val = heightmap[i];
+            val += Math.abs(minVal);
+            val /= maxVal - minVal;
+            if (val < 0) {
+                val = 0;
+            }
+            if (val > 1) {
+                val = 1;
+            }
+            val *= normalFactor;
+
+            heightmap[i] = val;
         }
     }
 

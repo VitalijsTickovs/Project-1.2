@@ -7,7 +7,7 @@ import Data_storage.*;
 
 public class PhysicsEngine {
 
-    public double h = 0.01; // The step of the Euler's method
+    public double h = 0.05; // The step of the Euler's method
     public Terrain terrain;
     public ArrayList<Ball> ballsToSimulate;
     private final double G = 9.81;
