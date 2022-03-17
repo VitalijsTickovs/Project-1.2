@@ -4,6 +4,8 @@ import Data_storage.*;
 import GUI.MenuGUI;
 import Physics.PhysicsEngine;
 import Reader.Reader;
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
@@ -21,6 +23,8 @@ import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
+import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Renderer extends Cam {
@@ -29,12 +33,10 @@ public class Renderer extends Cam {
     Geometry target;
     Geometry ballRender;
     float ballRadius = 1f;
-    final float unitPixelSize = 0.5f;
-    float totalSize = 512;
+    float totalSize = 1024;
     float xoff = 0;
     float yoff = 0;
     Vector2 ballStartPos;
-    double ballStarty;
     double targetRadius;
     Vector2 targetPos;
     private PhysicsEngine engine;
@@ -42,7 +44,7 @@ public class Renderer extends Cam {
     float x=totalSize/2;
     float y=totalSize/2;
     float val = 0;
-    int normalFactor = 25;
+    int normalFactor = 100;
     /**
      * Initializes area terrain based on the function given in input file
      */
@@ -124,11 +126,6 @@ public class Renderer extends Cam {
     }
 
     public void findTangent(){
-        double NormaltoX;
-        //XPosition=terrain.terrainFunction.xDerivativeAt(x, y);
-
-        NormaltoX=-1/terrain.terrainFunction.xDerivativeAt(x, y);
-        double normaltoy= -1/terrain.terrainFunction.yDerivativeAt(x,y);
         Vector3f terNormal = terrainQuad.getNormal(new Vector2f(getBallX(),getBallY()));
         double scalar = ballRadius/terNormal.length();
         terNormal = terNormal.mult((float) scalar);
@@ -172,6 +169,7 @@ public class Renderer extends Cam {
             //Moving the ball object to specified position
             ballRender.setLocalTranslation((float) (this.x + terrain.xOff), (float) (val + terrain.xOff), (float) (this.y + terrain.xOff));
             findTangent();
+            text.setText("x: " + df.format(getBallX()) + "  y: " + df.format(getBallY()) + "  z: "+ df.format(getBallZ()));
         }
     }
 
@@ -218,9 +216,24 @@ public class Renderer extends Cam {
         engine.addBall(ball);
     }
 
+    BitmapText text;
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+    public void InitText(){
+        BitmapText hudText = new BitmapText(guiFont);
+        hudText.setSize(guiFont.getCharSet().getRenderedSize());
+        hudText.setColor(ColorRGBA.White);                             // font color
+        hudText.setText("");
+        hudText.setLocalTranslation(0, 50, 0); // position
+        this.text = hudText;
+        guiNode.setQueueBucket(RenderQueue.Bucket.Gui);
+        guiNode.attachChild(hudText);
+
+    }
+
     Ball ball;
     @Override
     public void simpleInitApp() {
+        setDisplayStatView(false);
         initPhysics();
 
         // builds terrain based on function given
@@ -230,8 +243,8 @@ public class Renderer extends Cam {
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
         InitCam(chaseCam);
-        //flyCam.setMoveSpeed(100);
 
+        //flyCam.setMoveSpeed(100);
         //setting sky background to Sky.jpg
         InitSky("Sky/Skysphere.jpeg");
         InitWater();
