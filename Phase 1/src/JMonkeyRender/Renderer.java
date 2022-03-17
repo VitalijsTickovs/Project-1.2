@@ -1,9 +1,9 @@
 package JMonkeyRender;
 
 import Data_storage.*;
+import GUI.MenuGUI;
 import Physics.PhysicsEngine;
 import Reader.Reader;
-import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
@@ -22,7 +22,6 @@ import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
-import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -47,17 +46,17 @@ public class Renderer extends Cam {
     /**
      * Initializes area terrain based on the function given in input file
      */
-    public void initTerrain(){
+    public void initTerrain(String texPath){
         this.xoff = (float) (this.ballStartPos.x - this.totalSize/2);
         this.yoff = (float) (this.ballStartPos.y - this.totalSize/2);
         terrain.calculateHeightMap((int) totalSize+1, normalFactor);
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
-        Texture grass = assetManager.loadTexture("Terrain/Grass3.jpeg");
+        Texture tex = assetManager.loadTexture(texPath);
 
         //Adding grass texture to terrain
-        mat1.setTexture("ColorMap",grass);
+        mat1.setTexture("ColorMap",tex);
 
         //Setting terrain using heightmap
         this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
@@ -202,7 +201,7 @@ public class Renderer extends Cam {
         this.ballStartPos = this.terrain.ballStartingPosition;
         this.targetRadius = this.terrain.target.radius;
         this.targetPos = this.terrain.target.position;
-        initTerrain();
+        initTerrain(MenuGUI.texPath);
 
         ball = new Ball(this.ballStartPos, new Vector2(3, -5));
         engine = new PhysicsEngine();
@@ -230,7 +229,9 @@ public class Renderer extends Cam {
         setDisplayStatView(false);
         initPhysics();
         InitText();
+
         // builds terrain based on function given
+        initTerrain(MenuGUI.getTexPath());
         InitBall();
 
         InitTarget();

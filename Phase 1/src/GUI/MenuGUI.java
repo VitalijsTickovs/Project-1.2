@@ -5,15 +5,32 @@ import gameengine.Game;
 
 public class MenuGUI extends javax.swing.JFrame {
     static boolean gameBoolean =true;//false =player game; true =bot game
-    static int levelNum =0;//0 =Earth; 1 =Moon; 2 =Mars; 3 =Test
+    static int levelNum;//0 =Earth; 1 =Moon; 2 =Mars; 3 =Test
+    public static String texPath;
     
     public MenuGUI() {
         initComponents();
         botRB.setSelected(gameBoolean);//bot game is default
         playerRB.setSelected(!gameBoolean);
-        
-        levelCB.setSelectedIndex(levelNum);
-        
+
+        levelCB.getSelectedIndex();
+        getTexPath();
+    }
+
+    public static String getTexPath(){
+        if (levelCB.getSelectedIndex() == 0) {
+            // set path String to grass terrain
+            texPath = "Terrain/grass.jpeg";
+        }
+        if (levelCB.getSelectedIndex() == 1) {
+            // set path String to moon terrain
+            texPath = "Terrain/Moon_ground.png";
+        }
+        if (levelCB.getSelectedIndex() == 2) {
+            // set path String to mars terrain
+            texPath = "Terrain/Mars_ground.jpg";
+        }
+        return texPath;
     }
 
     @SuppressWarnings("unchecked")
@@ -304,7 +321,7 @@ public class MenuGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JComboBox<String> levelCB;
+    private static javax.swing.JComboBox<String> levelCB;
     private javax.swing.JButton levelDetailsB;
     private javax.swing.JButton multiB;
     private javax.swing.JRadioButton playerRB;
