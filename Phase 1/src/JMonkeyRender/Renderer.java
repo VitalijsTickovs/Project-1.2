@@ -1,3 +1,5 @@
+package JMonkeyRender;
+
 import Data_storage.*;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
@@ -17,9 +19,7 @@ import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
-import java.util.Arrays;
-
-public class Main extends Cam {
+public class Renderer extends Cam {
     private boolean inTarget;
     TerrainQuad terrainQuad;
     Terrain terrain;
@@ -27,7 +27,7 @@ public class Main extends Cam {
     Geometry ball;
     float ballRadius = 1f;
     final float unitPixelSize = 0.5f;
-    float totalSize = 128;
+    float totalSize = 512;
     float xoff = 0;
     float yoff = 0;
     double ballStartx;
@@ -38,7 +38,7 @@ public class Main extends Cam {
     float x=totalSize/2;
     float y=totalSize/2;
     float val = 0;
-    int normalFactor = 50;
+    int normalFactor = 25;
     /**
      * Initializes area terrain based on the function given in input file
      */
@@ -120,44 +120,16 @@ public class Main extends Cam {
     }
 
     public void findTangent(){
-        double XPosition;
-        double YPosition;
-        double ZPosition;
-        float BallatX;
-        float BallatY;
-        float BallatZ;
+        double NormaltoX;
+        //XPosition=terrain.terrainFunction.xDerivativeAt(x, y);
 
-        XPosition=terrain.terrainFunction.xDerivativeAt(x, y);
-        YPosition=terrain.terrainFunction.yDerivativeAt(x, y);
-        ZPosition=terrain.terrainFunction.valueAt(x,y); //height
-        BallatX=getBallX();
-        BallatY=getBallY();
-        BallatZ=getBallZ();
-
-        Vector3f normal = this.terrainQuad.getNormal(new Vector2f(x,y));
-
-        float XDifference=BallatX-normal.x;
-        float YDifference=BallatY-normal.z;
-        float ZDifference=BallatZ-normal.y;
-
-        System.out.println(XDifference);
+        NormaltoX=-1/terrain.terrainFunction.xDerivativeAt(x, y);
+        double normaltoy= -1/terrain.terrainFunction.yDerivativeAt(x,y);
+        Vector3f terNormal = terrainQuad.getNormal(new Vector2f(getBallX(),getBallY()));
+        double scalar = ballRadius/terNormal.length();
+        terNormal = terNormal.mult((float) scalar);
         //Just put 0.2 as a threshold, like if the difference is above that, is gonna be visible
-        if(XDifference<this.ballRadius) {
-            ball.move(this.ballRadius - XDifference ,0,0);
-        }else if(XDifference>this.ballRadius){
-            ball.move(new Vector3f(XDifference + ballRadius, 0,0));
-        }
-
-        if(YDifference<this.ballRadius){
-            ball.move(0,0,this.ballRadius - YDifference );
-        }else if(XDifference>this.ballRadius){
-            ball.move(new Vector3f(0, 0,YDifference + ballRadius));
-        }
-        if(ZDifference <this.ballRadius){
-            ball.move(0, this.ballRadius - ZDifference, 0);
-        }else if(XDifference>this.ballRadius){
-            ball.move(new Vector3f(0, YDifference + ballRadius,0));
-        }
+        ball.move(terNormal.x, terNormal.y, terNormal.z);
     }
 
 
@@ -195,6 +167,7 @@ public class Main extends Cam {
             this.val = val;
             //Moving the ball object to specified position
             ball.setLocalTranslation((float) (x + terrain.xOff), (float) (val + terrain.xOff), (float) (y + terrain.xOff));
+            findTangent();
         }
     }
 
@@ -218,7 +191,7 @@ public class Main extends Cam {
         Geometry water=new Geometry("water", waveSize);
         water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
         water.setShadowMode(RenderQueue.ShadowMode.Receive);
-        water.move(xoff - 100, -1, -xoff + 100);
+        water.move(xoff - 100, normalFactor/2, -xoff + 100);
         water.setMaterial(waterProcessor.getMaterial());
         rootNode.attachChild(water);
     }
@@ -235,7 +208,6 @@ public class Main extends Cam {
         //System.out.println(terrain.heightmap);
         // generates a ball into the world
         InitBall();
-        moveBall(0,0);
         InitTarget();
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
@@ -252,12 +224,11 @@ public class Main extends Cam {
     @Override
     public void simpleUpdate(float tpf) {
 //        moveBall(f,f);
-//        f+=0.1f;
+//        f+=0.01f;
     }
 
-    public static void main(String[] args) {
-        Main game = new Main();
-        game.setShowSettings(false);
+    public void start3d(){
+        this.setShowSettings(false);
         // Setting up renderer settings, so JME settings tab wouldnt pop out
         AppSettings settings = new AppSettings(true);
         settings.put("Width", 1280);
@@ -265,8 +236,8 @@ public class Main extends Cam {
         settings.put("Title", "Golf Game");
         settings.put("VSync", true);
         settings.put("Samples", 4);
-        game.setSettings(settings);
+        this.setSettings(settings);
 
-        game.start();
+        this.start();
     }
 }

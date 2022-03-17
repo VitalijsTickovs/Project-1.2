@@ -72,7 +72,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     /**
-     * Main method to run the game loop
+     * JMonkeyRender.Main method to run the game loop
      */
     public void run() {
         long last = System.nanoTime();
