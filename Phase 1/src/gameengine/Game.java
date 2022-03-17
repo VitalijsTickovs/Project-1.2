@@ -41,14 +41,14 @@ public class Game extends Canvas implements Runnable, GameObject {
         shot = null;
         // "0.1*sin(e**(-(x**2+y**2)/40)*x*y)"
         // Set up terrain
-        terrain = new Terrain("e**(-(x**2+y**2)/40)", 0.2, 0.1, new Vector2(-20, -20), new Vector2(20, 20));
+        terrain = Reader.readFile();//new Terrain("e**(-(x**2+y**2)/40)", 0.2, 0.1, new Vector2(-20, -20), new Vector2(20, 20));
         terrain.calculateHeightMap(1024, 1.0);
-        terrain.target = new Target();
-        terrain.target.position = new Vector2(4, 4);
-        terrain.target.radius = 4;
+        //terrain.target = new Target();
+        //terrain.target.position = new Vector2(4, 4);
+        //terrain.target.radius = 4;
         //terrain.addZone(new Vector2(-5.24, -7.8), new Vector2(10.5, 10), 0.3, 0.2);
         // Set up the ball
-        ball = new Ball(new Vector2(-1, -0.5), new Vector2(3, -5));
+        ball = new Ball(terrain.ballStartingPosition, Vector2.zeroVector);
         engine = new PhysicsEngine();
         engine.terrain = terrain;
         engine.addBall(ball);
@@ -56,8 +56,8 @@ public class Game extends Canvas implements Runnable, GameObject {
         cam = new Camera();
         cam.width = 40;
         cam.height = 40;
-        cam.x = ball.state.position.x - cam.width/2;
-        cam.y = ball.state.position.y - cam.height/2;
+        cam.x = ball.state.position.x;
+        cam.y = ball.state.position.y;
         // Setup the renderer
         renderer = new Renderer();
         renderer.heightRange = 20;
@@ -71,6 +71,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         terrainImage = new BufferedImage((int) (cam.width*renderer.unitSizePixels), (int) (cam.height*renderer.unitSizePixels), BufferedImage.TYPE_4BYTE_ABGR);
         // Set up the frame
         frame = new JFrame();
+        frame.setTitle("Crazy Putting");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize((int) (cam.width*renderer.unitSizePixels), (int) (cam.height*renderer.unitSizePixels));
         frame.setLocationRelativeTo(null);
@@ -124,7 +125,14 @@ public class Game extends Canvas implements Runnable, GameObject {
      */
     public void update() {
         if (shot == null && !shotInput.isOpen && points.size() == 0) {
-            shotInput.openWindow();
+            // Check if in water
+            if (terrain.terrainFunction.valueAt(ball.state.position.x, ball.state.position.y) <= 0) {
+                // Reset the shot
+                ball.state.position = terrain.ballStartingPosition;
+                numShots = 0;
+            } else {
+                shotInput.openWindow();
+            }
         }
         if (points.size() == 0 && shot != null) {
             points = engine.simulateShot(shot, ball);

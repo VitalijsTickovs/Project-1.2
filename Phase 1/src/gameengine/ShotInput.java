@@ -19,6 +19,7 @@ public class ShotInput {
     public void openWindow() {
         isOpen = true;
         frame = new JFrame();
+        frame.setTitle("Input shot velocity");
         frame.setSize(300, 170);
         frame.setLocationRelativeTo(game);
         frame.setLocation(frame.getX(), game.frame.getY()+game.frame.getHeight());

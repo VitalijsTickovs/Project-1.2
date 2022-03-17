@@ -163,7 +163,7 @@ public class Renderer {
                 double lighting = (maxHeight+10)/20;
                 int numBlockX = (int) ((x1-terrain.startingCorner.x)/sizeColored);
                 int numBlockY = (int) ((y1-terrain.startingCorner.y)/sizeColored);
-                if (maxHeight > 0) {
+                if (maxHeight >= 0) {
                     if (terrain.isPointInZone(x1, y1)) {
                         if ((numBlockX + numBlockY) % 2 == 0) {
                             g2.setColor(new Color((int) (200 * lighting), (int) (200 * lighting), 0));

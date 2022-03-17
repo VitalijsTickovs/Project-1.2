@@ -5,20 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added Get method for ball">
-      <change afterPath="$PROJECT_DIR$/Phase 1/src/GUI/HighscoreGUI.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Phase 1/src/GUI/MenuGUI.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Phase 1/src/GUI/resources/hs.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Cam.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/JMonkeyRender/Cam.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/Terrain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/Terrain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/JMonkeyRender/Renderer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/TerrainFunction1.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/TerrainFunction1.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/GUI/MenuGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/GUI/MenuGUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Reader/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Reader/Reader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/Reader/UserInput.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Reader/UserInput.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/function/Function.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/function/Function.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Renderer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Renderer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/ShotInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/ShotInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Cam.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Cam.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Data_storage/Terrain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Data_storage/Terrain.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Reader/Reader.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Reader/Reader.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Reader/UserInput.csv" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Reader/UserInput.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/gameengine/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/gameengine/Game.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/gameengine/Renderer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/gameengine/Renderer.class" afterDir="false" />
@@ -37,6 +35,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="26VamCtiAPb8QVTVfHO8bWz3FPR" />
   <component name="ProjectLevelVcsManager">

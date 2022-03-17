@@ -235,7 +235,6 @@ public class MenuGUI extends javax.swing.JFrame {
         ////FETCH PLAYER/BOT BOOLEAN
         /////OPEN PUTTING RENDER
         render.start3d();
-        
         this.setVisible(false);
     }//GEN-LAST:event_multiBActionPerformed
 
