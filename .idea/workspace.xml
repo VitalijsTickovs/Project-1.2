@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added target spawning">
+    <list default="true" id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added Get method for ball">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/Terrain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/Terrain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Renderer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Renderer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,8 +25,17 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="ProjectId" id="26VamCtiAPb8QVTVfHO8bWz3FPR" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
   </component>
   <component name="RunManager" selected="Application.Game">
     <configuration name="Game" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -56,7 +65,15 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added Get method for ball" />
+      <created>1647511371649</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1647511371649</updated>
+    </task>
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
