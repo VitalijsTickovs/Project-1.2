@@ -25,15 +25,15 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     public Vector2 shot;
 
+    public int numShots;
+
     /**
      * Constructor.
      * 
      * @param fps The wanted FPS (frames per second) of the game
      */
     public Game(int fps) {
-        // Your path to GitHub here
-        //String csvFile = "C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv";
-        //Terrain terrainT = Reader.readFile(csvFile);
+        numShots = 0;
         FPS = fps;
         running = false;
         shotInput = new ShotInput();
@@ -65,6 +65,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         renderer.cam = cam;
         renderer.ball = ball;
         renderer.unitSizePixels = 10;
+        renderer.game = this;
         renderer.createTerrainImage();
         // Set up the terrain image
         terrainImage = new BufferedImage((int) (cam.width*renderer.unitSizePixels), (int) (cam.height*renderer.unitSizePixels), BufferedImage.TYPE_4BYTE_ABGR);
@@ -79,7 +80,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     /**
-     * Main method to run the game loop
+     * JMonkeyRender.Main method to run the game loop
      */
     public void run() {
         long last = System.nanoTime();
@@ -127,6 +128,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         }
         if (points.size() == 0 && shot != null) {
             points = engine.simulateShot(shot, ball);
+            numShots++;
             shot = null;
         }
         if (points.size() != 0) {

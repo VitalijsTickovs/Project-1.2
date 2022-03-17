@@ -15,9 +15,10 @@ public class Renderer {
     public Ball ball;
     public BufferedImage terrainImage;
     public double heightRange;
+    public Game game;
 
     public void render(Graphics2D g2) {
-        g2.setColor(Color.WHITE);
+        g2.setColor(new Color(75, 47, 26));
         g2.fillRect(0, 0, (int) (cam.width*unitSizePixels), (int) (cam.width*unitSizePixels));
         // Render the terrain
         double camTLx = cam.x - cam.width/2;
@@ -89,12 +90,15 @@ public class Renderer {
 
         // Draw ball position
         g2.setFont(new Font("TimesRoman", Font.BOLD, 15));
-        g2.setColor(Color.BLACK);
+        g2.setColor(Color.WHITE);
         BigDecimal xx = new BigDecimal(ball.state.position.x);
         xx = xx.setScale(2, RoundingMode.HALF_UP);
         BigDecimal yy = new BigDecimal(ball.state.position.y);
         yy = yy.setScale(2, RoundingMode.HALF_UP);
         g2.drawString("x = "+xx+" y = "+yy, unitSizePixels, 2*unitSizePixels);
+
+        // Draw number of shots
+        g2.drawString("Shots taken: "+game.numShots, unitSizePixels, 4*unitSizePixels);
 
     }
 
@@ -108,8 +112,8 @@ public class Renderer {
         // Number of units in colored space
         double sizeColored = 4;
         // Clear screen
-        g2.setColor(Color.WHITE);
-        g2.fillRect(0, 0, (int) (cam.width*unitSizePixels), (int) (cam.height*unitSizePixels));
+        g2.setColor(new Color(75, 47, 26));
+        g2.fillRect(0, 0, terrainImage.getWidth(), terrainImage.getHeight());
         //g2.setColor(new Color(96, 69, 38));
         //g2.fillRect(0, 10*unitSizePixels, terrainImage.getWidth(), terrainImage.getHeight()-10*unitSizePixels);
         // Render the terrain

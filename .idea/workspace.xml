@@ -5,15 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="206f0094-a76d-42dc-9e90-94a391679a5b" name="Changes" comment="Added Get method for ball">
+      <change afterPath="$PROJECT_DIR$/Phase 1/src/GUI/HighscoreGUI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Phase 1/src/GUI/MenuGUI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Phase 1/src/GUI/resources/hs.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Physics/PhysicsEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Cam.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/JMonkeyRender/Cam.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Data_storage/Terrain.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Data_storage/Terrain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/JMonkeyRender/Renderer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/Reader/UserInput.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/Reader/UserInput.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Game.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/Renderer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/Renderer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phase 1/src/gameengine/ShotInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/Phase 1/src/gameengine/ShotInput.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Cam.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Cam.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Data_storage/Terrain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Data_storage/Terrain.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Data_storage/TerrainFunction1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Data_storage/TerrainFunction1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Reader/Reader.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Reader/Reader.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Reader/UserInput.csv" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Reader/UserInput.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/gameengine/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/gameengine/Game.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/gameengine/Renderer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/gameengine/Renderer.class" afterDir="false" />
     </list>
@@ -44,7 +50,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
   </component>
-  <component name="RunManager" selected="Application.Game">
+  <component name="RunManager" selected="Application.MenuGUI">
     <configuration name="Game" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="gameengine.Game" />
       <module name="Project-1.2" />
@@ -65,6 +71,19 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MenuGUI" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="GUI.MenuGUI" />
+      <module name="Project-1.2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="GUI.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ShotInput" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="gameengine.ShotInput" />
       <module name="Project-1.2" />
@@ -80,6 +99,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.MenuGUI" />
         <item itemvalue="Application.Game" />
         <item itemvalue="Application.ShotInput" />
         <item itemvalue="Application.Main" />

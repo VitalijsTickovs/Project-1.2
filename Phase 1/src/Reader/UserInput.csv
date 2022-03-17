@@ -2,12 +2,12 @@ terrainX0 = -50;
 terrainY0 = -50;
 terrainX1 = 50;
 terrainY1 = 50;
-greenKineticFriction = 0.01;
-greenStaticFriction = 0.05;
-terrainFunction = sin(x) + sin(y);
+greenKineticFriction = 0.1;
+greenStaticFriction = 0.2;
+terrainFunction = sin((x+y)/7)+0.5;
 
-ballStartPointX = 0.1;
-ballStartPointY = 0.1;
+ballStartPointX = 1;
+ballStartPointY = 1;
 
 targetRadius = 0.1;
 targetX = 1.1;
