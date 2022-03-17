@@ -39,14 +39,9 @@ public class Game extends Canvas implements Runnable, GameObject {
         shotInput = new ShotInput();
         shotInput.game = this;
         shot = null;
-        // "0.1*sin(e**(-(x**2+y**2)/40)*x*y)"
         // Set up terrain
-        terrain = Reader.readFile();//new Terrain("e**(-(x**2+y**2)/40)", 0.2, 0.1, new Vector2(-20, -20), new Vector2(20, 20));
+        terrain = Reader.readFile();
         terrain.calculateHeightMap(1024, 1.0);
-        //terrain.target = new Target();
-        //terrain.target.position = new Vector2(4, 4);
-        //terrain.target.radius = 4;
-        //terrain.addZone(new Vector2(-5.24, -7.8), new Vector2(10.5, 10), 0.3, 0.2);
         // Set up the ball
         ball = new Ball(terrain.ballStartingPosition, Vector2.zeroVector);
         engine = new PhysicsEngine();
@@ -81,7 +76,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     /**
-     * JMonkeyRender.Main method to run the game loop
+     * Runs the game loop
      */
     public void run() {
         long last = System.nanoTime();
@@ -134,11 +129,13 @@ public class Game extends Canvas implements Runnable, GameObject {
                 shotInput.openWindow();
             }
         }
+        // Find the positions after a shot
         if (points.size() == 0 && shot != null) {
             points = engine.simulateShot(shot, ball);
             numShots++;
             shot = null;
         }
+        // Update the ball position if it has been calculated
         if (points.size() != 0) {
             ball.state.position = points.get(0);
             points.remove(0);
@@ -162,15 +159,6 @@ public class Game extends Canvas implements Runnable, GameObject {
         g2.drawImage(terrainImage, 0, 0, terrainImage.getWidth(), terrainImage.getHeight(), null);
 
         renderer.render(g2);
-        /*fillTerrain(g2);
-
-        // Render ball
-        int ballWidth = unitSizePixels/4;
-        int ballHeight = unitSizePixels/4;
-        int xx = cameraWidth*unitSizePixels/2 - ballWidth/2;//(int) ((ball.state.position.x - terrain.startingCorner.x)*unitSizePixels);////
-        int yy = cameraHeight*unitSizePixels/2 - ballHeight/2;//(int) ((ball.state.position.y - terrain.startingCorner.y)*unitSizePixels);////
-        g2.setColor(Color.WHITE);
-        g2.fillArc(xx, yy, ballWidth, ballHeight, 0, 360);*/
 
         g2.dispose();
         bs.show();

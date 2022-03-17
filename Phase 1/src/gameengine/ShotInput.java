@@ -12,10 +12,16 @@ public class ShotInput {
     public Game game;
     public boolean isOpen;
 
+    /**
+     * Constructor. Creates a new ShotInput
+     */
     public ShotInput() {
         isOpen = false;
     }
 
+    /**
+     * Opens a JFrame window with a velocity input option
+     */
     public void openWindow() {
         isOpen = true;
         frame = new JFrame();
@@ -27,16 +33,17 @@ public class ShotInput {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel mainPanel = new JPanel();
+        // Set up x-velocity row
         JPanel row1 = new JPanel();
         row1.add(new JLabel("x-velocity = "), BorderLayout.WEST);
         JTextField xTextField = new JTextField(20);
         row1.add(xTextField, BorderLayout.EAST);
-
+        // Set up y-velocity row
         JPanel row2 = new JPanel();
         row2.add(new JLabel("y-velocity = "), BorderLayout.WEST);
         JTextField yTextField = new JTextField(20);
         row2.add(yTextField, BorderLayout.EAST);
-
+        // Set up shoot button row
         JPanel row3 = new JPanel();
         JButton shoot = new JButton("SHOOT!");
         shoot.addActionListener(new ActionListener() {

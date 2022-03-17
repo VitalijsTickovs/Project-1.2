@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 
 public class Renderer {
     public Camera cam;
@@ -17,6 +16,10 @@ public class Renderer {
     public double heightRange;
     public Game game;
 
+    /**
+     * Renders the entire game
+     * @param g2 The Graphics2D object to render to
+     */
     public void render(Graphics2D g2) {
         g2.setColor(new Color(75, 47, 26));
         g2.fillRect(0, 0, (int) (cam.width*unitSizePixels), (int) (cam.width*unitSizePixels));
@@ -41,7 +44,7 @@ public class Renderer {
             }
 
             if (camTLy < terrain.startingCorner.y - heightRange/2) {
-                yTL = 0;//(int) (unitSizePixels * heightRange/2);
+                yTL = 0;
             } else {
                 // Calculate y top left
                 yTL = (int) ((camTLy - (terrain.startingCorner.y - heightRange/2))*unitSizePixels);
@@ -86,7 +89,7 @@ public class Renderer {
         g2.setColor(new Color(50, 50, 50, 50));
         g2.fillArc(ballRenderX-3*ballWidth/4, ballRenderY-3*ballHeight/4, 3*ballWidth/2, 3*ballHeight/2, 0, 360);
         g2.setColor(Color.WHITE);
-        g2.fillArc(ballRenderX - ballWidth / 2, ballRenderY - ballHeight, ballWidth, ballHeight, 0, 360);
+        g2.fillArc(ballRenderX - ballWidth / 2, ballRenderY - 4*ballHeight/5, ballWidth, ballHeight, 0, 360);
 
         // Draw ball position
         g2.setFont(new Font("TimesRoman", Font.BOLD, 15));
@@ -102,6 +105,9 @@ public class Renderer {
 
     }
 
+    /**
+     * Creates a BufferedImage of the terrain
+     */
     public void createTerrainImage() {
         terrainImage = new BufferedImage(
                 (int) ((terrain.limitingCorner.x-terrain.startingCorner.x)*unitSizePixels),
@@ -114,8 +120,6 @@ public class Renderer {
         // Clear screen
         g2.setColor(new Color(75, 47, 26));
         g2.fillRect(0, 0, terrainImage.getWidth(), terrainImage.getHeight());
-        //g2.setColor(new Color(96, 69, 38));
-        //g2.fillRect(0, 10*unitSizePixels, terrainImage.getWidth(), terrainImage.getHeight()-10*unitSizePixels);
         // Render the terrain
         int numVertices = (int) Math.sqrt(terrain.heightmap.length);
         double xStep = (terrain.limitingCorner.x - terrain.startingCorner.x) / numVertices;
@@ -163,13 +167,16 @@ public class Renderer {
                 double lighting = (maxHeight+10)/20;
                 int numBlockX = (int) ((x1-terrain.startingCorner.x)/sizeColored);
                 int numBlockY = (int) ((y1-terrain.startingCorner.y)/sizeColored);
+                // Land
                 if (maxHeight >= 0) {
+                    // Sand
                     if (terrain.isPointInZone(x1, y1)) {
                         if ((numBlockX + numBlockY) % 2 == 0) {
                             g2.setColor(new Color((int) (200 * lighting), (int) (200 * lighting), 0));
                         } else {
-                            g2.setColor(new Color((int) (150 * lighting), (int) (150 * lighting), 0));
+                            g2.setColor(new Color((int) (180 * lighting), (int) (150 * lighting), 0));
                         }
+                        // Grass
                     } else {
                         if ((numBlockX + numBlockY) % 2 == 0) {
                             g2.setColor(new Color(0, (int) (200 * lighting), 0));
@@ -178,11 +185,8 @@ public class Renderer {
                         }
                     }
                 } else {
-                    //if ((numBlockX+numBlockY)%2 == 0) {
-                        g2.setColor(new Color((int) (34*lighting), (int) (124*lighting), (int) (176*lighting)));
-                    //} else {
-                        //g2.setColor(new Color(0, 0, 0.5f*lighting));
-                    //}
+                    // Water
+                    g2.setColor(new Color((int) (34*lighting), (int) (124*lighting), (int) (176*lighting)));
                 }
 
                 g2.fillPolygon(
@@ -192,8 +196,6 @@ public class Renderer {
                 );
             }
         }
-        // Draw obstacles
-
         // Render target
         double targetHeight = terrain.terrainFunction.valueAt(terrain.target.position.x, terrain.target.position.y);
         int targetRenderX = (int) ((terrain.target.position.x - terrain.startingCorner.x)*unitSizePixels);
@@ -220,11 +222,21 @@ public class Renderer {
         }
     }
 
+    /**
+     * Draws a circle onto the function terrain
+     * @param g2 The Graphics2D object that the function is being drawn to
+     * @param x The x coordinate of the center of the circle
+     * @param y The y coordinate of the center of the circle
+     * @param radius The radius of the circle
+     * @param color The color of the circle
+     * @param filled Whether it's a filled circle or just an outline
+     */
     private void drawCircle(Graphics2D g2, double x, double y, double radius, Color color, boolean filled) {
         int[] xPoints = new int[361];
         int[] yPoints = new int[361];
         g2.setColor(color);
         int firstPointX = -1, firstPointY=-1;
+        // Loop through 360 degrees and add the points
         for (int deg=0; deg<=360; deg++) {
             double xx = x+radius*Math.cos(deg/(2*Math.PI));
             double yy = y+radius*Math.sin(deg/(2*Math.PI));
@@ -234,7 +246,6 @@ public class Renderer {
             xPoints[deg] = renderX;
             yPoints[deg] = renderY;
             if (firstPointX == -1) {
-                //g2.drawLine(prevPointX, prevPointY, renderX, renderY);
                 firstPointX = renderX;
                 firstPointY = renderY;
             }
