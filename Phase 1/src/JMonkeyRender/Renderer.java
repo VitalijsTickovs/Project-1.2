@@ -1,6 +1,7 @@
 package JMonkeyRender;
 
 import Data_storage.*;
+import Physics.PhysicsEngine;
 import Reader.Reader;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
@@ -19,21 +20,23 @@ import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
+import java.util.ArrayList;
+
 public class Renderer extends Cam {
-    private boolean inTarget;
     TerrainQuad terrainQuad;
     Terrain terrain;
     Geometry target;
-    Geometry ball;
+    Geometry ballRender;
     float ballRadius = 1f;
     final float unitPixelSize = 0.5f;
     float totalSize = 512;
     float xoff = 0;
     float yoff = 0;
-    double ballStartx;
+    Vector2 ballStartPos;
     double ballStarty;
     double targetRadius;
     Vector2 targetPos;
+    private PhysicsEngine engine;
 
     float x=totalSize/2;
     float y=totalSize/2;
@@ -43,8 +46,8 @@ public class Renderer extends Cam {
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(){
-        this.xoff = (float) (this.ballStartx - this.totalSize/2);
-        this.yoff = (float) (this.ballStarty - this.totalSize/2);
+        this.xoff = (float) (this.ballStartPos.x - this.totalSize/2);
+        this.yoff = (float) (this.ballStartPos.y - this.totalSize/2);
         terrain.calculateHeightMap((int) totalSize+1, normalFactor);
 
         //Setting up the Texture of the ground
@@ -68,15 +71,15 @@ public class Renderer extends Cam {
     public void InitBall(){
         Sphere ball = new Sphere(120, 120, ballRadius);
         TangentBinormalGenerator.generate(ball);
-        this.ball = new Geometry("Ball", ball);
+        this.ballRender = new Geometry("Ball", ball);
 
         Texture sphereTex = assetManager.loadTexture("Ball/Golfball.jpeg");
         Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
 
         mat.setTexture("ColorMap", sphereTex);
-        this.ball.setMaterial(mat);
-        rootNode.attachChild(this.ball);
-        moveBall((float) this.ballStartx, (float) this.ballStarty);
+        this.ballRender.setMaterial(mat);
+        rootNode.attachChild(this.ballRender);
+        moveBall(ballStartPos);
     }
 
     public void InitTarget(){
@@ -108,9 +111,9 @@ public class Renderer extends Cam {
     /**
      *checks if final ball position is within the target radius
     */
-    public boolean isInTarget(Ball ball, Target t){
-
-        if (ball.state.position.x >= t.position.x - t.radius && ball.state.position.x <= t.position.x + t.radius && ball.state.position.y >= t.position.y - t.radius && ball.state.position.y <= t.position.y + t.radius){
+    public boolean isInTarget(Ball ball){
+        if (ball.state.position.x >= targetPos.x - targetRadius && ball.state.position.x <= targetPos.x + targetRadius &&
+                ball.state.position.y >= targetPos.y - targetRadius && ball.state.position.y <= targetPos.y + targetRadius){
             inTarget = true;
         }
         else inTarget = false;
@@ -129,7 +132,7 @@ public class Renderer extends Cam {
         double scalar = ballRadius/terNormal.length();
         terNormal = terNormal.mult((float) scalar);
         //Just put 0.2 as a threshold, like if the difference is above that, is gonna be visible
-        ball.move(terNormal.x, terNormal.y, terNormal.z);
+        ballRender.move(terNormal.x, terNormal.y, terNormal.z);
     }
 
 
@@ -148,13 +151,13 @@ public class Renderer extends Cam {
     /**
      * Moves ball according to x & y coordinates
      */
-    public void moveBall(float x, float y){
-        if(x<(this.totalSize)/2 && y < (this.totalSize)/2) {
-            this.x = x;
-            this.y = y;
+    public void moveBall(Vector2 balPos){
+        if(balPos.x<(this.totalSize)/2 && balPos.y < (this.totalSize)/2) {
+            this.x = (float) balPos.x;
+            this.y = (float) balPos.y;
             //Getting height value corresponding to x and y values
             float val;
-            val = (float) terrain.terrainFunction.valueAt( x* terrain.xOff, y * terrain.yOff);
+            val = (float) terrain.terrainFunction.valueAt( this.x* terrain.xOff, this.y * terrain.yOff);
             val += Math.abs(terrain.minVal);
             val /= terrain.maxVal - terrain.minVal;
             if (val < 0) {
@@ -166,7 +169,7 @@ public class Renderer extends Cam {
             val *= normalFactor;
             this.val = val;
             //Moving the ball object to specified position
-            ball.setLocalTranslation((float) (x + terrain.xOff), (float) (val + terrain.xOff), (float) (y + terrain.xOff));
+            ballRender.setLocalTranslation((float) (this.x + terrain.xOff), (float) (val + terrain.xOff), (float) (this.y + terrain.xOff));
             findTangent();
         }
     }
@@ -191,26 +194,38 @@ public class Renderer extends Cam {
         Geometry water=new Geometry("water", waveSize);
         water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
         water.setShadowMode(RenderQueue.ShadowMode.Receive);
-        water.move(xoff - 100, normalFactor/2, -xoff + 100);
+        water.move(xoff - 100, -1, -xoff + 100);
         water.setMaterial(waterProcessor.getMaterial());
         rootNode.attachChild(water);
     }
 
-    @Override
-    public void simpleInitApp() {
+    public void initPhysics(){
         this.terrain = Reader.readFile();
-        this.ballStartx = this.terrain.ballStartingPosition.x;
-        this.ballStarty = this.terrain.ballStartingPosition.y;
+        this.ballStartPos = this.terrain.ballStartingPosition;
         this.targetRadius = this.terrain.target.radius;
         this.targetPos = this.terrain.target.position;
-        // builds terrain based on function given
+
+        //terrain.target.position = new Vector2(4, 4);
+        //terrain.target.radius = 4;
+        //terrain.addZone(new Vector2(-5.24, -7.8), new Vector2(10.5, 10), 0.3, 0.2);
+        ball = new Ball(this.ballStartPos, new Vector2(3, -5));
+        engine = new PhysicsEngine();
+        engine.terrain = this.terrain;
+        engine.addBall(ball);
+    }
+
+    Ball ball;
+    @Override
+    public void simpleInitApp() {
+        initPhysics();
+
         initTerrain();
-        //System.out.println(terrain.heightmap);
-        // generates a ball into the world
+        // builds terrain based on function given
         InitBall();
+
         InitTarget();
         //creating and attaching camera to ball
-        ChaseCamera chaseCam = new ChaseCamera(cam, ball, inputManager);
+        ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
         InitCam(chaseCam);
         //flyCam.setMoveSpeed(100);
 
@@ -220,11 +235,25 @@ public class Renderer extends Cam {
 
     }
 
-    float f;
+
+    private ArrayList<Vector2> points = new ArrayList<>();
+    Boolean inTarget = false;
     @Override
     public void simpleUpdate(float tpf) {
-//        moveBall(f,f);
-//        f+=0.01f;
+            if (!inTarget) {
+                if (points.size() == 0) {
+                    points = engine.simulateShot(new Vector2(Math.random() * 10 - 5, Math.random() * 10 - 5), ball);
+
+                }
+                if (points.size() != 0) {
+                    ball.state.position = points.get(0);
+                    moveBall(ball.state.position);
+                    points.remove(0);
+                }
+                isInTarget(ball);
+            }else{
+                System.exit(1);
+            }
     }
 
     public void start3d(){
