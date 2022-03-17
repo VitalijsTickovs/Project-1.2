@@ -192,7 +192,7 @@ public class Renderer extends Cam {
         Geometry water=new Geometry("water", waveSize);
         water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
         water.setShadowMode(RenderQueue.ShadowMode.Receive);
-        water.move(xoff - 100, -1, -xoff + 100);
+        water.move(xoff - 100, totalSize/2, -xoff + 100);
         water.setMaterial(waterProcessor.getMaterial());
         rootNode.attachChild(water);
     }
@@ -202,13 +202,8 @@ public class Renderer extends Cam {
         this.ballStartPos = this.terrain.ballStartingPosition;
         this.targetRadius = this.terrain.target.radius;
         this.targetPos = this.terrain.target.position;
-        terrain.addZone(new Vector2(-5.24, -7.8), new Vector2(10.5, 10), 0.3, 0.2);
         initTerrain();
 
-
-        //terrain.target.position = new Vector2(4, 4);
-        //terrain.target.radius = 4;
-        //terrain.addZone(new Vector2(-5.24, -7.8), new Vector2(10.5, 10), 0.3, 0.2);
         ball = new Ball(this.ballStartPos, new Vector2(3, -5));
         engine = new PhysicsEngine();
         engine.terrain = this.terrain;
@@ -234,20 +229,15 @@ public class Renderer extends Cam {
     public void simpleInitApp() {
         setDisplayStatView(false);
         initPhysics();
-
-        initTerrain();
         InitText();
         // builds terrain based on function given
         InitBall();
-
-
 
         InitTarget();
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
         InitCam(chaseCam);
 
-        //flyCam.setMoveSpeed(100);
         //setting sky background to Sky.jpg
         InitSky("Sky/Skysphere.jpeg");
         InitWater();

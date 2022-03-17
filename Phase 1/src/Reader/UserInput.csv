@@ -4,14 +4,14 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.1;
 greenStaticFriction = 0.2;
-terrainFunction = e**(-(x**2+y**2)/20);
+terrainFunction = e**(-(x**2+y**2)/40);
 
-ballStartPointX = 1;
-ballStartPointY = 1;
+ballStartPointX = -1;
+ballStartPointY = -0.5;
 
 targetRadius = 1;
-targetX = 1.1;
-targetY = 2.5;
+targetX = 1.5;
+targetY = 5;
 
 //Sand pit data
 sandZoneX = -10<x<10.1;
