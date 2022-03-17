@@ -47,44 +47,34 @@ public class Terrain {
         double yOff = (limitingCorner.y - startingCorner.y)/numVerteces;
         for (int x = 0; x < numVerteces; x++) {
             for (int y = 0; y < numVerteces; y++) {
-                double xx = startingCorner.x + x;
-                double yy = startingCorner.y + y;
+                double xx = startingCorner.x + x * xOff;
+                double yy = startingCorner.y + y * yOff;
                 float val = (float) terrainFunction.valueAt(xx, yy);
-//                if(val > maxVal) maxVal = val;
-//                if(val < minVal) minVal = val;
-                if(val > this.maxVal) val = maxVal;
-                else if(val < this.minVal) val = minVal;
+                if (val > maxVal) {
+                    maxVal = val;
+                }
+                if (val < minVal) {
+                    minVal = val;
+                }
                 heightmap[pos] = val;
                 pos++;
             }
         }
-//        pos = 0;
-//        for (int x = 0; x < numVerteces; x++) {
-//            for (int y = 0; y < numVerteces; y++) {
-//                float val = heightmap[pos];
-//                if (val > maxVal) {
-//                    maxVal = val;
-//                }
-//                if (val < minVal) {
-//                    minVal = val;
-//                }
-//
-//                val += Math.abs(minVal);
-//                val /= maxVal - minVal;
-//                if (val < minVal) {
-//                    val = minVal;
-//                }
-//                else if (val > maxVal) {
-//                    val = maxVal;
-//                }
-//                val *= normalFactor;
-//                heightmap[pos]= val;
-//                pos++;
-//            }
-//        }
+        for (int i=0; i<heightmap.length; i++) {
+            float val = heightmap[i];
+            val += Math.abs(minVal);
+            val /= maxVal - minVal;
+            if (val < 0) {
+                val = 0;
+            }
+            if (val > 1) {
+                val = 1;
+            }
+            val *= normalFactor;
 
+            heightmap[i] = val;
+        }
     }
-
 
     public void print(){
         System.out.println("Mesh grid:");
