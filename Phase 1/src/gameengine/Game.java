@@ -19,13 +19,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     private Terrain terrain;
     private Ball ball;
     private PhysicsEngine engine;
-    //private int numVerteces;
-    //private int unitSizePixels;
-
-    //private int cameraWidth, cameraHeight;
-
     private Renderer renderer;
-
     private Camera cam;
 
     /**
@@ -39,26 +33,14 @@ public class Game extends Canvas implements Runnable, GameObject {
         //Terrain terrainT = Reader.readFile(csvFile);
         this.FPS = fps;
         this.running = false;
-
-        //cameraWidth = 10;
-        //cameraHeight = 10;
-
-        //numVerteces = 512;
-
-        //unitSizePixels = 40;
-
-
-
-        //int width = cameraWidth*unitSizePixels;//(int) (terrain.limitingCorner.x - terrain.startingCorner.x)*unitSizePixels;//
-        //int height = cameraHeight*unitSizePixels;//;//(int) (terrain.limitingCorner.y - terrain.startingCorner.y)*unitSizePixels;//
-        //System.out.println(terrain.terrainFunction);
         // "0.1*sin(e**(-(x**2+y**2)/40)*x*y)"
         // Set up terrain
-        terrain = new Terrain("sin((x+y)/7)+0.5", 0.2, 0.1, new Vector2(-15, -15), new Vector2(15, 15));
+        terrain = new Terrain("sin((x+y)/7)+0.5", 0.2, 0.1, new Vector2(-20, -20), new Vector2(20, 20));
         terrain.calculateHeightMap(1024, 1.0);
         terrain.target = new Target();
         terrain.target.position = new Vector2(4, 4);
-        terrain.target.radius = 1;
+        terrain.target.radius = 4;
+        terrain.addZone(new Vector2(-5.24, -7.8), new Vector2(10.5, 10), 0.3, 0.2);
         // Set up the ball
         ball = new Ball(new Vector2(0, 0), new Vector2(3, -5));
         engine = new PhysicsEngine();

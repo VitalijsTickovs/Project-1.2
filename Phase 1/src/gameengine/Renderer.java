@@ -1,12 +1,11 @@
 package gameengine;
 
-import Data_storage.Ball;
-import Data_storage.Terrain;
-import Data_storage.Vector2;
-import Data_storage.Vector3;
+import Data_storage.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 public class Renderer {
@@ -83,6 +82,15 @@ public class Renderer {
         g2.setColor(Color.WHITE);
         g2.fillArc(ballRenderX - ballWidth / 2, ballRenderY - ballHeight / 2, ballWidth, ballHeight, 0, 360);
 
+        // Draw ball position
+        g2.setFont(new Font("TimesRoman", Font.BOLD, 15));
+        g2.setColor(Color.BLACK);
+        BigDecimal xx = new BigDecimal(ball.state.position.x);
+        xx = xx.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal yy = new BigDecimal(ball.state.position.y);
+        yy = yy.setScale(2, RoundingMode.HALF_UP);
+        g2.drawString("x = "+xx+" y = "+yy, unitSizePixels, 2*unitSizePixels);
+
     }
 
     public void createTerrainImage() {
@@ -141,18 +149,26 @@ public class Renderer {
                 int renderPixelX4 = (int) ((x4 - terrain.startingCorner.x) * unitSizePixels);
                 int renderPixelY4 = (int) ((y4 - h4 - terrain.startingCorner.y) * unitSizePixels);
 
-                float lighting = (float)((maxHeight+10)/20);
+                double lighting = (maxHeight+10)/20;
                 int numBlockX = (int) ((x1-terrain.startingCorner.x)/sizeColored);
                 int numBlockY = (int) ((y1-terrain.startingCorner.y)/sizeColored);
                 if (maxHeight > 0) {
-                    if ((numBlockX+numBlockY)%2 == 0) {
-                        g2.setColor(new Color(0, 0.7f*lighting, 0));
+                    if (terrain.isPointInZone(x1, y1)) {
+                        if ((numBlockX + numBlockY) % 2 == 0) {
+                            g2.setColor(new Color((int) (200 * lighting), (int) (200 * lighting), 0));
+                        } else {
+                            g2.setColor(new Color((int) (150 * lighting), (int) (150 * lighting), 0));
+                        }
                     } else {
-                        g2.setColor(new Color(0, 0.5f*lighting, 0));
+                        if ((numBlockX + numBlockY) % 2 == 0) {
+                            g2.setColor(new Color(0, (int) (200 * lighting), 0));
+                        } else {
+                            g2.setColor(new Color(0, (int) (150 * lighting), 0));
+                        }
                     }
                 } else {
                     //if ((numBlockX+numBlockY)%2 == 0) {
-                        g2.setColor(new Color(0, 0, 0.7f*lighting));
+                        g2.setColor(new Color((int) (34*lighting), (int) (124*lighting), (int) (176*lighting)));
                     //} else {
                         //g2.setColor(new Color(0, 0, 0.5f*lighting));
                     //}
@@ -165,28 +181,14 @@ public class Renderer {
                 );
             }
         }
+        // Draw obstacles
+
         // Render target
         double targetHeight = terrain.terrainFunction.valueAt(terrain.target.position.x, terrain.target.position.y);
         int targetRenderX = (int) ((terrain.target.position.x - terrain.startingCorner.x)*unitSizePixels);
         int targetRenderY = (int) ((terrain.target.position.y - targetHeight - terrain.startingCorner.y)*unitSizePixels);
         double radius = terrain.target.radius;
-        g2.setColor(Color.BLACK);
-        int prevPointX = -1, prevPointY=-1;
-        for (double deg=0; deg<=360; deg+=1) {
-            double xx = terrain.target.position.x+radius*Math.cos(deg/(2*Math.PI));
-            double yy = terrain.target.position.y+radius*Math.sin(deg/(2*Math.PI));
-            double h = terrain.terrainFunction.valueAt(xx, yy);
-            int renderX = (int) ((xx - terrain.startingCorner.x)*unitSizePixels);
-            int renderY = (int) ((yy - h - terrain.startingCorner.y)*unitSizePixels);
-            if (prevPointX != -1) {
-                g2.drawLine(prevPointX, prevPointY, renderX, renderY);
-                prevPointX = renderX;
-                prevPointY = renderY;
-            } else {
-                prevPointX = renderX;
-                prevPointY = renderY;
-            }
-        }
+        drawCircle(g2, terrain.target.position.x, terrain.target.position.y, radius, Color.BLACK, false);
         // Draw flag
         g2.setColor(Color.WHITE);
         g2.drawLine(targetRenderX, targetRenderY, targetRenderX, targetRenderY-2*unitSizePixels);
@@ -196,5 +198,44 @@ public class Renderer {
                 new int[] {targetRenderY-2*unitSizePixels, targetRenderY-3*unitSizePixels/2, targetRenderY-unitSizePixels},
                 3
         );
+
+        // Draw obstacles
+        for (IObstacle o : terrain.obstacles) {
+            // Trees
+            if (o instanceof ObstacleTree) {
+                ObstacleTree t = (ObstacleTree) o;
+                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, new Color(96, 69, 38), true);
+            }
+        }
+    }
+
+    private void drawCircle(Graphics2D g2, double x, double y, double radius, Color color, boolean filled) {
+        int[] xPoints = new int[361];
+        int[] yPoints = new int[361];
+        g2.setColor(color);
+        int firstPointX = -1, firstPointY=-1;
+        for (int deg=0; deg<=360; deg++) {
+            double xx = x+radius*Math.cos(deg/(2*Math.PI));
+            double yy = y+radius*Math.sin(deg/(2*Math.PI));
+            double h = terrain.terrainFunction.valueAt(xx, yy);
+            int renderX = (int) ((xx - terrain.startingCorner.x)*unitSizePixels);
+            int renderY = (int) ((yy - h - terrain.startingCorner.y)*unitSizePixels);
+            xPoints[deg] = renderX;
+            yPoints[deg] = renderY;
+            if (firstPointX == -1) {
+                //g2.drawLine(prevPointX, prevPointY, renderX, renderY);
+                firstPointX = renderX;
+                firstPointY = renderY;
+            }
+        }
+        // Add last point
+        xPoints[360] = firstPointX;
+        yPoints[360] = firstPointY;
+        // Draw the polygon
+        if (filled) {
+            g2.fillPolygon(xPoints, yPoints, 361);
+        } else {
+            g2.drawPolygon(xPoints, yPoints, 361);
+        }
     }
 }

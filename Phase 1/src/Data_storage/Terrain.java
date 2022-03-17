@@ -8,7 +8,7 @@ public class Terrain {
     public float[] heightmap;
 
     //All of the data below should be included, when Terrain is created
-    public Zone zones[] = new Zone[0];
+    public Zone[] zones = new Zone[0];
     public IObstacle[] obstacles = new IObstacle[0];
     public Target target;
     public Vector2 ballStartingPosition;
@@ -38,10 +38,34 @@ public class Terrain {
         this.heightmap = null;
     }
 
+    public boolean isPointInZone(double x, double y) {
+        for (Zone z : zones) {
+            if (z.isPositionInside(new Vector2(x, y))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addZone(Vector2 bottomLeft, Vector2 topRight, double zoneStaticFriction, double zoneKineticFriction) {
+        Zone[] temp = new Zone[zones.length+1];
+        for (int i=0; i<zones.length; i++) {
+            temp[i] = zones[i];
+        }
+        Zone z = new Zone();
+        z.downLeftCorner = bottomLeft.copy();
+        z.topRightCorner = topRight.copy();
+        z.staticFriction = zoneStaticFriction;
+        z.kineticFriction = zoneKineticFriction;
+        temp[temp.length-1] = z;
+        zones = temp;
+    }
+
     public float minVal = -10;
     public float maxVal = 10;
     public double xOff;
     public double yOff;
+
     public void calculateHeightMap(int numVerteces, double normalFactor) {
         heightmap = new float[numVerteces * numVerteces];
         int pos = 0;
