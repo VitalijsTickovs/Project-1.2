@@ -32,26 +32,44 @@ public class Renderer extends Cam {
     Terrain terrain;
     Geometry target;
     Geometry ballRender;
+
+    private ArrayList<Vector2> points = new ArrayList<>();
+    Boolean inTarget = false;
+
     float ballRadius = 1f;
     float totalSize = 1024;
+
     float xoff = 0;
     float yoff = 0;
+
     Vector2 ballStartPos;
     double targetRadius;
     Vector2 targetPos;
     private PhysicsEngine engine;
 
-    float x=totalSize/2;
-    float y=totalSize/2;
+    BitmapText text;
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+
+    Node mainScene = new Node("Water");
+
+    float x = 0;
+    float y = 0;
     float val = 0;
     int normalFactor = 100;
+
     /**
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(String texPath){
+        //Calculating offset to spawn the terrain arround the ball
         this.xoff = (float) (this.ballStartPos.x - this.totalSize/2);
         this.yoff = (float) (this.ballStartPos.y - this.totalSize/2);
+
+        //Creating heightmap representation of the terrain
         terrain.calculateHeightMap((int) totalSize+1, normalFactor);
+
+        //Setting terrain using heightmap
+        this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
 
         //Setting up the Texture of the ground
         Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
@@ -59,10 +77,6 @@ public class Renderer extends Cam {
 
         //Adding grass texture to terrain
         mat1.setTexture("ColorMap",tex);
-
-        //Setting terrain using heightmap
-        this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
-
         terrainQuad.setMaterial(mat1);
         
         rootNode.attachChild(terrainQuad);
@@ -72,27 +86,40 @@ public class Renderer extends Cam {
      * Creates golf ball, with textures
      */
     public void InitBall(){
+        //Creates Sphere object and adds to Geometry object
         Sphere ball = new Sphere(120, 120, ballRadius);
         TangentBinormalGenerator.generate(ball);
         this.ballRender = new Geometry("Ball", ball);
 
+        //Adding textures to the ball
         Texture sphereTex = assetManager.loadTexture("Ball/Golfball.jpeg");
         Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
-
         mat.setTexture("ColorMap", sphereTex);
         this.ballRender.setMaterial(mat);
+
+        //add the geometry object to the scene
         rootNode.attachChild(this.ballRender);
+        //Moving the ball according to the start position
         moveBall(ballStartPos);
     }
 
+    /**
+     * Creates the target hole
+     */
     public void InitTarget(){
+        //Creating cylinder, which would represent target hole
         Cylinder tar = new Cylinder(120, 120, (float) targetRadius, 0.1f, true);
         this.target = new Geometry("Target", tar);
+
+        //Rotating the cylinder
         this.target.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.HALF_PI , new Vector3f(0,0,1)));
+
+        //Making the target hole white color
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.White);
-
         this.target.setMaterial(mat);
+
+        //Finding the position for the target
         float val;
         val = (float) terrain.terrainFunction.valueAt(targetPos.x * terrain.xOff,targetPos.y * terrain.yOff);
         val += Math.abs(terrain.minVal);
@@ -106,8 +133,10 @@ public class Renderer extends Cam {
         val *= normalFactor;
         this.val = val;
 
+        //Moving the cylinder to the calculated position
         this.target.setLocalTranslation((float) this.targetPos.x, val, (float) this.targetPos.y);
 
+        //Adding it to the scene
         rootNode.attachChild(target);
     }
 
@@ -125,6 +154,10 @@ public class Renderer extends Cam {
 
     }
 
+    /**
+     * Moves the by finding the normal tangent by radius of the ball
+     * so it would not seem that ball is in the terrain
+     */
     public void findTangent(){
         Vector3f terNormal = terrainQuad.getNormal(new Vector2f(getBallX(),getBallY()));
         double scalar = ballRadius/terNormal.length();
@@ -166,59 +199,83 @@ public class Renderer extends Cam {
             }
             val *= normalFactor;
             this.val = val;
+
             //Moving the ball object to specified position
             ballRender.setLocalTranslation((float) (this.x + terrain.xOff), (float) (val + terrain.xOff), (float) (this.y + terrain.xOff));
+            //Adjusting the ball not to be in the ground
             findTangent();
+            //Outputting the position of the ball
             text.setText("x: " + df.format(getBallX()) + "  y: " + df.format(getBallY()) + "  z: "+ df.format(getBallZ()));
         }
     }
 
+    /**
+     * Creates a sky background
+     * @param path specification to load different background for different maps
+     */
     public void InitSky(String path){
         mainScene.attachChild(SkyFactory.createSky(getAssetManager(), path, SkyFactory.EnvMapType.SphereMap));
         rootNode.attachChild(mainScene);
     }
 
-    Node mainScene = new Node("Test");
+    /**
+     * Spawns water simulation around the terrain
+     */
     public void InitWater(){
+        //Creates new water object reflection
         SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
         waterProcessor.setLightPosition(new Vector3f(0.55f, -0.82f, 0.15f));
         waterProcessor.setReflectionScene(mainScene);
 
+        //Setting the wave size
         Vector3f waterLocation=new Vector3f(0,0,0);
         waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
-
         viewPort.addProcessor(waterProcessor);
-        Quad waveSize = new Quad(this.totalSize + 200,this.totalSize + 200);
 
+        //Creating the box of water
+        Quad waveSize = new Quad(this.totalSize + 200,this.totalSize + 200);
         Geometry water=new Geometry("water", waveSize);
-        water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
         water.setShadowMode(RenderQueue.ShadowMode.Receive);
-        water.move(xoff - 100, totalSize/2, -xoff + 100);
         water.setMaterial(waterProcessor.getMaterial());
+
+        //Setting location to be around the terrain
+        water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
+        water.move(xoff - 100, 46, -xoff + 100);
+
+        //Attaching water object to the scene
         rootNode.attachChild(water);
     }
 
+    /**
+     * Initializes all the necessary files for calculating the ball movement
+     */
     public void initPhysics(){
+        //Attaches the input values to Terrain object
         this.terrain = Reader.readFile();
+
         this.ballStartPos = this.terrain.ballStartingPosition;
         this.targetRadius = this.terrain.target.radius;
         this.targetPos = this.terrain.target.position;
+
+        //Initializing terrain
         initTerrain(MenuGUI.texPath);
 
+        //setting the physics engine
         ball = new Ball(this.ballStartPos, new Vector2(3, -5));
         engine = new PhysicsEngine();
         engine.terrain = this.terrain;
         engine.addBall(ball);
     }
 
-    BitmapText text;
-    private static final DecimalFormat df = new DecimalFormat("0.00");
+    /**
+     * Displays text with current ball position
+     */
     public void InitText(){
         BitmapText hudText = new BitmapText(guiFont);
         hudText.setSize(guiFont.getCharSet().getRenderedSize());
-        hudText.setColor(ColorRGBA.White);                             // font color
+        hudText.setColor(ColorRGBA.White);
         hudText.setText("");
-        hudText.setLocalTranslation(0, 50, 0); // position
+        hudText.setLocalTranslation(0, 50, 0);
         this.text = hudText;
         guiNode.setQueueBucket(RenderQueue.Bucket.Gui);
         guiNode.attachChild(hudText);
@@ -229,49 +286,47 @@ public class Renderer extends Cam {
     Queue<Vector2> q;
     @Override
     public void simpleInitApp() {
+        //Disabling unnecessary information
         setDisplayStatView(false);
+        //Reading from the file to get move set
         q = VectorsReader.read("/Phase 1/src/Physics/Vectors.csv");
+
         initPhysics();
-        InitText();
-
-        // builds terrain based on function given
-        initTerrain(MenuGUI.getTexPath());
-        InitBall();
-
-        InitTarget();
-        //creating and attaching camera to ball
-        ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
-        InitCam(chaseCam);
-
         //setting sky background to Sky.jpg
         InitSky("Sky/Skysphere.jpeg");
         InitWater();
+        InitText();
+        InitBall();
+        InitTarget();
 
+        //creating and attaching camera to ball
+        ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
+        InitCam(chaseCam);
     }
-
-
-    private ArrayList<Vector2> points = new ArrayList<>();
-    Boolean inTarget = false;
     @Override
     public void simpleUpdate(float tpf) {
             if (!inTarget) {
+                //simulates from Vectors.csv file
                 if (points.size() == 0 && !q.isEmpty()) {
                     points = engine.simulateShot(q.remove(), ball);
                 }
+                //moves the ball with calculated position
                 if (points.size() != 0) {
                     ball.state.position = points.get(0);
                     moveBall(ball.state.position);
                     points.remove(0);
                 }
+                //checks if the ball is in the hole
                 isInTarget(ball);
             }else{
+                //exit if ball reached the target
                 System.exit(1);
             }
     }
 
     public void start3d(){
         this.setShowSettings(false);
-        // Setting up renderer settings, so JME settings tab wouldnt pop out
+        // Setting up renderer settings, so JME settings tab wouldn't pop out
         AppSettings settings = new AppSettings(true);
         settings.put("Width", 1280);
         settings.put("Height", 720);
