@@ -39,11 +39,6 @@
             <artifactId>jme3-lwjgl</artifactId>
             <version>${jme3_v}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mariuszgromada.math</groupId>
-            <artifactId>MathParser.org-mXparser</artifactId>
-            <version>4.4.2</version>
-        </dependency>
     </dependencies>
     
 </project>
