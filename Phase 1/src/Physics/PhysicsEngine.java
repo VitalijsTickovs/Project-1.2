@@ -12,10 +12,14 @@ public class PhysicsEngine {
     private final double G = 9.81;
 
     public PhysicsEngine() {
-        ballsToSimulate = new ArrayList<>();
+        ballsToSimulate = new ArrayList<Ball>();
         terrain = null;
     }
 
+    /**
+     * Adds a ball to the list of balls that should be processed
+     * @param ball The new Ball to process
+     */
     public void addBall(Ball ball) {
         ballsToSimulate.add(ball);
     }
@@ -30,6 +34,12 @@ public class PhysicsEngine {
         }
     }
 
+    /**
+     * Simulates a shot and stores the positions until the ball stops
+     * @param initialSpeed The inital speed of the ball
+     * @param ball The ball to shoot
+     * @return ArrayList containing ball positions throughout the shot
+     */
     public ArrayList<Vector2> simulateShot(Vector2 initialSpeed, Ball ball) {
         ArrayList<Vector2> coordinates = new ArrayList<Vector2>();
         ball.state.velocity = initialSpeed;
@@ -40,6 +50,11 @@ public class PhysicsEngine {
         return coordinates;
     }
 
+    /**
+     * Creates the new state of the ball after an iteration step
+     * @param ball The ball to calculate the new state for
+     * @return The new state of the ball
+     */
     private BallState countNewBallState(Ball ball) {
         BallState newState = ball.state.copy();
         newState.position = countNewPosition(newState, ball.radius);
@@ -88,7 +103,6 @@ public class PhysicsEngine {
     private Vector2 checkBallOutOfBounds(BallState state){
         Vector2 newPosition = state.position.copy();
         boolean reverseX = false;
-
         if (newPosition.x > terrain.limitingCorner.x) {
             reverseX = true;
             Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
@@ -108,7 +122,7 @@ public class PhysicsEngine {
                 newPosition = state.position;
             }
         }
-
+        // On y-axis
         boolean reverseY = false;
         if (newPosition.y > terrain.limitingCorner.y) {
             reverseY = true;
@@ -129,7 +143,7 @@ public class PhysicsEngine {
                 newPosition = state.position;
             }
         }
-
+        // Reverse the velocity if needed
         if (reverseX) {
             state.velocity.x = -state.velocity.x;
         }
@@ -144,6 +158,11 @@ public class PhysicsEngine {
         Vector2 ballPosition = ball.state.position;
         double xSlope = getXSlopeAt(ballPosition.x, ballPosition.y);
         double ySlope = getYSlopeAt(ballPosition.x, ballPosition.y);
+
+        // Check if in water
+        if (terrain.terrainFunction.valueAt(ball.state.position.x, ball.state.position.y) <= 0) {
+            return Vector2.zeroVector;
+        }
 
         double kineticFriction = getKineticFrictionAtPosition(ball.state.position);
 
@@ -182,6 +201,12 @@ public class PhysicsEngine {
         return newVelocity;
     }
 
+    /**
+     * Gets the x derivative at a given position
+     * @param x The x coordinate
+     * @param y The y coordinate
+     * @return The derivative value
+     */
     private double getXSlopeAt(double x, double y) {
         double functionValue = terrain.terrainFunction.valueAt(x, y);
         if (functionValue > 10 || functionValue < -10) {
@@ -191,6 +216,12 @@ public class PhysicsEngine {
         }
     }
 
+    /**
+     * Gets the y derivative at a given position
+     * @param x The x coordinate
+     * @param y THe y coordinate
+     * @return The derivative value
+     */
     private double getYSlopeAt(double x, double y) {
         double functionValue = terrain.terrainFunction.valueAt(x, y);
         if (functionValue > 10 || functionValue < -10) {
@@ -200,6 +231,11 @@ public class PhysicsEngine {
         }
     }
 
+    /**
+     * Gets the kinetic friction at a given position
+     * @param position The position to check
+     * @return The kinetic friction value
+     */
     private double getKineticFrictionAtPosition(Vector2 position) {
         double friction = terrain.kineticFriction;
         for (Zone zone : terrain.zones) {
@@ -210,6 +246,11 @@ public class PhysicsEngine {
         return friction;
     }
 
+    /**
+     * Gets the static friction at a given position
+     * @param position The position to check
+     * @return The static friction value
+     */
     private double getStaticFrictionAtPosition(Vector2 position) {
         double friction = terrain.staticFriction;
         for (Zone zone : terrain.zones) {
@@ -220,12 +261,26 @@ public class PhysicsEngine {
         return friction;
     }
 
+    /**
+     * Gets the x-acceleration
+     * @param slope The terrain derivative vector
+     * @param speed The current velocity vector
+     * @param friction The friction to use
+     * @return The x-acceleration value
+     */
     private double xAcceleration(Vector2 slope, Vector2 speed, double friction) {
         double downHillForce = -G * slope.x;
         double frictionForce = G * friction * speed.x / speed.length();
         return (downHillForce - frictionForce);
     }
 
+    /**
+     * Gets the y-acceleration
+     * @param slope The terrain derivative vector
+     * @param speed The current velocity vector
+     * @param friction The friction to use
+     * @return The y-acceleration value
+     */
     private double yAcceleration(Vector2 slope, Vector2 speed, double friction) {
         double downHillForce = -G * slope.y;
         double frictionForce = G * friction * speed.y / speed.length();

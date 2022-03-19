@@ -1,5 +1,8 @@
 package Data_storage;
 
+import org.mariuszgromada.math.mxparser.Expression;
+import function.Function;
+
 public class Terrain {
     //This is generated after Terrain is created
     public double[][] meshGrid2;
@@ -20,7 +23,7 @@ public class Terrain {
     public double staticFriction;
     public double kineticFriction;
 
-    public TerrainFunction terrainFunction;
+    public TerrainFunction1 terrainFunction;
     public double scaleFactor = 1;
 
     public int xRes = 500;
@@ -66,6 +69,36 @@ public class Terrain {
     public double xOff;
     public double yOff;
 
+    public boolean isValid(int accuracy) {
+        double xStep = (limitingCorner.x - startingCorner.x)/accuracy;
+        double yStep = (limitingCorner.y - startingCorner.y)/accuracy;
+
+        Function dfxx = terrainFunction.dfx.getDerivative("x");
+        Function dfyy = terrainFunction.dfy.getDerivative("y");
+        Function dfxy = terrainFunction.dfx.getDerivative("y");
+
+        for (int xx=0; xx<accuracy; xx++) {
+            for (int yy=0; yy<accuracy; yy++) {
+                double x = startingCorner.x + xx*xStep;
+                double y = startingCorner.y + yy*yStep;
+
+                double fVal = Math.abs(terrainFunction.valueAt(x, y));
+                double dfxVal = Math.abs(terrainFunction.xDerivativeAt(x, y));
+                double dfyVal = Math.abs(terrainFunction.yDerivativeAt(x, y));
+                double dfxxVal = Math.abs(dfxx.evaluate(new String[] {"x", "y"}, new double[] {x, y}));
+                double dfyyVal = Math.abs(dfyy.evaluate(new String[] {"x", "y"}, new double[] {x, y}));
+                double dfxyVal = Math.abs(dfxy.evaluate(new String[] {"x", "y"}, new double[] {x, y}));
+
+                if (fVal > 10 || dfxVal > 0.15 || dfyVal > 0.15 ||
+                    dfxxVal > 0.1 || dfyyVal > 0.1 || dfxyVal > 0.1) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public void calculateHeightMap(int numVerteces, double normalFactor) {
         heightmap = new float[numVerteces * numVerteces];
         int pos = 0;
@@ -73,6 +106,7 @@ public class Terrain {
         this.yOff = (limitingCorner.y - startingCorner.y)/numVerteces;
         for (int x = 0; x < numVerteces; x++) {
             for (int y = 0; y < numVerteces; y++) {
+
                 double xx = startingCorner.x + x * this.xOff;
                 double yy = startingCorner.y + y * this.yOff;
                 float val = (float) terrainFunction.valueAt(xx, yy);

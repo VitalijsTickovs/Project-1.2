@@ -48,8 +48,7 @@ public class Vector2 {
     }
 
     public Vector2 normalized() {
-        Vector2 normalizedVector = copy().scale(1 / length());
-        return normalizedVector;
+        return copy().scale(1 / length());
     }
 
     /**

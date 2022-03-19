@@ -1,6 +1,7 @@
 package Data_storage;
 
 import function.Function;
+import org.mariuszgromada.math.mxparser.*;
 
 public class TerrainFunction1 extends TerrainFunction {
     /*
@@ -10,8 +11,8 @@ public class TerrainFunction1 extends TerrainFunction {
      */
 
     public function.Function f;
-    private function.Function dfx;
-    private function.Function dfy;
+    public function.Function dfx;
+    public function.Function dfy;
 
     public TerrainFunction1(String function) {
         /*

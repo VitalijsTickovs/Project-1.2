@@ -18,18 +18,15 @@ public class Reader {
    private static final String delimiter = ";";
    private static Scanner scanner;
 
-   private static int xDim = 500;
-   private static int yDim = 500;
-
    // region private Variables
    // Singular values
-   public static double terrainX0;
-   public static double terrainY0;
+   private static double terrainX0;
+   private static double terrainY0;
    private static double terrainX1;
    private static double terrainY1;
    private static double greenKineticFriction;
    private static double greenStaticFriction;
-   private static String terrainFunction; // ask Niko for his implementation and leave it as a String for now
+   private static String terrainFunction;
 
    private static double ballStartPointX;
    private static double ballStartPointY;
@@ -270,6 +267,7 @@ public class Reader {
       // Multiple values
       defineObstacles();
       defineZones();
+
       return terrain;
    }
 
