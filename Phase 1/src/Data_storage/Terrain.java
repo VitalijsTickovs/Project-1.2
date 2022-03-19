@@ -1,6 +1,6 @@
 package Data_storage;
 
-import org.mariuszgromada.math.mxparser.Expression;
+// import org.mariuszgromada.math.mxparser.Expression;
 import function.Function;
 
 public class Terrain {
@@ -56,7 +56,7 @@ public class Terrain {
             temp[i] = zones[i];
         }
         Zone z = new Zone();
-        z.downLeftCorner = bottomLeft.copy();
+        z.bottomLeftCorner = bottomLeft.copy();
         z.topRightCorner = topRight.copy();
         z.staticFriction = zoneStaticFriction;
         z.kineticFriction = zoneKineticFriction;

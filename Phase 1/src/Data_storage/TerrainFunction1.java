@@ -1,7 +1,7 @@
 package Data_storage;
 
 import function.Function;
-import org.mariuszgromada.math.mxparser.*;
+// import org.mariuszgromada.math.mxparser.*;
 
 public class TerrainFunction1 extends TerrainFunction {
     /*

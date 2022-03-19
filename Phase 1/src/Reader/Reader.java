@@ -109,7 +109,7 @@ public class Reader {
     */
    private static boolean createScanner() {
       try {
-         scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/userInput.csv"));
+         scanner = new Scanner(new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/userInput.csv"));
          return true;
 
       } catch (FileNotFoundException e) {
@@ -439,7 +439,7 @@ public class Reader {
       } else {
          zone.staticFriction = defsandStaticFriction;
       }
-      zone.downLeftCorner = position0;
+      zone.bottomLeftCorner = position0;
       zone.topRightCorner = position1;
       return zone;
    }

@@ -12,32 +12,29 @@ import Physics.PhysicsEngine;
 import Reader.*;
 
 public class Game extends Canvas implements Runnable, GameObject {
+    public JFrame frame;
+    public Vector2 shot;
+    public int numShots;
+    
+    
     private final int FPS;
     private boolean running;
     private Thread thread;
     private BufferedImage terrainImage;
-    public JFrame frame;
     private Terrain terrain;
     private Ball ball;
     private PhysicsEngine engine;
     private Renderer renderer;
     private Camera cam;
-    private ShotInput shotInput;
-
-    public Vector2 shot;
-
-    public int numShots;
-
+    private ShotInputWindow shotInput;
     /**
-     * Constructor.
-     * 
-     * @param fps The wanted FPS (frames per second) of the game
+     * @param fps The target FPS (frames per second) of the game
      */
     public Game(int fps) {
         numShots = 0;
         FPS = fps;
         running = false;
-        shotInput = new ShotInput();
+        shotInput = new ShotInputWindow();
         shotInput.game = this;
         shot = null;
         // Set up terrain
@@ -64,12 +61,13 @@ public class Game extends Canvas implements Runnable, GameObject {
         renderer.game = this;
         renderer.createTerrainImage();
         // Set up the terrain image
-        terrainImage = new BufferedImage((int) (cam.width*renderer.unitSizePixels), (int) (cam.height*renderer.unitSizePixels), BufferedImage.TYPE_4BYTE_ABGR);
+        terrainImage = new BufferedImage((int) (cam.width * renderer.unitSizePixels),
+                (int) (cam.height * renderer.unitSizePixels), BufferedImage.TYPE_4BYTE_ABGR);
         // Set up the frame
         frame = new JFrame();
         frame.setTitle("Crazy Putting");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize((int) (cam.width*renderer.unitSizePixels), (int) (cam.height*renderer.unitSizePixels));
+        frame.setSize((int) (cam.width * renderer.unitSizePixels), (int) (cam.height * renderer.unitSizePixels));
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.add(this);
@@ -107,15 +105,15 @@ public class Game extends Canvas implements Runnable, GameObject {
             last = now;
 
             if (timer > 1000000000.0) {
-                //System.out.println("FPS: "+fps);
+                // System.out.println("FPS: "+fps);
                 timer = 0;
                 fps = 0;
             }
         }
     }
 
+    //region Update
     private ArrayList<Vector2> points = new ArrayList<Vector2>();
-
     /**
      * Updates the state of the game each step
      */
@@ -142,28 +140,43 @@ public class Game extends Canvas implements Runnable, GameObject {
             points.remove(0);
         }
         // Update camera position
-        cam.x += (ball.state.position.x - cam.x)/10;
-        cam.y += (ball.state.position.y - cam.y)/10;
+        cam.x += (ball.state.position.x - cam.x) / 10;
+        cam.y += (ball.state.position.y - cam.y) / 10;
     }
 
+    //endregion
+
+    // region Render
+    private BufferStrategy bufferStrategy;
     /**
      * Renders the game
      */
     public void render() {
-        BufferStrategy bs = getBufferStrategy();
-        if (bs == null) {
-            createBufferStrategy(3);
+        if (isBufferStrategyNull()) {
             return;
         }
+        updateGraphics();
+    }
 
-        Graphics2D g2 = (Graphics2D) bs.getDrawGraphics();
+    private boolean isBufferStrategyNull() {
+        bufferStrategy = getBufferStrategy();
+        if (bufferStrategy == null) {
+            createBufferStrategy(3);
+            return true;
+        }
+        return false;
+    }
+
+    private void updateGraphics() {
+        Graphics2D g2 = (Graphics2D) bufferStrategy.getDrawGraphics();
         g2.drawImage(terrainImage, 0, 0, terrainImage.getWidth(), terrainImage.getHeight(), null);
 
         renderer.render(g2);
 
         g2.dispose();
-        bs.show();
+        bufferStrategy.show();
     }
+    // endregion
 
     /**
      * Starts the game.
