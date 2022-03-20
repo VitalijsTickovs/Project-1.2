@@ -7,6 +7,14 @@ import java.awt.event.*;
 import Data_storage.InputPanel;
 import Data_storage.Vector2;
 
+/**
+ * We shall be using this class to make interfaces. It can create parts of the
+ * interface that are repeated often.
+ * In phase 2, this will be useful when we get to create the terrain editor.
+ * Feel free to add methods that create an interface component according to
+ * given settings.
+ * Keep things clean
+ */
 public class InterfaceFactory {
     /**
      * Creates a window positioned relative to another component
@@ -16,12 +24,19 @@ public class InterfaceFactory {
         JFrame frame = new JFrame();
         frame.setTitle(title);
         frame.setSize((int) size.x, (int) size.y);
-        frame.setLocationRelativeTo(component);
-        frame.setLocation((int) posRelativeTo.x, (int) posRelativeTo.y);
         frame.setResizable(setResizable);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        frame.setLocationRelativeTo(component);
+        setFramePosition(frame, posRelativeTo);
         return frame;
+    }
+
+    private static void setFramePosition(JFrame frame, Vector2 posRelativeTo) {
+        if (posRelativeTo == null) {
+            return;
+        }
+        frame.setLocation((int) posRelativeTo.x, (int) posRelativeTo.y);
+
     }
 
     /**
@@ -51,9 +66,10 @@ public class InterfaceFactory {
     }
 
     /**
-     * Creates a button with a text, adds a function to be called on-click and adds the button to a frame
+     * Creates a button with a text, adds a function to be called on-click and adds
+     * the button to a frame
      */
-    public static JButton createButton(String title, ActionListener listener, JFrame frame){
+    public static JButton createButton(String title, ActionListener listener, JFrame frame) {
         JButton button = new JButton(title);
         button.addActionListener(listener);
 

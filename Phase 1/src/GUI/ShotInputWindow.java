@@ -1,8 +1,8 @@
-package gameengine;
+package GUI;
 
 import Data_storage.InputPanel;
 import Data_storage.Vector2;
-import GUI.InterfaceFactory;
+import gameengine.Game;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,24 +13,42 @@ public class ShotInputWindow {
     public Game game;
     public boolean isOpen;
 
+    private JFrame frame;
+    private boolean wasCreated = false;
+
+    // region Startup
     /**
      * Constructor. Creates a new ShotInput
      */
-    public ShotInputWindow() {
+    public ShotInputWindow(Game game) {
         isOpen = false;
+        this.game = game;
     }
+    // endregion
 
     /**
-     * Opens a JFrame window with a velocity input option
+     * Creates a JFrame window with a velocity input option
      */
     public void openWindow() {
-        JFrame frame = createFrame();
+        if (!wasCreated) {
+            createWindow();
+            wasCreated = true;
+        }
+        if (!isOpen) {
+            frame.setVisible(true);
+            isOpen = true;
+        }
+    }
+
+    private void createWindow() {
+        frame = createFrame();
         JPanel mainPanel = new JPanel();
-        InputPanel xInputPanel = createRowXVelocityInputPanel();
-        InputPanel yInputPanel = createRowYVelocityInputPanel();
+        InputPanel xInputPanel = createXVelocityInputPanel();
+        InputPanel yInputPanel = createYVelocityInputPanel();
         // Set up shoot button row
         JPanel buttonPanel = new JPanel();
-        JButton shootButton = createShootButton(xInputPanel,yInputPanel,frame);
+        JButton shootButton = createShootButton(xInputPanel, yInputPanel, frame);
+        buttonPanel.add(shootButton);
         frame.dispose();
 
         mainPanel.add(xInputPanel.panel, BorderLayout.NORTH);
@@ -39,22 +57,23 @@ public class ShotInputWindow {
 
         frame.add(mainPanel);
         frame.setVisible(true);
+
     }
 
     private JFrame createFrame() {
         Vector2 frameSize = new Vector2(300, 170);
-        Vector2 framePosition = new Vector2(frameSize.x, game.frame.getY() + game.frame.getHeight());
+        Vector2 framePosition = new Vector2(frameSize.x * 2, game.frame.getY() + game.frame.getHeight());
         JFrame frame = InterfaceFactory.createFrame("Input shot velocity", frameSize, false, framePosition, game);
         isOpen = true;
 
         return frame;
     }
 
-    private InputPanel createRowXVelocityInputPanel() {
+    private InputPanel createXVelocityInputPanel() {
         return InterfaceFactory.createInputPanel("x-velocity = ", 20);
     }
 
-    private InputPanel createRowYVelocityInputPanel() {
+    private InputPanel createYVelocityInputPanel() {
         return InterfaceFactory.createInputPanel("y-velocity = ", 20);
     }
 
@@ -72,14 +91,12 @@ public class ShotInputWindow {
                 try {
                     game.shot = readShotVector(xInputPanel, yInputPanel);
                     frame.setVisible(false);
-                    frame.dispose();
                     isOpen = false;
                 } catch (Exception e) {
                     System.out.println("Velocities must be floating point values.");
                 }
             }
         };
-
     }
 
     private Vector2 readShotVector(InputPanel xInputPanel, InputPanel yInputPanel) {
