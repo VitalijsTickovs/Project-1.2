@@ -4,7 +4,7 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.1;
 greenStaticFriction = 0.2;
-terrainFunction = e**(-(x**2+y**2)/40);
+terrainFunction = sin(y/10) + sin(x/10) + 2);
 
 ballStartPointX = -1;
 ballStartPointY = -0.5;

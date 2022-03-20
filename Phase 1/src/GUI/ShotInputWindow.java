@@ -89,7 +89,7 @@ public class ShotInputWindow {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    game.shot = readShotVector(xInputPanel, yInputPanel);
+                    game.shotVector = readShotVector(xInputPanel, yInputPanel);
                     frame.setVisible(false);
                     isOpen = false;
                 } catch (Exception e) {

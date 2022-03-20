@@ -3,7 +3,7 @@ package gameengine;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import Data_storage.Ball;
 import Data_storage.Terrain;
@@ -15,7 +15,7 @@ import Reader.*;
 
 public class Game extends Canvas implements Runnable, GameObject {
     public JFrame frame;
-    public Vector2 shot;
+    public Vector2 shotVector;
     public int numShots;
 
     private final int FPS;
@@ -27,7 +27,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     private PhysicsEngine engine;
     private Renderer renderer;
     private Camera cam;
-    private ShotInputWindow shotInput;
+    private ShotInputWindow shotInputWindow;
 
     // region Startup
     /**
@@ -48,11 +48,11 @@ public class Game extends Canvas implements Runnable, GameObject {
     private void resetStartingVariables() {
         numShots = 0;
         running = false;
-        shot = null;
+        shotVector = null;
     }
 
     private void createInputWindow() {
-        shotInput = new ShotInputWindow(this);
+        shotInputWindow = new ShotInputWindow(this);
     }
 
     private void createTerrain() {
@@ -69,8 +69,8 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void createCamera() {
         cam = new Camera();
-        cam.width = 40;
-        cam.height = 40;
+        cam.width = 75;
+        cam.height = 75;
         cam.x = ball.state.position.x;
         cam.y = ball.state.position.y;
     }
@@ -137,40 +137,76 @@ public class Game extends Canvas implements Runnable, GameObject {
     // endregion
 
     // region Update
-    private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
+    private LinkedList<Vector2> ballPositions = new LinkedList<Vector2>();
 
     /**
      * Updates the state of the game each step
      */
     public void update() {
-        if (shot == null && !shotInput.isOpen && ballPositions.size() == 0) {
-            // Check if in water
-            boolean isInWater = terrain.terrainFunction.valueAt(ball.state.position.x, ball.state.position.y) <= 0;
-            if (isInWater) {
+        handleBallInWater();
+        handleOpenWindow();
+        // Find the positions after a shot
+        simulateShot();
+        // Update the ball position if it has been calculated
+        moveBall();
+        moveCamera();
+    }
+
+    private void handleBallInWater() {
+        if (isSimulationFinished()) {
+            boolean isBallInWater = terrain.terrainFunction.valueAt(ball.state.position.x, ball.state.position.y) <= 0;
+            if (isBallInWater) {
                 resetGame();
-            } else {
-                shotInput.openWindow();
             }
         }
-        // Find the positions after a shot
-        if (ballPositions.size() == 0 && shot != null) {
-            ballPositions = engine.simulateShot(shot, ball);
-            numShots++;
-            shot = null;
-        }
-        // Update the ball position if it has been calculated
-        if (ballPositions.size() != 0) {
-            ball.state.position = ballPositions.get(0);
-            ballPositions.remove(0);
-        }
-        // Update camera position
-        cam.x += (ball.state.position.x - cam.x) / 10;
-        cam.y += (ball.state.position.y - cam.y) / 10;
     }
 
     private void resetGame() {
         ball.state.position = terrain.ballStartingPosition;
         numShots = 0;
+    }
+
+    private void handleOpenWindow() {
+        if (isSimulationFinished()) {
+            shotInputWindow.openWindow();
+        }
+    }
+
+    /**
+     * @return true, if the ball has stopped and the input window should open
+     */
+    private boolean isSimulationFinished() {
+        boolean ballStopped = ballPositions.size() == 0;
+        boolean inputWindowClosed = !shotInputWindow.isOpen;
+        boolean ballHasBeenPushed = shotVector == null;
+        return ballHasBeenPushed && inputWindowClosed && ballStopped;
+    }
+
+    private void simulateShot() {
+        if (shouldPushBall()) {
+            ballPositions = engine.simulateShot(shotVector, ball);
+            numShots++;
+            shotVector = null;
+        }
+    }
+
+    private boolean shouldPushBall() {
+        boolean ballStopped = ballPositions.size() == 0;
+        boolean ballHasNotBeenPushed = shotVector != null;
+        return ballStopped && ballHasNotBeenPushed;
+    }
+
+    private void moveBall() {
+        boolean ballMoving = ballPositions.size() != 0;
+        if (ballMoving) {
+            ball.state.position = ballPositions.get(0);
+            ballPositions.remove(0);
+        }
+    }
+
+    private void moveCamera() {
+        cam.x += (ball.state.position.x - cam.x) / 10;
+        cam.y += (ball.state.position.y - cam.y) / 10;
     }
     // endregion
 

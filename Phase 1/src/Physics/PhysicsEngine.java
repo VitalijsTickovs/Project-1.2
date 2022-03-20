@@ -1,6 +1,7 @@
 package Physics;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import Data_storage.*;
 
@@ -40,8 +41,8 @@ public class PhysicsEngine {
      * @param ball The ball to shoot
      * @return ArrayList containing ball positions throughout the shot
      */
-    public ArrayList<Vector2> simulateShot(Vector2 initialSpeed, Ball ball) {
-        ArrayList<Vector2> coordinates = new ArrayList<Vector2>();
+    public LinkedList<Vector2> simulateShot(Vector2 initialSpeed, Ball ball) {
+        LinkedList<Vector2> coordinates = new LinkedList<Vector2>();
         ball.state.velocity = initialSpeed;
         do {
             ball.state = countNewBallState(ball);
@@ -301,7 +302,7 @@ public class PhysicsEngine {
         System.out.println(e.terrain.terrainFunction);
         Ball ball = new Ball(new Vector2(-1, -0.5), new Vector2(1, 0));
         e.addBall(ball);
-        ArrayList<Vector2> positions = e.simulateShot(new Vector2(3, 0), ball);
+        LinkedList<Vector2> positions = e.simulateShot(new Vector2(3, 0), ball);
 
         System.out.println("Position: (x=" + ball.state.position.x + ", y=" + ball.state.position.y + ")");
         System.out.println("Velocity: (v(x)=" + ball.state.velocity.x + ", v(y)=" + ball.state.velocity.y + ")");
