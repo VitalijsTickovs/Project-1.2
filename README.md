@@ -8,6 +8,7 @@ PURPOSE OF PROJECT: Calculating the approximation of how the ball would move bas
 DATE: 17.03.2022
 HOW TO START THIS PROJECT: Open src/GUI/MenuGUI.java file. Compile and run the specified file.
 AUTHORS: Alex, Niko, Tomas, Vitaly, Wei, Stan, Léa
+
 USER INSTRUCTIONS:
 
 Before you run our project you have to specify the main source root.
