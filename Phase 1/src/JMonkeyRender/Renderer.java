@@ -307,9 +307,6 @@ public class Renderer extends Cam {
     public void simpleUpdate(float tpf) {
             if (!inTarget) {
                 //simulates from Vectors.csv file
-                if (points.size() == 0 && !q.isEmpty()) {
-                    points = engine.simulateShot(q.remove(), ball);
-                }
                 //moves the ball with calculated position
                 if (points.size() != 0) {
                     ball.state.position = points.get(0);

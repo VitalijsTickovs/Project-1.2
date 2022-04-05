@@ -11,7 +11,6 @@ import Data_storage.Terrain;
 import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
 import Data_storage.Zone;
-import com.sun.tools.javac.Main;
 
 public class Reader {
 
@@ -109,7 +108,7 @@ public class Reader {
     */
    private static boolean createScanner() {
       try {
-         scanner = new Scanner(new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/userInput.csv"));
+         scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/userInput.csv"));
          return true;
 
       } catch (FileNotFoundException e) {
