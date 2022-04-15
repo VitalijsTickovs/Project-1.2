@@ -10,7 +10,7 @@ public class CollisionSystem {
     public static BallState modifyStateDueToCollisions(BallState state, Vector2 previousPosition, double ballRadius){
 
         ArrayList<IObstacle> collidesWith = getTouchedObstacles(state.position, ballRadius);
-        CollisionData collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition);
+        CollisionData collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition, ballRadius);
         if (collisionData != null) {
             bounceBall(state, previousPosition, collisionData);
         }
@@ -34,13 +34,13 @@ public class CollisionSystem {
         return touchedObstacles;
     }
 
-    private static CollisionData getClosestCollisionData(ArrayList<IObstacle> collidesWith, Vector2 currentPosition, Vector2 previousPosition){
+    private static CollisionData getClosestCollisionData(ArrayList<IObstacle> collidesWith, Vector2 currentPosition, Vector2 previousPosition, double ballRadius){
         CollisionData closestCollisionData = null;
         for (IObstacle iObstacle : collidesWith) {
             if (iObstacle == null) {
                 continue;
             }
-            CollisionData collisionData = iObstacle.getCollisionData(currentPosition, previousPosition);
+            CollisionData collisionData = iObstacle.getCollisionData(currentPosition, previousPosition, ballRadius);
             if (collisionData == null) {
                 continue;
             }
@@ -59,7 +59,8 @@ public class CollisionSystem {
         double moveDistanceAfterCollision = state.position.distanceTo(collisionData.collisionPosition);
 
         state.velocity.reflect(collisionData.collisionNormal);
-        state.velocity.scale(1 - collisionData.bounciness);
+        // For eg. if bounciness equals 0.8, the returned velocity vector will be 20% shorter
+        state.velocity.scale(collisionData.bounciness);
 
         Vector2 newVelocityDirection = state.velocity.normalized();
         state.position.translate(newVelocityDirection.scale(moveDistanceAfterCollision));

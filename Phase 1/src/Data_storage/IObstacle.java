@@ -15,7 +15,7 @@ public interface IObstacle {
      * @param velocity
      * @return
      */
-    public abstract CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition);
+    public abstract CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition, double ballRadius);
 
     public abstract void print();
 }
