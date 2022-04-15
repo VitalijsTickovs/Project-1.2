@@ -1,6 +1,9 @@
 package Data_storage;
 
 public class Rectangle extends Shape {
+    public Rectangle(){
+        
+    }
 
     public Rectangle(Vector2 bottomLeftCorner, Vector2 topRightCorner){
         this.bottomLeftCorner = bottomLeftCorner;
@@ -25,6 +28,14 @@ public class Rectangle extends Shape {
         boolean isXInside = objectPosition.x + ballRadius > bottomLeftCorner.x && objectPosition.x - ballRadius < topRightCorner.x;
         boolean isYInside = objectPosition.y + ballRadius > bottomLeftCorner.y && objectPosition.y - ballRadius < topRightCorner.y;
         if (isXInside && isYInside) {
+            return true;
+        }
+
+        boolean touchesBottomLeftCorner = objectPosition.distanceTo(bottomLeftCorner) < ballRadius;
+        boolean touchesBottomRightCorner = objectPosition.distanceTo(new Vector2(topRightCorner.x, bottomLeftCorner.y)) < ballRadius;
+        boolean touchesTopRightCorner = objectPosition.distanceTo(topRightCorner) < ballRadius;
+        boolean touchesTopLeftCorner = objectPosition.distanceTo(new Vector2(bottomLeftCorner.x, topRightCorner.y)) < ballRadius;
+        if (touchesBottomLeftCorner || touchesBottomRightCorner || touchesTopRightCorner || touchesTopLeftCorner) {
             return true;
         }
         return false;

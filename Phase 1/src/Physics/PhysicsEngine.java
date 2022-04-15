@@ -8,7 +8,7 @@ import Data_storage.*;
 public class PhysicsEngine {
 
     public double h = 0.05; // The step of the Euler's method
-    public Terrain terrain;
+    public static Terrain terrain;
     public ArrayList<Ball> ballsToSimulate;
     private final double G = 9.81;
 
@@ -58,100 +58,20 @@ public class PhysicsEngine {
      */
     private BallState countNewBallState(Ball ball) {
         BallState newState = ball.state.copy();
-        newState.position = countNewPosition(newState, ball.radius);
+        modifyPosition(newState);
+        Vector2 startingPosition = ball.state.position;
+        CollisionSystem.modifyStateDueToCollisions(newState, startingPosition, ball.radius);
         newState.velocity = countNewVelocity(ball);
 
         return newState;
     }
 
-    private Vector2 countNewPosition(BallState state, double radius) {
-        Vector2 newPosition = state.position.copy();
-        doEulerPositionStep(state, h);
-
-        IObstacle collidesWith = isTouchingAnObstacle(newPosition, radius);
-        if (collidesWith != null) {
-            bounceBall(state, collidesWith, h, radius);
-            newPosition = state.position;
-        }
-
-        // Check out of bounds
-        state.position = checkBallOutOfBounds(state);
-        return state.position;
+    private void modifyPosition(BallState state) {
+        doEulerStep(state, h); // Modifies the ball state's position by one Euler step
     }
 
-    private void doEulerPositionStep(BallState state, double h) {
+    private void doEulerStep(BallState state, double h) {
         state.position.translate(new Vector2(h * state.velocity.x, h * state.velocity.y));
-    }
-
-    /**
-     * 
-     * @param position
-     * @return the obstacle that the ball collided with or null if it didn't
-     */
-    private IObstacle isTouchingAnObstacle(Vector2 position, double radius) {
-        for (IObstacle obstacle : terrain.obstacles) {
-            if (obstacle.isBallColliding(position, radius)) {
-                return obstacle;
-            }
-        }
-        return null;
-    }
-
-    private void bounceBall(BallState state, IObstacle collidesWith, double h, double radius) {
-        collidesWith.bounceVector(state.position, state.velocity, h, radius);
-    }
-
-    private Vector2 checkBallOutOfBounds(BallState state){
-        Vector2 newPosition = state.position.copy();
-        boolean reverseX = false;
-        if (newPosition.x > terrain.limitingCorner.x) {
-            reverseX = true;
-            Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(terrain.limitingCorner.x, 0), new Vector2(terrain.limitingCorner.x, 1));
-            if (intersectionPoint != null) {
-                newPosition = intersectionPoint;
-            } else {
-                newPosition = state.position;
-            }
-        } else if (newPosition.x < terrain.startingCorner.x) {
-            reverseX = true;
-            Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(terrain.startingCorner.x, 0), new Vector2(terrain.startingCorner.x, 1));
-            if (intersectionPoint != null) {
-                newPosition = intersectionPoint;
-            } else {
-                newPosition = state.position;
-            }
-        }
-        // On y-axis
-        boolean reverseY = false;
-        if (newPosition.y > terrain.limitingCorner.y) {
-            reverseY = true;
-            Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(0, terrain.limitingCorner.y), new Vector2(0, terrain.limitingCorner.y));
-            if (intersectionPoint != null) {
-                newPosition = intersectionPoint;
-            } else {
-                newPosition = state.position;
-            }
-        } else if (newPosition.y < terrain.startingCorner.y) {
-            reverseY = true;
-            Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(0, terrain.startingCorner.y), new Vector2(0, terrain.startingCorner.y));
-            if (intersectionPoint != null) {
-                newPosition = intersectionPoint;
-            } else {
-                newPosition = state.position;
-            }
-        }
-        // Reverse the velocity if needed
-        if (reverseX) {
-            state.velocity.x = -state.velocity.x;
-        }
-        if (reverseY) {
-            state.velocity.y = -state.velocity.y;
-        }
-        return newPosition;
     }
 
     private Vector2 countNewVelocity(Ball ball) {
@@ -173,6 +93,7 @@ public class PhysicsEngine {
 
         // Set velocity to max speed if too big
         clampBallVelocity(newVelocity);
+
         Vector2 slope = new Vector2(xSlope, ySlope);
 
         if (ballInMotion) {
@@ -292,19 +213,5 @@ public class PhysicsEngine {
         if (velocity.length() > Ball.maxSpeed) {
             velocity = velocity.normalized().scale(Ball.maxSpeed);
         }
-    }
-
-
-
-    public static void main(String[] args) {
-        PhysicsEngine e = new PhysicsEngine();
-        e.terrain = new Terrain("e**(-(x**2 + y**2)/40)", 0.2, 0.1, new Vector2(-10, -10), new Vector2(10, 10));
-        System.out.println(e.terrain.terrainFunction);
-        Ball ball = new Ball(new Vector2(-1, -0.5), new Vector2(1, 0));
-        e.addBall(ball);
-        LinkedList<Vector2> positions = e.simulateShot(new Vector2(3, 0), ball);
-
-        System.out.println("Position: (x=" + ball.state.position.x + ", y=" + ball.state.position.y + ")");
-        System.out.println("Velocity: (v(x)=" + ball.state.velocity.x + ", v(y)=" + ball.state.velocity.y + ")");
     }
 }

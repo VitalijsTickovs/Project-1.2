@@ -96,7 +96,7 @@ public class UtilityClass {
             if (points[i] == null) {
                 continue;
             }
-            if (closestPoint.distanceTo(points[i]) < closestPoint.distanceTo(closestPoint)) {
+            if (closestTo.distanceTo(points[i]) < closestTo.distanceTo(closestPoint)) {
                 closestPoint = points[i];
             }
         }

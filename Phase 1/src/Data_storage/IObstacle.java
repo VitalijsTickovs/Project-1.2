@@ -15,7 +15,7 @@ public interface IObstacle {
      * @param velocity
      * @return
      */
-    public abstract void bounceVector(Vector2 position, Vector2 velocity, double h, double radius);
+    public abstract CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition);
 
     public abstract void print();
 }

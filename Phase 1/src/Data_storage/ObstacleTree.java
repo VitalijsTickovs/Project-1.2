@@ -29,12 +29,12 @@ public class ObstacleTree extends Circle implements IObstacle {
     }
 
     @Override
-    public void bounceVector(Vector2 position, Vector2 velocity, double h, double ballRadius) {
+    public CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition) {
         Vector2 normal = getCollisionNormal(position);
         // If bounciness equals 0.8, the returned velocity vector will be 20% shorter
-        Vector2 bouncedVelocity = velocity.reflect(normal).scale(bounciness);
+        Vector2 bouncedVelocity = velocity.reflected(normal).scale(bounciness);
         velocity = bouncedVelocity;
-        Vector2 positionToBall = originPosition.translate(position.getOppositeVector());
+        Vector2 positionToBall = originPosition.translate(position.reversed());
         double distanceToBall = positionToBall.length();
         double moveBall = distanceToBall - ballRadius - radius;
         Vector2 moveToObstacleVector = positionToBall.normalized().scale(moveBall * h);
@@ -44,7 +44,7 @@ public class ObstacleTree extends Circle implements IObstacle {
     }
 
     public Vector2 getCollisionNormal(Vector2 position) {
-        return position.translate(originPosition.getOppositeVector());
+        return position.translate(originPosition.reversed());
     }
 
     @Override

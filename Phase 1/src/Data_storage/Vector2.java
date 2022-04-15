@@ -28,25 +28,35 @@ public class Vector2 {
     }
 
     /**
-     * 
-     * @param vector translation vector. The vector will be changed by this offset
-     * @return a new changed vector after modifying this vector
+     * @return this vector after it is translated
      */
     public Vector2 translate(Vector2 vector) {
         x += vector.x;
         y += vector.y;
-        return new Vector2(x, y);
+        return this;
     }
 
     /**
-     * 
-     * @param vector translation vector. The vector will be changed by this offset
-     * @return a new changed vector after modifying this vector
+     * @return this vector after it is translated
      */
     public Vector2 translate(double deltaX, double deltaY) {
         x += deltaX;
         y += deltaY;
-        return new Vector2(x, y);
+        return this;
+    }
+
+    /**
+     * @return a tanslated copy of this vector
+     */
+    public Vector2 translated(Vector2 vector) {
+        return new Vector2(x + vector.x, y + vector.y);
+    }
+
+    /**
+     * @return a tanslated copy of this vector
+     */
+    public Vector2 translated(double deltaX, double deltaY) {
+        return new Vector2(x + deltaX, y + deltaY);
     }
 
     /**
@@ -116,21 +126,28 @@ public class Vector2 {
      */
     public Vector2 reflected(Vector2 normal) {
         Vector2 vector = copy();
-        double dotProduct = dotProduct(vector, normal.normalized());
+        double dotProduct = dotProduct(vector, normal.getPerpendicularVector().normalized());
         // vector - 2 * (dotProduct) * normal;
-        Vector2 reflection = vector.translate(normal.normalized().scale(2 * dotProduct).reversed());
+        Vector2 reflection = vector.translate(normal.getPerpendicularVector().normalized().scale(2 * dotProduct).reversed());
         return reflection;
     }
-/**
+    
+    /**
      * Picture included
      * https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
      * @param normal
      * @return reflects this vector by a normal and returns the result
      */
     public Vector2 reflect(Vector2 normal) {
-        double dotProduct = dotProduct(this, normal.normalized());
+        double dotProduct = dotProduct(this, normal.getPerpendicularVector().normalized());
         // vector - 2 * (dotProduct) * normal;
-        return translate(normal.normalized().scale(2 * dotProduct).reversed());
+        return translate(normal.getPerpendicularVector().normalized().scale(2 * dotProduct).reversed());
+    }
+
+    public Vector2 getPerpendicularVector(){
+        Line2D line = new Line2D(this, Vector2.zeroVector);
+        Line2D perpendicularLine = line.getPerpendicularLineAtPoint(Vector2.zeroVector);
+        return perpendicularLine.secondPosition;
     }
 
     /**

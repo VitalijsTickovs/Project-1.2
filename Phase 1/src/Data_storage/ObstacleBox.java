@@ -8,21 +8,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   // This is basically friction for bounces
 
   public ObstacleBox(Vector2 bottomLeftCorner, Vector2 topRightCorner){
-        super(bottomLeftCorner, topRightCorner);
-    }
-  public static void main(String[] args) {
-    Vector2 bottomLeft = new Vector2(-2, -2);
-    Vector2 topRight = new Vector2(2, 2);
-
-    ObstacleBox box = new ObstacleBox(bottomLeft, topRight);
-
-    Vector2 pos = new Vector2(-1,-2.5);
-    Vector2 pos2 = new Vector2(-1,-1.9);
-    Vector2[] wall = box.getWall(pos, pos2);
-
-    System.out.println(wall[0]);
-    System.out.println(wall[1]);
-
+    super(bottomLeftCorner, topRightCorner);
   }
 
   @Override
@@ -41,45 +27,28 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   }
 
   @Override
-  public void bounceVector(
-    Vector2 position,
-    Vector2 velocity,
-    double h,
-    double ballRadius
-  ) {
-    Vector2[] wall = getWall(position, position.translate(velocity.scale(h)));
-    Vector2 intersectionPosition = UtilityClass.findLineIntersection(
-      position,
-      position.copy().translate(velocity.scale(h)),
-      wall[0],
-      wall[1]
-    );
-    Vector2 positionToBall = intersectionPosition.translate(
-      position.reversed()
-    );
-    double distanceToBall = positionToBall.length();
-    double moveBall = distanceToBall - ballRadius;
-    Vector2 moveToObstacleVector = positionToBall
-      .normalized()
-      .scale(moveBall * h);
+  public CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition) {
 
-    position.translate(moveToObstacleVector);
-    Vector2 normal = getCollisionNormal(position, velocity);
-    // If bounciness equals 0.8, the returned velocity vector will be 20% shorter
-    Vector2 bouncedVelocity = velocity.reflected(normal).scale(bounciness);
-    velocity = bouncedVelocity;
-    Vector2 movePastObstacleVector = velocity
-      .normalized()
-      .scale((distanceToBall - moveBall) * h);
-    position.translate(movePastObstacleVector);
+    Vector2[] wall = getWallCollision(previousPosition, currentPosition);
+
+    CollisionData collisionData = new CollisionData();
+    
+    Vector2 wallDirectionVector = wall[1].translated(wall[0].reversed());
+    Vector2 normal = wallDirectionVector.getPerpendicularVector();
+    collisionData.collisionNormal = normal;
+    
+    collisionData.bounciness = bounciness;
+    collisionData.collisionPosition = wall[2];
+
+    return collisionData;
   }
 
   /**
    *
-   * @return a list containing two points laying on the same line as the wall that the object collided with and the collision point
+   * @return a list containing two corners of the wall and the collision point
    * or null if the object did not collide with any wall
    */
-  private Vector2[] getWall(Vector2 firstPosition, Vector2 secondPosition) {
+  private Vector2[] getWallCollision(Vector2 firstPosition, Vector2 secondPosition) {
     Vector2[] collisionPoints = getAllCrossPoints(firstPosition,secondPosition);
     Vector2 closestPoint = UtilityClass.getClosestPoint(firstPosition, collisionPoints);
     Vector2[] wallAndClosestPoint = new Vector2[3];
@@ -131,13 +100,13 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     Vector2[] crossPoints = new Vector2[4];
     
     Vector2[] leftWall = getLeftWall();
-    crossPoints[0] = UtilityClass.findLineIntersection(firstPosition, secondPosition, leftWall[0], leftWall[1]);
+    crossPoints[0] = UtilityClass.findEpisodeIntersection(firstPosition, secondPosition, leftWall[0], leftWall[1]);
     Vector2[] rightWall = getRightWall();
-    crossPoints[1] = UtilityClass.findLineIntersection(firstPosition, secondPosition, rightWall[0], rightWall[1]);
+    crossPoints[1] = UtilityClass.findEpisodeIntersection(firstPosition, secondPosition, rightWall[0], rightWall[1]);
     Vector2[] topWall = getTopWall();
-    crossPoints[2] = UtilityClass.findLineIntersection(firstPosition, secondPosition, topWall[0], topWall[1]);
+    crossPoints[2] = UtilityClass.findEpisodeIntersection(firstPosition, secondPosition, topWall[0], topWall[1]);
     Vector2[] bottomWall = getBottomWall();
-    crossPoints[3] = UtilityClass.findLineIntersection(firstPosition, secondPosition, bottomWall[0], bottomWall[1]);
+    crossPoints[3] = UtilityClass.findEpisodeIntersection(firstPosition, secondPosition, bottomWall[0], bottomWall[1]);
 
     return crossPoints;
   }
@@ -145,28 +114,28 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   private Vector2[] getBottomWall() {
     Vector2[] wall = new Vector2[2];
     wall[0] = bottomLeftCorner;
-    wall[1] = bottomLeftCorner.translate(new Vector2(-1, 0));
+    wall[1] = new Vector2(topRightCorner.x, bottomLeftCorner.y);
     return wall;
   }
 
   private Vector2[] getTopWall() {
     Vector2[] wall = new Vector2[2];
     wall[0] = topRightCorner;
-    wall[1] = topRightCorner.translate(new Vector2(-1, 0));
+    wall[1] = new Vector2(bottomLeftCorner.x, topRightCorner.y);
     return wall;
   }
 
   private Vector2[] getRightWall() {
     Vector2[] wall = new Vector2[2];
     wall[0] = topRightCorner;
-    wall[1] = topRightCorner.translate(new Vector2(0, -1));
+    wall[1] = new Vector2(topRightCorner.x, bottomLeftCorner.y);
     return wall;
   }
 
   private Vector2[] getLeftWall() {
     Vector2[] wall = new Vector2[2];
     wall[0] = bottomLeftCorner;
-    wall[1] = bottomLeftCorner.translate(new Vector2(0, 1));
+    wall[1] = new Vector2(bottomLeftCorner.x, topRightCorner.y);
     return wall;
   }
 

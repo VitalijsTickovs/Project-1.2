@@ -6,7 +6,7 @@ public class Circle extends Shape {
 
     @Override
     protected boolean isPositionInside(Vector2 objectPosition) {
-        Vector2 deltaPos = objectPosition.copy().translate(originPosition.getOppositeVector());
+        Vector2 deltaPos = objectPosition.copy().translate(originPosition.reversed());
         double distance = deltaPos.length();
 
         boolean isInside = distance < radius;
@@ -18,7 +18,7 @@ public class Circle extends Shape {
 
     @Override
     protected boolean isCircleInside(Vector2 objectPosition, double ballRadius) {
-        Vector2 deltaPos = objectPosition.copy().translate(originPosition.getOppositeVector());
+        Vector2 deltaPos = objectPosition.copy().translate(originPosition.reversed());
         double distance = deltaPos.length();
 
         boolean isInside = distance < radius + ballRadius;

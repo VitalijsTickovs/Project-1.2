@@ -55,9 +55,7 @@ public class Terrain {
         for (int i=0; i<zones.length; i++) {
             temp[i] = zones[i];
         }
-        Zone z = new Zone();
-        z.bottomLeftCorner = bottomLeft.copy();
-        z.topRightCorner = topRight.copy();
+        Zone z = new Zone(bottomLeft.copy(),topRight.copy());
         z.staticFriction = zoneStaticFriction;
         z.kineticFriction = zoneKineticFriction;
         temp[temp.length-1] = z;

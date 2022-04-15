@@ -33,23 +33,37 @@ public class Vector3 {
     }
 
     /**
-     * @return a new changed vector after modifying this vector
+     * @return this vector after it is translated
      */
     public Vector3 translate(Vector3 vector) {
         x += vector.x;
         y += vector.y;
         z += vector.z;
-        return new Vector3(x, y, z);
+        return this;
     }
 
     /**
-     * @return a new changed vector after modifying this vector
+     * @return this vector after it is translated
      */
     public Vector3 translate(double deltaX, double deltaY, double deltaZ) {
         x += deltaX;
         y += deltaY;
         z += deltaZ;
-        return new Vector3(x, y, z);
+        return this;
+    }
+
+    /**
+     * @return a tanslated copy of this vector
+     */
+    public Vector3 translated(Vector3 vector) {
+        return new Vector3(x += vector.x, y += vector.y, z += vector.z);
+    }
+
+    /**
+     * @return a tanslated copy of this vector
+     */
+    public Vector3 translated(double deltaX, double deltaY, double deltaZ) {
+        return new Vector3(x += deltaX, y += deltaY, z += deltaZ);
     }
 
     public double distanceTo(Vector3 toVector){
@@ -65,6 +79,7 @@ public class Vector3 {
         z *= -1;
         return this; 
     }
+    
     /**
      * reverses a copy of this vector and returns the result without modifying the original vector
      */
