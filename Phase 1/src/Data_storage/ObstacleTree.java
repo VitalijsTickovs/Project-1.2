@@ -7,7 +7,7 @@ public class ObstacleTree extends Circle implements IObstacle {
 
     @Override
     public boolean isBallColliding(Vector2 ballPos, double radius) {
-        return isBallInside(ballPos, radius);
+        return isCircleInside(ballPos, radius);
     }
 
     @Override

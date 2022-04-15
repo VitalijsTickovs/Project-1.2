@@ -32,6 +32,9 @@ public class Vector3 {
         return Math.sqrt((x * x) + (y * y) + (z * z));
     }
 
+    /**
+     * @return a new changed vector after modifying this vector
+     */
     public Vector3 translate(Vector3 vector) {
         x += vector.x;
         y += vector.y;
@@ -39,6 +42,9 @@ public class Vector3 {
         return new Vector3(x, y, z);
     }
 
+    /**
+     * @return a new changed vector after modifying this vector
+     */
     public Vector3 translate(double deltaX, double deltaY, double deltaZ) {
         x += deltaX;
         y += deltaY;
@@ -46,27 +52,87 @@ public class Vector3 {
         return new Vector3(x, y, z);
     }
 
-    public Vector3 getOppositeVector() {
+    public double distanceTo(Vector3 toVector){
+        return Math.sqrt((x - toVector.x) * (x - toVector.x) + (y - toVector.y) * (y - toVector.y) + (z - toVector.z) * (z - toVector.z));
+    }
+
+    /**
+     * reverses this vector and returns the result
+     */
+    public Vector3 reverse() {
+        x *= -1;
+        y *= -1;
+        z *= -1;
+        return this; 
+    }
+    /**
+     * reverses a copy of this vector and returns the result without modifying the original vector
+     */
+    public Vector3 reversed() {
         return new Vector3(-x, -y, -z);
     }
-
+    
+    /**
+     * scales this vector and returns the result
+     */
     public Vector3 scale(double scale) {
-        return new Vector3(x * scale, y * scale, z * scale);
+        x*= scale;
+        y*= scale;
+        z*= scale;
+        return this;
     }
 
+    /**
+     * scales a copy of this vector and returns the result without modifying the original vector
+     */
+    public Vector3 scaled(double scale) {
+        return new Vector3(x * scale, y * scale, z * scale);
+    }
+    
+    /**
+     * normalizes this vector and returns the result
+     */
+    public Vector3 normalize() {
+        Vector3 normalizedVector = copy().scale(1 / length());
+        x = normalizedVector.x;
+        y = normalizedVector.y;
+        z = normalizedVector.z;
+        
+        return this;
+    }
+
+    /**
+     * normalizes a copy of this vector and returns the result without modifying the original vector
+     */
     public Vector3 normalized() {
         Vector3 normalizedVector = copy().scale(1 / length());
         return normalizedVector;
     }
 
-    public Vector3 reflect(Vector3 normal) {
+    /**
+     * returns a copy of this vector after it is reflected by a normal
+     */
+    public Vector3 reflected(Vector3 normal) {
         Vector3 vector = copy();
         double dotProduct = dotProduct(vector, normal.normalized());
         // vector - 2 * (dotProduct) * normal;
-        Vector3 reflection = vector.translate(normal.normalized().scale(2 * dotProduct).getOppositeVector());
+        Vector3 reflection = vector.translate(normal.normalized().scale(2 * dotProduct).reversed());
         return reflection;
     }
+    /**
+     * reflects this vector and returns it afterwards
+     */
+    public Vector3 reflect(Vector3 normal) {
+        double dotProduct = dotProduct(this, normal.normalized());
+        // vector - 2 * (dotProduct) * normal;
+        translate(normal.normalized().scale(2 * dotProduct).reversed());
+        return this;
+    }
 
+    /**
+     * 
+     * @return a new vector with the same values as the original
+     */
     public Vector3 copy() {
         return new Vector3(x, y, z);
     }
