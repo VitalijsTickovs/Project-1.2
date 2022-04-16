@@ -28,7 +28,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   @Override
   public CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
 
-    Vector2[] wall = getWallCollision(previousPosition, currentPosition, ballRadius);
+    Vector2[] wall = getCollisionPointAndWall(previousPosition, currentPosition, ballRadius);
 
     CollisionData collisionData = new CollisionData();
     
@@ -47,7 +47,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
    * @return a list containing two corners of the wall and the collision point
    * or null if the object did not collide with any wall
    */
-  private Vector2[] getWallCollision(Vector2 firstPosition, Vector2 secondPosition, double ballRadius) {
+  private Vector2[] getCollisionPointAndWall(Vector2 firstPosition, Vector2 secondPosition, double ballRadius) {
     Vector2[] collisionPoints = getAllCrossPoints(firstPosition, secondPosition, ballRadius);
     Vector2 closestPoint = UtilityClass.getClosestPoint(firstPosition, collisionPoints);
     Vector2[] wallAndClosestPoint = new Vector2[3];
@@ -81,6 +81,10 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     return wallAndClosestPoint;
   }
 
+  /**
+   * @return a list of 4 positions that save the collision point of the ball with the wall. 
+   * If a point is null, then no collision with that wall occured
+   */
   private Vector2[] getAllCrossPoints(Vector2 firstPosition, Vector2 secondPosition, double ballRadius){
     Vector2[] crossPoints = new Vector2[4];
     Line2D moveLine = new Line2D(firstPosition, secondPosition);

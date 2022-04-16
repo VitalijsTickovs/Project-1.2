@@ -20,26 +20,64 @@ public class ObstacleTree extends Circle implements IObstacle {
         return bounciness;
     }
 
+    @Override
+    public CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
+        Vector2[] collisionPoints = getCollisionPoints(currentPosition, previousPosition, ballRadius);
+
+        if (collisionPoints == null) {
+            return null;
+        }
+
+        Vector2 closestCollisionPoint = getClosestCollisionPoint(collisionPoints, previousPosition);
+
+        CollisionData collisionData = new CollisionData();
+        collisionData.collisionPosition = closestCollisionPoint;
+        
+        collisionData.bounciness = bounciness;
+        collisionData.collisionNormal = getNormal(closestCollisionPoint);
+
+        return collisionData;
+    }
+
+    /**
+     * The whole outline of the geometry is here 
+     * https://drive.google.com/file/d/1rt7-Zydk_wbFvLNzdlaMwInoSB4xYM0x/view?usp=sharing
+     * @return two collision points with this obstacle (the same one twice if it is a tangent)
+     * or null if there is no collision
+     */
+    public Vector2[] getCollisionPoints(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
+        Line2D movementLine = new Line2D(currentPosition, previousPosition);
+        Vector2[] collisionsWithLine = movementLine.getCrossPointsWithCircle(originPosition, radius);
+
+        if (collisionsWithLine == null) {
+            return null;
+        }
+
+        Vector2 deltaPositionToCollisionPoint = previousPosition.translated(collisionsWithLine[0].reversed()).normalize().scale(ballRadius);
+        Vector2[] collisionPoints = new Vector2[2];
+        collisionPoints[0] = collisionsWithLine[0].translate(deltaPositionToCollisionPoint);
+        collisionPoints[1] = collisionsWithLine[1].translate(deltaPositionToCollisionPoint);
+
+        return collisionPoints;
+    }
+
+    private Vector2 getClosestCollisionPoint(Vector2[] collisionPoints, Vector2 previousPosition){
+        if (collisionPoints[0].distanceTo(previousPosition) < collisionPoints[1].distanceTo(previousPosition)) {
+            return collisionPoints[0];
+        }
+        return collisionPoints[1];
+    }
+
+    private Vector2 getNormal(Vector2 closestCollisionPoint){
+        return closestCollisionPoint.translated(originPosition.reversed());
+    }
+
     public ObstacleTree copy() {
         ObstacleTree newTree = new ObstacleTree();
         newTree.bounciness = bounciness;
         newTree.originPosition = originPosition;
         newTree.radius = radius;
         return newTree;
-    }
-
-    @Override
-    public CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
-        Vector2[] wall = getCollisionNormal(currentPosition, previousPosition);
-
-        CollisionData collisionData = new CollisionData();
-
-        collisionData.bounciness = bounciness;
-        collisionData.collisionPosition = wall[2];
-    }
-
-    public Vector2 getCollisionNormal(Vector2 position) {
-        return position.translate(originPosition.reversed());
     }
 
     @Override
