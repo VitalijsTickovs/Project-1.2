@@ -12,9 +12,10 @@ public class PhysicsEngine {
     public ArrayList<Ball> ballsToSimulate;
     private final double G = 9.81;
 
-    public PhysicsEngine() {
+    public PhysicsEngine(Terrain setTerrain) {
         ballsToSimulate = new ArrayList<Ball>();
-        terrain = null;
+        terrain = setTerrain;
+        CollisionSystem.obstacles = terrain.obstacles;
     }
 
     /**

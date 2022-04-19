@@ -62,8 +62,7 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void createBall() {
         ball = new Ball(terrain.ballStartingPosition, Vector2.zeroVector);
-        engine = new PhysicsEngine();
-        engine.terrain = terrain;
+        engine = new PhysicsEngine(terrain);
         engine.addBall(ball);
     }
 

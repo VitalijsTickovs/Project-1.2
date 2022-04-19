@@ -262,8 +262,7 @@ public class Renderer extends Cam {
 
         //setting the physics engine
         ball = new Ball(this.ballStartPos, new Vector2(3, -5));
-        engine = new PhysicsEngine();
-        engine.terrain = this.terrain;
+        engine = new PhysicsEngine(this.terrain);
         engine.addBall(ball);
     }
 

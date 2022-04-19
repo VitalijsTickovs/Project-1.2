@@ -6,6 +6,7 @@ import Data_storage.*;
 
 public class CollisionSystem {
 
+    public static IObstacle[] obstacles;
 
     public static BallState modifyStateDueToCollisions(BallState state, Vector2 previousPosition, double ballRadius){
 
@@ -26,7 +27,7 @@ public class CollisionSystem {
      */
     private static ArrayList<IObstacle> getTouchedObstacles(Vector2 position, double radius) {
         ArrayList<IObstacle> touchedObstacles = new ArrayList<>();
-        for (IObstacle obstacle : PhysicsEngine.terrain.obstacles) {
+        for (IObstacle obstacle : obstacles) {
             if (obstacle.isBallColliding(position, radius)) {
                 touchedObstacles.add(obstacle);
             }
