@@ -33,6 +33,15 @@ public class Vector2 {
         return new Vector2(x, y);
     }
 
+    public double getX(){
+        return x;
+    }
+
+    public double getY(){
+        return y;
+    }
+
+
     public Vector2 translate(double deltaX, double deltaY) {
         x += deltaX;
         y += deltaY;

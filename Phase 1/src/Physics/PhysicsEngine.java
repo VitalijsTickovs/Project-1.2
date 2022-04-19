@@ -16,6 +16,9 @@ public class PhysicsEngine {
         ballsToSimulate = new ArrayList<Ball>();
         terrain = null;
     }
+    /*
+    EXAMPLE
+     */
 
     /**
      * Adds a ball to the list of balls that should be processed
@@ -66,7 +69,7 @@ public class PhysicsEngine {
 
     private Vector2 countNewPosition(BallState state, double radius) {
         Vector2 newPosition = state.position.copy();
-        doEulerPositionStep(state, h);
+        doRK2(state, h);
 
         IObstacle collidesWith = isTouchingAnObstacle(newPosition, radius);
         if (collidesWith != null) {
@@ -83,6 +86,28 @@ public class PhysicsEngine {
         state.position.translate(new Vector2(h * state.velocity.x, h * state.velocity.y));
     }
 
+
+
+    private void doRK2(BallState state, double h) {
+        state.position.translate(new Vector2(h/2 * state.velocity.x, h/2 * state.velocity.y));
+        state.position.translate(new Vector2(h * state.velocity.x, h * state.velocity.y));
+    }
+
+
+    Vector2 a = new Vector2();
+    Vector2 b = new Vector2();
+    Vector2 c = new Vector2();
+    Vector2 d = new Vector2();
+    private void doRK4(BallState state, double h) {
+       a= state.position;
+       b= new Vector2(h/2 * state.velocity.x + a.getX(), h/2 * state.velocity.y + a.getY());
+       c= new Vector2(h/2 * state.velocity.x + b.getX(), h/2 * state.velocity.y + b.getY());
+       d= new Vector2(h * state.velocity.x + c.getX(), h * state.velocity.y + c.getY());
+       state.position.translate(new Vector2(h/6* (a.getX()+2*b.getX()+2*c.getX()+d.getX()), h/6 *(a.getY()+2*b.getY()+2*c.getY()+d.getY())));
+
+    }
+
+
     /**
      * 
      * @param position
@@ -96,6 +121,10 @@ public class PhysicsEngine {
         }
         return null;
     }
+
+    /*
+    EXAMPLE
+     */
 
     private void bounceBall(BallState state, IObstacle collidesWith, double h, double radius) {
         collidesWith.bounceVector(state.position, state.velocity, h, radius);
