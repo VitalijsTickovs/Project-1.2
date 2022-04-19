@@ -18,8 +18,8 @@ public class Vector2 {
     public final static Vector2 zeroVector = new Vector2(0, 0);
     public final static Vector2 rightVector = new Vector2(1, 0);
     public final static Vector2 leftVector = new Vector2(-1, 0);
-    public final static Vector2 forwardVector = new Vector2(0, 1);
-    public final static Vector2 backwardVector = new Vector2(0, -1);
+    public final static Vector2 upVector = new Vector2(0, 1);
+    public final static Vector2 downVector = new Vector2(0, -1);
     public final static Vector2 unitVector = new Vector2(1, 1);
 
     // Helper methods

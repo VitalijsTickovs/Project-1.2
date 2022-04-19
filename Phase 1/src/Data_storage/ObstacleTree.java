@@ -47,7 +47,7 @@ public class ObstacleTree extends Circle implements IObstacle {
      */
     public Vector2[] getCollisionPoints(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
         Line2D movementLine = new Line2D(currentPosition, previousPosition);
-        Vector2[] collisionsWithLine = movementLine.getCrossPointsWithCircle(originPosition, radius);
+        Vector2[] collisionsWithLine = movementLine.getCrossPointsWithCircle(originPosition, radius + ballRadius);
 
         if (collisionsWithLine == null) {
             return null;

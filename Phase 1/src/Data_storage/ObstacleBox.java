@@ -152,10 +152,10 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     }
     boolean collidedFromTop = position.y > topRightCorner.y;
     if (collidedFromTop) {
-      return Vector2.forwardVector;
+      return Vector2.upVector;
     }
     // collidedFromBottom = position.y < downLeftCorner.y;
-    return Vector2.backwardVector;
+    return Vector2.downVector;
   }
 
   @Override
