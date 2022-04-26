@@ -1,5 +1,6 @@
 package Physics;
 
+import Data_storage.Line2D;
 import Data_storage.Vector2;
 
 public class UtilityClass {
@@ -32,6 +33,14 @@ public class UtilityClass {
         if (point.distanceTo(bottomLeft) + point.distanceTo(topRight) == bottomLeft.distanceTo(topRight))
             return true; // C is on the line.
         return false;
+    }
+
+    /**
+     * @return the cross point of these two lines
+     */
+    public static Vector2 findLineIntersection(Line2D firstLine, Line2D secondLine) {
+        return findLineIntersection(firstLine.getPointAtX(0), firstLine.getPointAtX(1),
+        secondLine.getPointAtX(0), secondLine.getPointAtX(1));
     }
 
     /**

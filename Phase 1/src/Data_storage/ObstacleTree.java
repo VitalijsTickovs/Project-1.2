@@ -1,5 +1,7 @@
 package Data_storage;
 
+import java.util.ArrayList;
+
 public class ObstacleTree extends Circle implements IObstacle {
 
     public double bounciness; // The percentage of momentum that the ball loses after bouncing.
@@ -47,16 +49,16 @@ public class ObstacleTree extends Circle implements IObstacle {
      */
     public Vector2[] getCollisionPoints(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
         Line2D movementLine = new Line2D(currentPosition, previousPosition);
-        Vector2[] collisionsWithLine = movementLine.getCrossPointsWithCircle(originPosition, radius + ballRadius);
+        ArrayList<Vector2> collisionsWithLine = movementLine.getCrossPointsWithCircle(originPosition, radius + ballRadius);
 
-        if (collisionsWithLine == null) {
-            return null;
+        if (collisionsWithLine.size() == 0) {
+            return null; 
         }
 
-        Vector2 deltaPositionToCollisionPoint = previousPosition.translated(collisionsWithLine[0].reversed()).normalize().scale(ballRadius);
+        Vector2 deltaPositionToCollisionPoint = previousPosition.translated(collisionsWithLine.get(0).reversed()).normalize().scale(ballRadius);
         Vector2[] collisionPoints = new Vector2[2];
-        collisionPoints[0] = collisionsWithLine[0].translate(deltaPositionToCollisionPoint);
-        collisionPoints[1] = collisionsWithLine[1].translate(deltaPositionToCollisionPoint);
+        collisionPoints[0] = collisionsWithLine.get(0).translate(deltaPositionToCollisionPoint);
+        collisionPoints[1] = collisionsWithLine.get(1).translate(deltaPositionToCollisionPoint);
 
         return collisionPoints;
     }

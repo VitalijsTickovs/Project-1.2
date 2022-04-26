@@ -1,5 +1,7 @@
 package Data_storage;
 
+import java.util.ArrayList;
+
 import Physics.UtilityClass;
 
 public class ObstacleBox extends Rectangle implements IObstacle {
@@ -9,6 +11,8 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   
   // This is basically friction for bounces
   public double bounciness; // The percentage of momentum that the ball keeps after bouncing.
+
+  private double ballRadius; // This is a temporary global variable to not pass it as a parameter everywhere
   
   @Override
   public boolean isBallColliding(Vector2 ballPos, double radius) {
@@ -28,7 +32,8 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   @Override
   public CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
 
-    Vector2[] wall = getCollisionPointAndWall(previousPosition, currentPosition, ballRadius);
+    this.ballRadius = ballRadius;
+    Vector2[] wall = getCollisionPointAndWall(previousPosition, currentPosition);
 
     CollisionData collisionData = new CollisionData();
     
@@ -47,8 +52,8 @@ public class ObstacleBox extends Rectangle implements IObstacle {
    * @return a list containing two corners of the wall and the collision point
    * or null if the object did not collide with any wall
    */
-  private Vector2[] getCollisionPointAndWall(Vector2 firstPosition, Vector2 secondPosition, double ballRadius) {
-    Vector2[] collisionPoints = getAllCrossPoints(firstPosition, secondPosition, ballRadius);
+  private Vector2[] getCollisionPointAndWall(Vector2 firstPosition, Vector2 secondPosition) {
+    Vector2[] collisionPoints = getAllCrossPoints(firstPosition, secondPosition);
     Vector2 closestPoint = UtilityClass.getClosestPoint(firstPosition, collisionPoints);
     Vector2[] wallAndClosestPoint = new Vector2[3];
 
@@ -81,34 +86,102 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     return wallAndClosestPoint;
   }
 
+  private Vector2[] getAllCrossPoints(Vector2 firstPosition, Vector2 secondPosition){
+    ArrayList<Vector2> allCrossPoints = new ArrayList<>();
+    addCrossPointsAtPosition(allCrossPoints, firstPosition);
+    addCrossPointsAtPosition(allCrossPoints, secondPosition);
+
+    addCrossPointsWithWalls(allCrossPoints, firstPosition, secondPosition);
+    return allCrossPoints.toArray(new Vector2[0]);
+  }
+  
+  private void addCrossPointsAtPosition(ArrayList<Vector2> allCrossPoints,Vector2 position){
+    ArrayList<Vector2> crossPointsFirstPosition = getCrossPointsAtPosition(position);
+
+    for (Vector2 point : crossPointsFirstPosition) {
+      if (point == null) {
+        continue;
+      }
+      allCrossPoints.add(point);
+    }
+  }
+
+  private ArrayList<Vector2> getCrossPointsAtPosition(Vector2 position){
+    ArrayList<Vector2> allCrossPointsAtPosition = new ArrayList<>();
+    allCrossPointsAtPosition.addAll(getCrossPointsInEpisode(getRightWall(), position));
+    allCrossPointsAtPosition.addAll(getCrossPointsInEpisode(getLeftWall(), position));
+    allCrossPointsAtPosition.addAll(getCrossPointsInEpisode(getTopWall(), position));
+    allCrossPointsAtPosition.addAll(getCrossPointsInEpisode(getBottomWall(), position));
+
+    return allCrossPointsAtPosition;
+  }
+  
+  private ArrayList<Vector2> getCrossPointsInEpisode(Vector2[] episode, Vector2 position){
+    Vector2[] leftWall = getLeftWall();
+    Line2D leftWallLine = new Line2D(leftWall[0], leftWall[1]);
+    ArrayList<Vector2> crossPointsWithWall = leftWallLine.getCrossPointsWithCircle(position, ballRadius);
+
+    if (crossPointsWithWall == null) {
+      return new ArrayList<Vector2>();
+    }
+    for (Vector2 point : crossPointsWithWall) {
+      if (!UtilityClass.isPointInEpisode(point, episode[0], episode[1])) {
+        point = null;
+      }
+    }
+    return crossPointsWithWall;
+  }
+
+  private void addCrossPointsWithWalls(ArrayList<Vector2> allCrossPoints, Vector2 firstPosition, Vector2 secondPosition){
+    Line2D pathLine = new Line2D(firstPosition, secondPosition);
+    Vector2[] crossPointsThroughMiddle = getCrossPointsWithWalls(firstPosition, secondPosition);
+    //Now we need the two lines that describe the edges of the ball's path
+    Line2D perpendicularToPathAtFirstPosition = pathLine.getPerpendicularLineAtPoint(firstPosition);
+    Line2D perpendicularToPathAtSecondPosition = pathLine.getPerpendicularLineAtPoint(secondPosition);
+    
+    double horizontalOffset = ballRadius / Math.sin(pathLine.getSlopeAngle());
+    Vector2 translation = new Vector2(horizontalOffset, 0);
+    Line2D firstParallel = pathLine.getLineTranslatedByVector(translation); 
+    Line2D secondParallel = pathLine.getLineTranslatedByVector(translation.reversed());
+    
+    Vector2 firstEpisodeFirstPosition = UtilityClass.findLineIntersection(firstParallel, perpendicularToPathAtFirstPosition);
+    Vector2 firstEpisodeSecondPosition = UtilityClass.findLineIntersection(firstParallel, perpendicularToPathAtSecondPosition);
+    
+    Vector2 secondEpisodeFirstPosition = UtilityClass.findLineIntersection(secondParallel, perpendicularToPathAtFirstPosition);
+    Vector2 secondEpisodeSecondPosition = UtilityClass.findLineIntersection(secondParallel, perpendicularToPathAtSecondPosition);
+    
+    Vector2[] crossPointsThroughFirstParallel = getCrossPointsWithWalls(firstEpisodeFirstPosition, firstEpisodeSecondPosition);
+    Vector2[] crossPointsThroughSecondParallel = getCrossPointsWithWalls(secondEpisodeFirstPosition, secondEpisodeSecondPosition);
+
+    addNonNullCrossPoints(allCrossPoints, crossPointsThroughMiddle);
+    addNonNullCrossPoints(allCrossPoints, crossPointsThroughFirstParallel);
+    addNonNullCrossPoints(allCrossPoints, crossPointsThroughSecondParallel);
+    
+  }
+
+  private void addNonNullCrossPoints(ArrayList<Vector2> allCrossPoints, Vector2[] crossPoints){
+    for (Vector2 point : crossPoints) {
+      if (point != null) {
+        allCrossPoints.add(point);
+      }
+    }
+  }
+
   /**
    * @return a list of 4 positions that save the collision point of the ball with the wall. 
    * If a point is null, then no collision with that wall occured
    */
-  private Vector2[] getAllCrossPoints(Vector2 firstPosition, Vector2 secondPosition, double ballRadius){
+  private Vector2[] getCrossPointsWithWalls(Vector2 firstPosition, Vector2 secondPosition){
     Vector2[] crossPoints = new Vector2[4];
-    Line2D moveLine = new Line2D(firstPosition, secondPosition);
     
     Vector2[] leftWall = getLeftWall();
     crossPoints[0] = UtilityClass.findEpisodeIntersection(firstPosition, secondPosition, leftWall[0], leftWall[1]);
-    if (crossPoints[0] != null) {
-      crossPoints[0] = moveLine.getPointAtX(crossPoints[0].x - ballRadius);
-    }
     Vector2[] rightWall = getRightWall();
     crossPoints[1] = UtilityClass.findEpisodeIntersection(firstPosition, secondPosition, rightWall[0], rightWall[1]);
-    if (crossPoints[1] != null) {
-      crossPoints[1] = moveLine.getPointAtX(crossPoints[1].x + ballRadius);
-    }
     Vector2[] topWall = getTopWall();
     crossPoints[2] = UtilityClass.findEpisodeIntersection(firstPosition, secondPosition, topWall[0], topWall[1]);
-    if (crossPoints[2] != null) {
-    crossPoints[2] = moveLine.getPointAtY(crossPoints[2].y + ballRadius);
-    }
     Vector2[] bottomWall = getBottomWall();
     crossPoints[3] = UtilityClass.findEpisodeIntersection(firstPosition, secondPosition, bottomWall[0], bottomWall[1]);
-    if (crossPoints[3] != null) {
-      crossPoints[3] = moveLine.getPointAtY(crossPoints[3].y - ballRadius);
-    }
 
     return crossPoints;
   }

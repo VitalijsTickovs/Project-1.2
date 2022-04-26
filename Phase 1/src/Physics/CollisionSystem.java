@@ -1,5 +1,6 @@
 package Physics;
 
+import java.lang.Thread.State;
 import java.util.ArrayList;
 
 import Data_storage.*;
@@ -7,6 +8,38 @@ import Data_storage.*;
 public class CollisionSystem {
 
     public static IObstacle[] obstacles;
+
+    public static void main(String[] args) {
+        setObstacles();
+        
+        
+        Ball ball = new Ball(new Vector2(-2,-2), new Vector2(1,1));
+        Vector2 previousPosition = new Vector2(-0.9,2);
+        modifyPosition(ball.state);
+        ArrayList<IObstacle> collidesWith = getTouchedObstacles(ball.state.position, ball.radius);
+        CollisionData data = getClosestCollisionData(collidesWith, ball.state.position, previousPosition, ball.radius);
+        System.out.println(data);
+    }
+    
+    private static void modifyPosition(BallState state) {
+        double h = 0.05; // The step of the Euler's method
+        doEulerStep(state, h); // Modifies the ball state's position by one Euler step
+    }
+
+    private static void doEulerStep(BallState state, double h) {
+        state.position.translate(new Vector2(h * state.velocity.x, h * state.velocity.y));
+    }
+
+    
+    private static void setObstacles(){
+        obstacles = new IObstacle[2];
+        obstacles[0] = new ObstacleBox(new Vector2(-1,-1), new Vector2(1,1));
+        ObstacleTree tree = new ObstacleTree();
+        tree.bounciness = 1;
+        tree.radius= 0.5;
+        tree.originPosition = new Vector2(0.5, 1.5);
+        obstacles[1] = tree;
+    }
 
     public static BallState modifyStateDueToCollisions(BallState state, Vector2 previousPosition, double ballRadius){
 
@@ -28,9 +61,9 @@ public class CollisionSystem {
     private static ArrayList<IObstacle> getTouchedObstacles(Vector2 position, double radius) {
         ArrayList<IObstacle> touchedObstacles = new ArrayList<>();
         for (IObstacle obstacle : obstacles) {
-            if (obstacle.isBallColliding(position, radius)) {
+            // if (obstacle.isBallColliding(position, radius)) {
                 touchedObstacles.add(obstacle);
-            }
+            // }
         }
         return touchedObstacles;
     }

@@ -1,5 +1,7 @@
 package Data_storage;
 
+import java.util.ArrayList;
+
 import Physics.UtilityClass;
 
 public class Line2D {
@@ -51,6 +53,49 @@ public class Line2D {
         return (firstPosition.y - secondPosition.y) / (firstPosition.x - secondPosition.x);
     }
 
+    public double getSlopeAngle(){
+        return Math.atan(slope);
+    }
+
+    /**
+     * Calculates the distance to a given point
+     * This is a solution taken from this website:
+     * https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+     * @param point
+     * @return
+     */
+    public double getDistanceToPoint(Vector2 point){
+        double A = point.x - firstPosition.x;
+        double B = point.y - firstPosition.y;
+        double C = secondPosition.x - firstPosition.x;
+        double D = secondPosition.y - firstPosition.y;
+
+        double dot = A * C + B * D;
+        double len_sq = C * C + D * D;
+        double param = -1;
+        if (len_sq != 0) //in case of 0 length line
+            param = dot / len_sq;
+
+        double xx, yy;
+
+        if (param < 0) {
+            xx = firstPosition.x;
+            yy = firstPosition.y;
+        }
+        else if (param > 1) {
+            xx = secondPosition.x;
+            yy = secondPosition.x;
+        }
+        else {
+            xx = firstPosition.x + param * C;
+            yy = firstPosition.y + param * D;
+        }
+
+        var dx = point.x - xx;
+        var dy = point.y - yy;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
     /**
      * @return A new line that is perpendicular to this line and passes through the given point
      */
@@ -59,13 +104,17 @@ public class Line2D {
         return new Line2D(invertedCoefficient, point);
     }
     
-    
     /**
      * @param point
      * @return A new line that is parallel to this line and passes through the given point
      */
     public Line2D getParallelLineAtPoint(Vector2 point){
         return new Line2D(slope, point);
+    }
+
+    public Line2D getLineTranslatedByVector(Vector2 translation){
+        Vector2 translatedPoint = firstPosition.translated(translation);
+        return getParallelLineAtPoint(translatedPoint);
     }
 
     public Vector2 getPointAtX(double x){
@@ -99,7 +148,13 @@ public class Line2D {
         return UtilityClass.findLineIntersection(firstPosition, secondPosition, line.firstPosition, line.secondPosition);
     }
 
-    public Vector2[] getCrossPointsWithCircle(Vector2 originPosition, double radius){
+    /**
+     * Finds the cross points between this line and a defined circle
+     * @param originPosition
+     * @param radius
+     * @return Two positions of cross points or null, if there were no collisions
+     */
+    public ArrayList<Vector2> getCrossPointsWithCircle(Vector2 originPosition, double radius){
         if (Double.isInfinite(slope)) {
             return countVerticalCrossPoints(originPosition, radius);
         }
@@ -112,13 +167,13 @@ public class Line2D {
 
         double discriminant = b * b - 4 * a * c;
 
-        Vector2[] crossPoints = new Vector2[2];
+        ArrayList<Vector2> crossPoints = new ArrayList<>(2);
 
         if (discriminant == 0) {
             double x = ((-b + Math.sqrt(discriminant)) / (2 * a));
             Vector2 crossPoint = getPointAtX(x);
-            crossPoints[0] = crossPoint;
-            crossPoints[1] = crossPoint;
+            crossPoints.add(crossPoint);
+            crossPoints.add(crossPoint);
             return crossPoints;
         }
         if (discriminant > 0) {
@@ -126,24 +181,24 @@ public class Line2D {
             double x2 = ((-b - Math.sqrt(discriminant)) / (2 * a));
             Vector2 crossPoint1 = getPointAtX(x1);
             Vector2 crossPoint2 = getPointAtX(x2);
-            crossPoints[0] = crossPoint1;
-            crossPoints[1] = crossPoint2;
+            crossPoints.add(crossPoint1);
+            crossPoints.add(crossPoint2);
             return crossPoints;
         }
-        return null;
+        return new ArrayList<Vector2>();
     }
 
-    private Vector2[] countVerticalCrossPoints(Vector2 originPosition, double radius){
+    private ArrayList<Vector2> countVerticalCrossPoints(Vector2 originPosition, double radius){
         boolean touchesCircle = radius * radius >= (firstPosition.x - originPosition.x) * (firstPosition.x - originPosition.x);
         if (touchesCircle) {
-            Vector2[] crossPoints = new Vector2[2];
+            ArrayList<Vector2> crossPoints = new ArrayList<>(2);
 
             double root = Math.sqrt((radius * radius) - (firstPosition.x - originPosition.x) * (firstPosition.x - originPosition.x));
-            crossPoints[0] = new Vector2(firstPosition.x, root + originPosition.y);
-            crossPoints[1] = new Vector2(firstPosition.x, - root + originPosition.y);
 
+            crossPoints.add(new Vector2(firstPosition.x, root + originPosition.y));
+            crossPoints.add(new Vector2(firstPosition.x, - root + originPosition.y));
             return crossPoints;
         }
-        return null;
+        return new ArrayList<Vector2>();
     }
 }

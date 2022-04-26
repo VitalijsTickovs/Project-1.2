@@ -108,7 +108,11 @@ public class Reader {
     */
    private static boolean createScanner() {
       try {
-         scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/userInput.csv"));
+         // String userDir = System.getProperty("user.dir");
+         String userDir = "C:\\Users\\staso\\Documents\\GitHub\\Project-1.2";
+         
+         String wholeDir =userDir + "\\Phase 1\\src\\Reader\\UserInput.csv";
+         scanner = new Scanner(new FileReader(wholeDir));
          return true;
 
       } catch (FileNotFoundException e) {
