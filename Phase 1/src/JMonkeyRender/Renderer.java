@@ -7,6 +7,9 @@ import Physics.VectorsReader;
 import Reader.Reader;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
+import com.jme3.light.AmbientLight;
+import com.jme3.light.DirectionalLight;
+import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.math.*;
@@ -28,13 +31,12 @@ import java.util.ArrayList;
 import java.util.Queue;
 
 public class Renderer extends Cam {
-    TerrainQuad terrainQuad;
-    Terrain terrain;
-    Geometry target;
-    Geometry ballRender;
+    private TerrainQuad terrainQuad;
+    private Terrain terrain;
+    private Geometry ballRender;
 
     private ArrayList<Vector2> points = new ArrayList<>();
-    Boolean inTarget = false;
+    private Boolean inTarget = false;
 
     float ballRadius = 1f;
     float totalSize = 1024;
@@ -55,30 +57,46 @@ public class Renderer extends Cam {
     float x = 0;
     float y = 0;
     float val = 0;
-    int normalFactor = 100;
+    int normalFactor = 50;
+    float terScale = (float) normalFactor/10;
 
     /**
      * Initializes area terrain based on the function given in input file
      */
     public void initTerrain(String texPath){
+
         //Calculating offset to spawn the terrain arround the ball
         this.xoff = (float) (this.ballStartPos.x - this.totalSize/2);
         this.yoff = (float) (this.ballStartPos.y - this.totalSize/2);
 
         //Creating heightmap representation of the terrain
         terrain.calculateHeightMap((int) totalSize+1, normalFactor);
+        AlphaMapGenerator.generateAlphaMap();
 
         //Setting terrain using heightmap
         this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
 
         //Setting up the Texture of the ground
-        Material mat1 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
-        Texture tex = assetManager.loadTexture(texPath);
+        Material matTerrain = new Material(assetManager,"Common/MatDefs/Terrain/Terrain.j3md");
+        matTerrain.setTexture("Alpha", assetManager.loadTexture(
+                "Terrain/image.png"));
+        Texture grass = assetManager.loadTexture(texPath);
+        grass.setWrap(Texture.WrapMode.Repeat);
+        matTerrain.setTexture("Tex1", grass);
+        matTerrain.setFloat("Tex1Scale", 64f);
 
-        //Adding grass texture to terrain
-        mat1.setTexture("ColorMap",tex);
-        terrainQuad.setMaterial(mat1);
-        
+        Texture sand = assetManager.loadTexture(
+                "Terrain/sand.jpeg");
+        sand.setWrap(Texture.WrapMode.Repeat);
+        matTerrain.setTexture("Tex2", sand);
+        matTerrain.setFloat("Tex2Scale", 32f);
+
+        AmbientLight amb = new AmbientLight();
+        amb.setColor(ColorRGBA.White.mult(5));
+        rootNode.addLight(amb);
+
+        terrainQuad.setMaterial(matTerrain);
+        terrainQuad.setLocalScale(1,terScale,1);
         rootNode.attachChild(terrainQuad);
     }
 
@@ -109,15 +127,15 @@ public class Renderer extends Cam {
     public void InitTarget(){
         //Creating cylinder, which would represent target hole
         Cylinder tar = new Cylinder(120, 120, (float) targetRadius, 0.1f, true);
-        this.target = new Geometry("Target", tar);
+        Geometry target = new Geometry("Target", tar);
 
         //Rotating the cylinder
-        this.target.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.HALF_PI , new Vector3f(0,0,1)));
+        target.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.HALF_PI , new Vector3f(0,0,1)));
 
         //Making the target hole white color
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.White);
-        this.target.setMaterial(mat);
+        target.setMaterial(mat);
 
         //Finding the position for the target
         float val;
@@ -134,7 +152,7 @@ public class Renderer extends Cam {
         this.val = val;
 
         //Moving the cylinder to the calculated position
-        this.target.setLocalTranslation((float) this.targetPos.x, val, (float) this.targetPos.y);
+        target.setLocalTranslation((float) this.targetPos.x, val*terScale, (float) this.targetPos.y);
 
         //Adding it to the scene
         rootNode.attachChild(target);
@@ -197,15 +215,15 @@ public class Renderer extends Cam {
             if (val > 1) {
                 val = 1;
             }
-            val *= normalFactor;
+            val *= normalFactor * terScale;
             this.val = val;
 
             //Moving the ball object to specified position
-            ballRender.setLocalTranslation((float) (this.x + terrain.xOff), (float) (val + terrain.xOff), (float) (this.y + terrain.xOff));
+            ballRender.setLocalTranslation((float) (this.x + terrain.xOff), (float) (this.val + terrain.xOff), (float) (this.y + terrain.xOff));
             //Adjusting the ball not to be in the ground
             findTangent();
             //Outputting the position of the ball
-            text.setText("x: " + df.format(getBallX()) + "  y: " + df.format(getBallY()) + "  z: "+ df.format(getBallZ()));
+            text.setText("x: " + df.format(getBallX()) + "  y: " + df.format(getBallY()) + "  z: "+ df.format(getBallZ()/terScale));
         }
     }
 
@@ -240,7 +258,8 @@ public class Renderer extends Cam {
 
         //Setting location to be around the terrain
         water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
-        water.move(xoff - 100, 46, -xoff + 100);
+        water.setLocalTranslation(xoff-100, 0, -yoff+100);
+        water.move(0, (float) terrain.minVal*terScale,0);
 
         //Attaching water object to the scene
         rootNode.attachChild(water);
@@ -300,19 +319,23 @@ public class Renderer extends Cam {
         InitTarget();
 
         //creating and attaching camera to ball
-        ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
-        InitCam(chaseCam);
+        //ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
+        //InitCam(chaseCam);
+        flyCam.setMoveSpeed(100);
     }
+
+    float ballx =.1f;
     @Override
     public void simpleUpdate(float tpf) {
             if (!inTarget) {
                 //simulates from Vectors.csv file
                 //moves the ball with calculated position
-                if (points.size() != 0) {
-                    ball.state.position = points.get(0);
-                    moveBall(ball.state.position);
-                    points.remove(0);
-                }
+                //if (points.size() != 0) {
+                    //ball.state.position = points.get(0);
+                    moveBall(new Vector2(ballx,ballx));
+                    //points.remove(0);
+                ballx++;
+                //}
                 //checks if the ball is in the hole
                 isInTarget(ball);
             }else{

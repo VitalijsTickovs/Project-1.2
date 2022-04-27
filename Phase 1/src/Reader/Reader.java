@@ -70,8 +70,8 @@ public class Reader {
    // ArrayList values
    private final static double defsandPitX0 = 0;
    private final static double defsandPitY0 = 0;
-   private final static double defsandPitX1 = 1;
-   private final static double defsandPitY1 = 1;
+   private final static double defsandPitX1 = 100;
+   private final static double defsandPitY1 = 100;
    private final static double defsandKineticFriction = 0.25;
    private final static double defsandStaticFriction = 0.4;
 
@@ -79,6 +79,14 @@ public class Reader {
    private final static double deftreeY = 0.5;
    private final static double deftreeRadius = 0.5;
    private final static double deftreeBounciness = 1;
+
+   public static double[]getSandX(){
+      return new double[]{defsandPitX0, defsandPitX1};
+   }
+
+   public static double[] getSandY(){
+      return new double[]{defsandPitY0, defsandPitY1};
+   }
 
    public double getBallX(){
       return defx0;

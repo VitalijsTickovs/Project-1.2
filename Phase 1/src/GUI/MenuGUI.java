@@ -20,7 +20,7 @@ public class MenuGUI extends javax.swing.JFrame {
     public static String getTexPath(){
         if (levelCB.getSelectedIndex() == 0) {
             // set path String to grass terrain
-            texPath = "Terrain/grass.jpeg";
+            texPath = "Terrain/grass2.jpeg";
         }
         if (levelCB.getSelectedIndex() == 1) {
             // set path String to moon terrain
