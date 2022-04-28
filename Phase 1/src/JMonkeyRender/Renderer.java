@@ -4,7 +4,7 @@ import Data_storage.*;
 import GUI.MenuGUI;
 import Physics.PhysicsEngine;
 import Physics.VectorsReader;
-import Reader.Reader;
+import Reader.TerrainLoader;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
@@ -251,7 +251,7 @@ public class Renderer extends Cam {
      */
     public void initPhysics(){
         //Attaches the input values to Terrain object
-        this.terrain = Reader.readFile();
+        this.terrain = TerrainLoader.readFile();
 
         this.ballStartPos = this.terrain.ballStartingPosition;
         this.targetRadius = this.terrain.target.radius;

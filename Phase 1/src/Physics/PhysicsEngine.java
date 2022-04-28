@@ -62,7 +62,7 @@ public class PhysicsEngine {
         modifyPosition(newState);
         Vector2 startingPosition = ball.state.position;
         CollisionSystem.modifyStateDueToCollisions(newState, startingPosition, ball.radius);
-        newState.velocity = countNewVelocity(ball);
+        newState.velocity = countNewVelocity(newState);
 
         return newState;
     }
@@ -75,18 +75,18 @@ public class PhysicsEngine {
         state.position.translate(new Vector2(h * state.velocity.x, h * state.velocity.y));
     }
 
-    private Vector2 countNewVelocity(Ball ball) {
-        Vector2 newVelocity = ball.state.velocity.copy();
-        Vector2 ballPosition = ball.state.position;
+    private Vector2 countNewVelocity(BallState ballState) {
+        Vector2 newVelocity = ballState.velocity.copy();
+        Vector2 ballPosition = ballState.position;
         double xSlope = getXSlopeAt(ballPosition.x, ballPosition.y);
         double ySlope = getYSlopeAt(ballPosition.x, ballPosition.y);
 
         // Check if in water
-        if (terrain.terrainFunction.valueAt(ball.state.position.x, ball.state.position.y) <= 0) {
+        if (terrain.terrainFunction.valueAt(ballState.position.x, ballState.position.y) <= 0) {
             return Vector2.zeroVector;
         }
 
-        double kineticFriction = getKineticFrictionAtPosition(ball.state.position);
+        double kineticFriction = getKineticFrictionAtPosition(ballState.position);
 
         double xAcceleration = 0, yAcceleration = 0;
 
@@ -98,13 +98,13 @@ public class PhysicsEngine {
         Vector2 slope = new Vector2(xSlope, ySlope);
 
         if (ballInMotion) {
-            xAcceleration = xAcceleration(slope, ball.state.velocity, kineticFriction);
-            yAcceleration = yAcceleration(slope, ball.state.velocity, kineticFriction);
+            xAcceleration = xAcceleration(slope, ballState.velocity, kineticFriction);
+            yAcceleration = yAcceleration(slope, ballState.velocity, kineticFriction);
         } else {
             // Stop the ball first
             newVelocity = Vector2.zeroVector;
 
-            double staticFriction = getStaticFrictionAtPosition(ball.state.position);
+            double staticFriction = getStaticFrictionAtPosition(ballState.position);
             boolean staticFrictionLessThanDownwardForce = staticFriction < slope.length();
 
             if (staticFrictionLessThanDownwardForce) {

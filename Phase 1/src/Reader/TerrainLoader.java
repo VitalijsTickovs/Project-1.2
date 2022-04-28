@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import Data_storage.IObstacle;
+import Data_storage.ObstacleBox;
 import Data_storage.ObstacleTree;
 import Data_storage.Target;
 import Data_storage.Terrain;
@@ -12,7 +13,7 @@ import Data_storage.TerrainFunction1;
 import Data_storage.Vector2;
 import Data_storage.Zone;
 
-public class Reader {
+public class TerrainLoader {
 
    private static final String delimiter = ";";
    private static Scanner scanner;
@@ -41,11 +42,17 @@ public class Reader {
    private static ArrayList<Double> sandZoneY1 = new ArrayList<Double>();
    private static ArrayList<Double> sandKineticFriction = new ArrayList<Double>();
    private static ArrayList<Double> sandStaticFriction = new ArrayList<Double>();
-
+   
    private static ArrayList<Double> treeX = new ArrayList<Double>();
    private static ArrayList<Double> treeY = new ArrayList<Double>();
    private static ArrayList<Double> treeRadius = new ArrayList<Double>();
    private static ArrayList<Double> treeBounciness = new ArrayList<Double>();
+   
+   private static ArrayList<Double> boxX0 = new ArrayList<Double>();
+   private static ArrayList<Double> boxY0 = new ArrayList<Double>();
+   private static ArrayList<Double> boxX1 = new ArrayList<Double>();
+   private static ArrayList<Double> boxY1 = new ArrayList<Double>();
+   private static ArrayList<Double> boxBounciness = new ArrayList<Double>();
 
    private static Terrain terrain; // The generated terrain that will be returned
    // endregion
@@ -74,20 +81,19 @@ public class Reader {
    private final static double defsandPitY1 = 1;
    private final static double defsandKineticFriction = 0.25;
    private final static double defsandStaticFriction = 0.4;
-
+   
    private final static double deftreeX = 0.5;
    private final static double deftreeY = 0.5;
    private final static double deftreeRadius = 0.5;
    private final static double deftreeBounciness = 1;
+   
+   private final static double defBoxX0 = 0;
+   private final static double defBoxY0 = 0;
+   private final static double defBoxX1 = 1;
+   private final static double defBoxY1 = 1;
+   private final static double defBoxBounciness = 1;
 
-   public double getBallX(){
-      return defx0;
-   }
-
-   public double getBallY(){
-      return defy0;
-   }
-
+   //endregion
 
    public static Terrain readFile() {
 
@@ -109,9 +115,10 @@ public class Reader {
    private static boolean createScanner() {
       try {
          // String userDir = System.getProperty("user.dir");
+         //Put your own user dir here or use the one above. I did not use the line above, because it only works on Mac
          String userDir = "C:\\Users\\staso\\Documents\\GitHub\\Project-1.2";
          
-         String wholeDir =userDir + "\\Phase 1\\src\\Reader\\UserInput.csv";
+         String wholeDir = userDir + "\\Phase 1\\src\\Reader\\UserInput.csv";
          scanner = new Scanner(new FileReader(wholeDir));
          return true;
 
@@ -210,8 +217,23 @@ public class Reader {
       if (line.contains("treeBounciness")) {
          treeBounciness.add(readDouble(line));
       }
+      //Box
+      if (line.contains("boxX")) {
+         double[] range = readRange(line);
+         boxX0.add(range[0]);
+         boxX1.add(range[1]);
+      }
+      if (line.contains("boxY")) {
+         double[] range = readRange(line);
+         boxY0.add(range[0]);
+         boxY1.add(range[1]);
+      }
+      if (line.contains("boxBounciness")) {
+         boxBounciness.add(readDouble(line));
+      }
    }
 
+   //region Read data
    private static double readDouble(String line) {
       try {
          if (line.contains("=")) {
@@ -258,6 +280,7 @@ public class Reader {
          return null;
       }
    }
+   //endregion
 
    // region Create Terrain
    private static Terrain saveDataIntoObject() {
@@ -330,6 +353,7 @@ public class Reader {
       ArrayList<IObstacle> obstacles = new ArrayList<>();
 
       obstacles.addAll(createTrees());
+      obstacles.addAll(createBoxes());
 
       terrain.obstacles = obstacles.toArray(new IObstacle[0]);
    }
@@ -376,6 +400,59 @@ public class Reader {
       tree.originPosition = position;
       return tree;
    }
+   
+   private static ArrayList<IObstacle> createBoxes() {
+      ArrayList<IObstacle> boxes = new ArrayList<>();
+      while (hasBox()) {
+         boxes.add(createBox());
+      }
+      return boxes;
+   }
+
+   private static boolean hasBox() {
+      return boxX0.size() > 0 || boxX1.size() > 0 || boxY0.size() > 0 || boxY1.size() > 0 || boxBounciness.size() > 0;
+   }
+
+   private static IObstacle createBox() {
+      // Position
+      Vector2 position0 = new Vector2();
+      Vector2 position1 = new Vector2();
+      if (boxX0.size() > 0) {
+         position0.x = boxX0.get(0);
+         boxX0.remove(0);
+      } else {
+         position0.x = defBoxX0;
+      }
+      if (boxY0.size() > 0) {
+         position0.y = boxY0.get(0);
+         boxY0.remove(0);
+      } else {
+         position0.y = defBoxY0;
+      }
+      if (boxX1.size() > 0) {
+         position1.x = boxX1.get(0);
+         boxX1.remove(0);
+      } else {
+         position1.x = defBoxX1;
+      }
+      if (boxY1.size() > 0) {
+         position1.y = boxY1.get(0);
+         boxY1.remove(0);
+      } else {
+         position1.y = defBoxY1;
+      }
+      ObstacleBox box = new ObstacleBox(position0, position1);
+      //Bounciness
+      if (boxBounciness.size() > 0) {
+         box.bounciness = boxBounciness.get(0);
+         boxBounciness.remove(0);
+      } else {
+         box.bounciness = defBoxBounciness;
+      }
+
+      return box;
+   }
+   
    // endregion
 
    // region Zones

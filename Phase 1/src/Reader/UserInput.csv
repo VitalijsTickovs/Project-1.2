@@ -6,7 +6,7 @@ greenKineticFriction = 0.1;
 greenStaticFriction = 0.2;
 terrainFunction = sin(y/10) + sin(x/10) + 2);
 
-ballStartPointX = -1;
+ballStartPointX = 1;
 ballStartPointY = -0.5;
 
 targetRadius = 1;
@@ -29,3 +29,14 @@ treeRadius = 4;
 treeX = -5;
 treeY = 0;
 treeBounciness = 0.55;
+
+//Tree data
+treeRadius = 4;
+treeX = -5;
+treeY = -8;
+treeBounciness = 0.55;
+
+//Box data
+boxX = 5<x<8;;
+boxY = 5<x<10;
+boxBounciness = 0.85;

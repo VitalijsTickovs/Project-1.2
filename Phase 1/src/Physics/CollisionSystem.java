@@ -10,8 +10,7 @@ public class CollisionSystem {
 
     public static void main(String[] args) {
         setObstacles();
-        
-        
+
         Ball ball = new Ball(new Vector2(-2,-2), new Vector2(1,1));
         ball.radius = 0.5;
         Vector2 previousPosition = new Vector2(-0.9,2);
@@ -105,12 +104,12 @@ public class CollisionSystem {
 
     private static void calculatePositionAfterCollision(BallState state, Vector2 previousPosition, Vector2 collisionPosition, double ballRadius){
         //Calculation variables
-        double moveDistanceAfterCollision = state.position.distanceTo(collisionPosition) + ballRadius;
-        Vector2 fromPreviousToCurrentPos = state.position.deltaPositionTo(previousPosition);
+        double moveDistanceAfterCollision = state.position.distanceTo(collisionPosition);
         Vector2 moveVectorAfterCollision = state.velocity.normalized().scale(moveDistanceAfterCollision);
-
+        Vector2 fromPreviousToCurrentPos = state.position.deltaPositionTo(previousPosition);
+        
         //Calculating the new position
-        Vector2 collisionPositionMinusRadius = collisionPosition.translated(fromPreviousToCurrentPos.normalized().scale(ballRadius).reverse());
+        Vector2 collisionPositionMinusRadius = collisionPosition.translated(fromPreviousToCurrentPos.normalize().scale(ballRadius).reverse());
         Vector2 positionAfterCollision = collisionPositionMinusRadius.translated(moveVectorAfterCollision);
         state.position = positionAfterCollision;
     }

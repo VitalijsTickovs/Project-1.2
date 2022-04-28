@@ -152,7 +152,7 @@ public class Line2D {
      * Finds the cross points between this line and a defined circle
      * @param originPosition
      * @param radius
-     * @return Two positions of cross points or null, if there were no collisions
+     * @return Two positions of cross points or an empty list, if there were no collisions
      */
     public ArrayList<Vector2> getCrossPointsWithCircle(Vector2 originPosition, double radius){
         if (Double.isInfinite(slope)) {
@@ -200,5 +200,10 @@ public class Line2D {
             return crossPoints;
         }
         return new ArrayList<Vector2>();
+    }
+
+    @Override
+    public String toString(){
+        return slope + "*x + " + yZero;
     }
 }

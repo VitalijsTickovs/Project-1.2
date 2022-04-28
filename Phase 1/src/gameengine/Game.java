@@ -56,7 +56,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     private void createTerrain() {
-        terrain = Reader.readFile();
+        terrain = TerrainLoader.readFile();
         terrain.calculateHeightMap(1024, 1.0);
     }
 
