@@ -144,6 +144,9 @@ public class Vector2 {
         return translate(normal.getPerpendicularVector().normalized().scale(2 * dotProduct).reversed());
     }
 
+    /**
+     * The perpendicular vector will always have a positive x coordinate
+     */
     public Vector2 getPerpendicularVector(){
         Line2D line = new Line2D(this, Vector2.zeroVector);
         Line2D perpendicularLine = line.getPerpendicularLineAtPoint(Vector2.zeroVector);

@@ -49,42 +49,50 @@ public class ObstacleBox extends Rectangle implements IObstacle {
 
   /**
    *
-   * @return a list containing two corners of the wall and the collision point
+   * @return Two corners of the wall and the collision point as a third value
    * or null if the object did not collide with any wall
    */
   private Vector2[] getCollisionPointAndWall(Vector2 firstPosition, Vector2 secondPosition) {
     Vector2[] collisionPoints = getAllCrossPoints(firstPosition, secondPosition);
     Vector2 closestPoint = UtilityClass.getClosestPoint(firstPosition, collisionPoints);
-    Vector2[] wallAndClosestPoint = new Vector2[3];
 
     if (closestPoint == null) {
       return null;
     }
-    Vector2[] wall = new Vector2[2];
 
-    boolean collidedFromLeft = closestPoint.equals(collisionPoints[0]);
-    if (collidedFromLeft) {
-      wall = getLeftWall();
-    }
-    boolean collidedFromRight = closestPoint.equals(collisionPoints[1]);
-    if (collidedFromRight) {
-      wall = getRightWall();
-    }
-    boolean collidedFromTop = closestPoint.equals(collisionPoints[2]);
-    if (collidedFromTop) {
-      wall = getTopWall();
-    }
-    boolean collidedFromBottom = closestPoint.equals(collisionPoints[3]);
-    if (collidedFromBottom) {
-      wall = getBottomWall();
+    if (collidedFrom(closestPoint, getLeftWall())) {
+      return constructCollisionPointsAndWall(closestPoint, getLeftWall());
     }
 
-    wallAndClosestPoint[0] = wall[0];
-    wallAndClosestPoint[1] = wall[1];
-    wallAndClosestPoint[2] = closestPoint;
+    if (collidedFrom(closestPoint, getRightWall())) {
+      return constructCollisionPointsAndWall(closestPoint, getRightWall());
+    }
 
-    return wallAndClosestPoint;
+    if (collidedFrom(closestPoint, getTopWall())) {
+      return constructCollisionPointsAndWall(closestPoint, getTopWall());
+    }
+    
+    if (collidedFrom(closestPoint, getBottomWall())) {
+      return constructCollisionPointsAndWall(closestPoint, getBottomWall());
+    }
+    return null; // This should never happen
   }
+
+  //region Helper methods
+  private Vector2[] constructCollisionPointsAndWall(Vector2 point, Vector2[] wall){
+    Vector2[] returnArray = new Vector2[3];
+
+    returnArray[0] = wall[0];
+    returnArray[1] = wall[1];
+    returnArray[2] = point;
+
+    return returnArray;
+  }
+
+  private boolean collidedFrom(Vector2 closestPoint, Vector2[] wall){
+    return UtilityClass.isPointInEpisode(closestPoint, wall[0], wall[1]);
+  }
+  //endregion
 
   /**
    * Explanation: https://drive.google.com/file/d/1wa3YOD5C4TxELWLMZ5EReX7EMyXXX-RP/view?usp=sharing
@@ -142,11 +150,12 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   }
 
   private void removePointsOutsideOfEpisode(ArrayList<Vector2> points, Vector2[] episode){
-    for (Vector2 point : points) {
-          if (!UtilityClass.isPointInEpisode(point, episode[0], episode[1])) {
-            point = null;
-          }
-        }
+    for (int i = 0; i < points.size(); i++) {
+      Vector2 point = points.get(i);
+      if (!UtilityClass.isPointInEpisode(point, episode[0], episode[1])) {
+        points.set(i, null);
+      }
+    }
   }
   //endregion
 
@@ -166,13 +175,17 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     Vector2[] secondParallelEpisode = getPathTravelledEpisode(pathLine, firstPosition, secondPosition, false);
     
     Vector2[] crossPointsThroughMiddle = getCrossPointsWithWalls(firstPosition, secondPosition);
+    addNonNullCrossPoints(allCrossPoints, crossPointsThroughMiddle);
+    //If any collisions through the middle occured, then they are automatically most accurate solution. 
+    //No need to check any further
+    if (crossPointsThroughMiddle.length > 0) {
+      return;
+    }
+    
     Vector2[] crossPointsThroughFirstParallel = getCrossPointsWithWalls(firstParallelEpisode[0], firstParallelEpisode[1]);
     Vector2[] crossPointsThroughSecondParallel = getCrossPointsWithWalls(secondParallelEpisode[0], secondParallelEpisode[1]);
-
-    addNonNullCrossPoints(allCrossPoints, crossPointsThroughMiddle);
     addNonNullCrossPoints(allCrossPoints, crossPointsThroughFirstParallel);
     addNonNullCrossPoints(allCrossPoints, crossPointsThroughSecondParallel);
-    
   }
 
   private void addNonNullCrossPoints(ArrayList<Vector2> allCrossPoints, Vector2[] crossPoints){
@@ -212,7 +225,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
    * @return a list of 4 positions that save the collision point of the ball with the wall. 
    * If a point is null, then no collision with that wall occured
    */
-  private Vector2[] getCrossPointsWithWalls(Vector2 firstPosition, Vector2 secondPosition){
+  public Vector2[] getCrossPointsWithWalls(Vector2 firstPosition, Vector2 secondPosition){
     Vector2[] crossPoints = new Vector2[4];
     
     Vector2[] leftWall = getLeftWall();

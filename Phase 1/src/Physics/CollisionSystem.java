@@ -34,7 +34,7 @@ public class CollisionSystem {
     
     private static void setObstacles(){
         obstacles = new IObstacle[2];
-        ObstacleBox box = new ObstacleBox(new Vector2(-1,-1), new Vector2(1,1));
+        ObstacleBox box = new ObstacleBox(new Vector2(-1.5,-1.5), new Vector2(1,1));
         box.bounciness = 1;
         obstacles[0] = box;
         ObstacleTree tree = new ObstacleTree();

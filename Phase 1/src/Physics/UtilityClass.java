@@ -16,6 +16,9 @@ public class UtilityClass {
      */
     public static Vector2 findEpisodeIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4){
         Vector2 crossPoint = findLineIntersection(p1, p2, p3, p4);
+        if (crossPoint == null) {
+            return null;
+        }
         if (isPointInEpisode(crossPoint, p1, p2) && isPointInEpisode(crossPoint, p3, p4)){
             return crossPoint;
         }
@@ -30,7 +33,12 @@ public class UtilityClass {
      * @return true, if the position is a part of an episode
      */
     public static boolean isPointInEpisode(Vector2 point, Vector2 bottomLeft,Vector2 topRight){
-        if (point.distanceTo(bottomLeft) + point.distanceTo(topRight) == bottomLeft.distanceTo(topRight))
+        double distanceA = point.distanceTo(bottomLeft);
+        double distanceB = point.distanceTo(topRight);
+        float distanceC =(float) bottomLeft.distanceTo(topRight);
+        
+        float sum = (float) (distanceA + distanceB);
+        if (sum == distanceC)
             return true; // C is on the line.
         return false;
     }
