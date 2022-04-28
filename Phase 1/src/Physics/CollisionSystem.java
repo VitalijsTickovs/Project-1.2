@@ -45,15 +45,14 @@ public class CollisionSystem {
     }
 
     public static BallState modifyStateDueToCollisions(BallState state, Vector2 previousPosition, double ballRadius){
-
         double searchRadius = state.position.distanceTo(previousPosition) + ballRadius;
         ArrayList<IObstacle> collidesWith = getTouchedObstacles(previousPosition, searchRadius);
         CollisionData collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition, ballRadius);
         if (collisionData != null) {
-            bounceBall(state, previousPosition, collisionData);
+            bounceBall(state, previousPosition, collisionData, ballRadius);
         }
 
-        state.position = checkBallOutOfBounds(state);
+        state.position = handleBallOutOfBounds(state);
         return state;
     }
 
@@ -93,19 +92,30 @@ public class CollisionSystem {
         return closestCollisionData;
     }
 
-    private static void bounceBall(BallState state, Vector2 previousPosition, CollisionData collisionData) {
-        double moveDistanceAfterCollision = state.position.distanceTo(collisionData.collisionPosition);
+    private static void bounceBall(BallState state, Vector2 previousPosition, CollisionData collisionData, double ballRadius) {
+        calculateVelocityAfterCollision(state, collisionData);
+        calculatePositionAfterCollision(state, previousPosition, collisionData.collisionPosition, ballRadius);
+    }
 
+    private static void calculateVelocityAfterCollision(BallState state, CollisionData collisionData){
         state.velocity.reflect(collisionData.collisionNormal);
         // For eg. if bounciness equals 0.8, the returned velocity vector will be 20% shorter
         state.velocity.scale(collisionData.bounciness);
-
-        Vector2 newVelocityDirection = state.velocity.normalized();
-        state.position.translate(newVelocityDirection.scale(moveDistanceAfterCollision));
-
     }
 
-    private static Vector2 checkBallOutOfBounds(BallState state){
+    private static void calculatePositionAfterCollision(BallState state, Vector2 previousPosition, Vector2 collisionPosition, double ballRadius){
+        //Calculation variables
+        double moveDistanceAfterCollision = state.position.distanceTo(collisionPosition) + ballRadius;
+        Vector2 fromPreviousToCurrentPos = state.position.deltaPositionTo(previousPosition);
+        Vector2 moveVectorAfterCollision = state.velocity.normalized().scale(moveDistanceAfterCollision);
+
+        //Calculating the new position
+        Vector2 collisionPositionMinusRadius = collisionPosition.translated(fromPreviousToCurrentPos.normalized().scale(ballRadius).reverse());
+        Vector2 positionAfterCollision = collisionPositionMinusRadius.translated(moveVectorAfterCollision);
+        state.position = positionAfterCollision;
+    }
+
+    private static Vector2 handleBallOutOfBounds(BallState state){
         Vector2 newPosition = state.position.copy();
         boolean reverseX = false;
         if (newPosition.x > PhysicsEngine.terrain.limitingCorner.x) {

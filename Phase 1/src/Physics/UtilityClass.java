@@ -47,6 +47,10 @@ public class UtilityClass {
      * @return the cross point of these two lines
      */
     public static Vector2 findLineIntersection(Line2D firstLine, Line2D secondLine) {
+        if (firstLine == null || secondLine == null) {
+            return null;
+        }
+
         return findLineIntersection(firstLine.getPointAtX(0), firstLine.getPointAtX(1),
         secondLine.getPointAtX(0), secondLine.getPointAtX(1));
     }
@@ -60,13 +64,9 @@ public class UtilityClass {
      * @return the cross point of these two lines
      */
     public static Vector2 findLineIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4) {
-        // (line1 = (A1, B1, C1)) A1*x + B1*y + C1 = 0 | x = (C1 - B1*y)/A1 | y = (C1 -
-        // A1*x)/B1
-        // (line2 = (A2, B2, C2)) A2*x + B2*y + C2 = 0 | x = (C2 - B2*y)/A2 | y = (C2 -
-        // A2*x)/B2
-        // k1*x + l1 = k2*x + l2
-        // (k1 - k2)*x = l2 - l1
-        // x = (l2 - l1)/(k1 - k2)
+        if (p1 == null || p2 == null || p3 == null || p4 == null) {
+            return null;
+        }
 
         double detD = getDeterminant(
                 getDeterminant(p1.x, 1, p2.x, 1),

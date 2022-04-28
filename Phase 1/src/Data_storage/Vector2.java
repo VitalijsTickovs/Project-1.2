@@ -110,12 +110,41 @@ public class Vector2 {
     }
 
     /**
+     * Adds this value to the vector's length. If the value is negative and higher than current length - the vector will go in the opposite direction
+     * @param length
+     * @return  this vector after its length was modified
+     */
+    public Vector2 modifyLength(double deltaLength){
+        double currentLength = length();
+        scale((currentLength + deltaLength) / currentLength);
+
+        return this;
+    }
+
+    /**
+     * Adds this value to the vector's length. If the value is negative and higher than current length - the vector will go in the opposite direction
+     * @param length
+     * @return  a copy of this vector with modified length
+     */
+    public Vector2 modifiedLength(double deltaLength){
+        Vector2 newVector = copy();
+        double currentLength = length();
+        newVector.scale((currentLength + deltaLength) / currentLength);
+
+        return newVector;
+    }
+
+    /**
      * 
      * @param toVector
      * @return
      */
     public double distanceTo(Vector2 toVector){
         return Math.sqrt((x - toVector.x) * (x - toVector.x) + (y - toVector.y) * (y - toVector.y));
+    }
+
+    public Vector2 deltaPositionTo(Vector2 toPosition){
+        return new Vector2(x - toPosition.x, y - toPosition.y);
     }
 
     /**

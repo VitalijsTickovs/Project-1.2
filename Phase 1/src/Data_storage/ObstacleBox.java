@@ -226,6 +226,10 @@ public class ObstacleBox extends Rectangle implements IObstacle {
    * If a point is null, then no collision with that wall occured
    */
   public Vector2[] getCrossPointsWithWalls(Vector2 firstPosition, Vector2 secondPosition){
+    if (firstPosition == null || secondPosition == null) {
+      return new Vector2[2];
+    }
+
     Vector2[] crossPoints = new Vector2[4];
     
     Vector2[] leftWall = getLeftWall();
