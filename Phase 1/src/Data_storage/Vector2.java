@@ -62,7 +62,7 @@ public class Vector2 {
     /**
      * reverses this vector and returns the result
      */
-    public Vector2 reversed() {
+    public Vector2 reverse() {
         x *= -1;
         y *= -1;
         return this;
@@ -71,7 +71,7 @@ public class Vector2 {
     /**
      * reverses a copy of this vector and returns the result without modifying the original vector
      */
-    public Vector2 reverse() {
+    public Vector2 reversed() {
         return new Vector2(-x, -y);
     }
     

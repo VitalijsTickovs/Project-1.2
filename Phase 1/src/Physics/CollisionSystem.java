@@ -1,6 +1,5 @@
 package Physics;
 
-import java.lang.Thread.State;
 import java.util.ArrayList;
 
 import Data_storage.*;
@@ -14,9 +13,11 @@ public class CollisionSystem {
         
         
         Ball ball = new Ball(new Vector2(-2,-2), new Vector2(1,1));
+        ball.radius = 0.5;
         Vector2 previousPosition = new Vector2(-0.9,2);
         modifyPosition(ball.state);
-        ArrayList<IObstacle> collidesWith = getTouchedObstacles(ball.state.position, ball.radius);
+        double searchRadius = ball.state.position.distanceTo(previousPosition) + ball.radius;
+        ArrayList<IObstacle> collidesWith = getTouchedObstacles(previousPosition, searchRadius);
         CollisionData data = getClosestCollisionData(collidesWith, ball.state.position, previousPosition, ball.radius);
         System.out.println(data);
     }
@@ -33,7 +34,9 @@ public class CollisionSystem {
     
     private static void setObstacles(){
         obstacles = new IObstacle[2];
-        obstacles[0] = new ObstacleBox(new Vector2(-1,-1), new Vector2(1,1));
+        ObstacleBox box = new ObstacleBox(new Vector2(-1,-1), new Vector2(1,1));
+        box.bounciness = 1;
+        obstacles[0] = box;
         ObstacleTree tree = new ObstacleTree();
         tree.bounciness = 1;
         tree.radius= 0.5;
@@ -43,7 +46,8 @@ public class CollisionSystem {
 
     public static BallState modifyStateDueToCollisions(BallState state, Vector2 previousPosition, double ballRadius){
 
-        ArrayList<IObstacle> collidesWith = getTouchedObstacles(state.position, ballRadius);
+        double searchRadius = state.position.distanceTo(previousPosition) + ballRadius;
+        ArrayList<IObstacle> collidesWith = getTouchedObstacles(previousPosition, searchRadius);
         CollisionData collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition, ballRadius);
         if (collisionData != null) {
             bounceBall(state, previousPosition, collisionData);
@@ -58,12 +62,12 @@ public class CollisionSystem {
      * @param position
      * @return the obstacle that the ball collided with or null if it didn't
      */
-    private static ArrayList<IObstacle> getTouchedObstacles(Vector2 position, double radius) {
+    private static ArrayList<IObstacle> getTouchedObstacles(Vector2 position, double searchRadius) {
         ArrayList<IObstacle> touchedObstacles = new ArrayList<>();
         for (IObstacle obstacle : obstacles) {
-            // if (obstacle.isBallColliding(position, radius)) {
+            if (obstacle.isBallColliding(position, searchRadius)) {
                 touchedObstacles.add(obstacle);
-            // }
+            }
         }
         return touchedObstacles;
     }
