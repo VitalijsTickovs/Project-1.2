@@ -35,6 +35,10 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     this.ballRadius = ballRadius;
     Vector2[] wall = getCollisionPointAndWall(previousPosition, currentPosition);
 
+    if(wall == null){
+      return null;
+    }
+
     CollisionData collisionData = new CollisionData();
     
     Vector2 wallDirectionVector = wall[1].translated(wall[0].reversed());

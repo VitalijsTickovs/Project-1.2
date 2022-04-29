@@ -27,16 +27,6 @@ public class PhysicsEngine {
     }
 
     /**
-     * Moves all balls by a timeframe h using Euler's integration method. Call this
-     * at a regular (frame independent) rate.
-     */
-    public void fixedUpdate() {
-        for (Ball ball : ballsToSimulate) {
-            ball.state = countNewBallState(ball);
-        }
-    }
-
-    /**
      * Simulates a shot and stores the positions until the ball stops
      * @param initialSpeed The inital speed of the ball
      * @param ball The ball to shoot
@@ -60,8 +50,7 @@ public class PhysicsEngine {
     private BallState countNewBallState(Ball ball) {
         BallState newState = ball.state.copy();
         modifyPosition(newState);
-        Vector2 startingPosition = ball.state.position;
-        CollisionSystem.modifyStateDueToCollisions(newState, startingPosition, ball.radius);
+        CollisionSystem.modifyStateDueToCollisions(newState, ball.state.position, ball.radius);
         newState.velocity = countNewVelocity(newState);
 
         return newState;

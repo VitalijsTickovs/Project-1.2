@@ -118,6 +118,8 @@ public class Game extends Canvas implements Runnable, GameObject {
             timer += now - last;
 
             if (numUpdates >= 1) {
+                printFPS(fps); // For debugging
+
                 update();
                 render();
                 fps++;
@@ -131,6 +133,13 @@ public class Game extends Canvas implements Runnable, GameObject {
                 timer = 0;
                 fps = 0;
             }
+        }
+    }
+
+    private void printFPS(int fps){
+        System.out.print("*");
+        if (fps % 60 == 0) {
+            System.out.println();
         }
     }
     // endregion
@@ -204,8 +213,8 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     private void moveCamera() {
-        cam.x += (ball.state.position.x - cam.x) / 10;
-        cam.y += (ball.state.position.y - cam.y) / 10;
+        cam.x += (ball.state.position.x - cam.x) / 10; //TODO: Why is it 10 and not 2 as has been previously?
+        cam.y += (ball.state.position.y - cam.y) / 10; //TODO:What does this number mean?
     }
     // endregion
 
@@ -216,6 +225,7 @@ public class Game extends Canvas implements Runnable, GameObject {
      * Renders the game
      */
     public void render() {
+        bufferStrategy = getBufferStrategy();
         if (isBufferStrategyNull()) {
             return;
         }
@@ -223,7 +233,6 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     private boolean isBufferStrategyNull() {
-        bufferStrategy = getBufferStrategy();
         if (bufferStrategy == null) {
             createBufferStrategy(3);
             return true;

@@ -104,12 +104,12 @@ public class CollisionSystem {
 
     private static void calculatePositionAfterCollision(BallState state, Vector2 previousPosition, Vector2 collisionPosition, double ballRadius){
         //Calculation variables
-        double moveDistanceAfterCollision = state.position.distanceTo(collisionPosition);
-        Vector2 moveVectorAfterCollision = state.velocity.normalized().scale(moveDistanceAfterCollision);
         Vector2 fromPreviousToCurrentPos = state.position.deltaPositionTo(previousPosition);
+        Vector2 collisionPositionMinusRadius = collisionPosition.translated(fromPreviousToCurrentPos.normalized().scale(ballRadius).reverse());
+        double moveDistanceAfterCollision = state.position.distanceTo(collisionPositionMinusRadius);
+        Vector2 moveVectorAfterCollision = state.velocity.normalized().scale(moveDistanceAfterCollision);
         
         //Calculating the new position
-        Vector2 collisionPositionMinusRadius = collisionPosition.translated(fromPreviousToCurrentPos.normalize().scale(ballRadius).reverse());
         Vector2 positionAfterCollision = collisionPositionMinusRadius.translated(moveVectorAfterCollision);
         state.position = positionAfterCollision;
     }
