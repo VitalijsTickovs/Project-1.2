@@ -72,7 +72,7 @@ public class PhysicsEngine {
 
         // Check if in water
         if (terrain.terrainFunction.valueAt(ballState.position.x, ballState.position.y) <= 0) {
-            return Vector2.zeroVector;
+            return Vector2.zeroVector();
         }
 
         double kineticFriction = getKineticFrictionAtPosition(ballState.position);
@@ -91,7 +91,7 @@ public class PhysicsEngine {
             yAcceleration = yAcceleration(slope, ballState.velocity, kineticFriction);
         } else {
             // Stop the ball first
-            newVelocity = Vector2.zeroVector;
+            newVelocity = Vector2.zeroVector();
 
             double staticFriction = getStaticFrictionAtPosition(ballState.position);
             boolean staticFrictionLessThanDownwardForce = staticFriction < slope.length();

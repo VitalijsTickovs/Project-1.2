@@ -42,7 +42,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     CollisionData collisionData = new CollisionData();
     
     Vector2 wallDirectionVector = wall[1].translated(wall[0].reversed());
-    Vector2 normal = wallDirectionVector.getPerpendicularVector();
+    Vector2 normal = wallDirectionVector;
     collisionData.collisionNormal = normal;
     
     collisionData.bounciness = bounciness;
@@ -182,7 +182,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     addNonNullCrossPoints(allCrossPoints, crossPointsThroughMiddle);
     //If any collisions through the middle occured, then they are automatically most accurate solution. 
     //No need to check any further
-    if (crossPointsThroughMiddle.length > 0) {
+    if (hasANonNullValue(crossPointsThroughMiddle)) {
       return;
     }
     
@@ -190,6 +190,15 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     Vector2[] crossPointsThroughSecondParallel = getCrossPointsWithWalls(secondParallelEpisode[0], secondParallelEpisode[1]);
     addNonNullCrossPoints(allCrossPoints, crossPointsThroughFirstParallel);
     addNonNullCrossPoints(allCrossPoints, crossPointsThroughSecondParallel);
+  }
+
+  private boolean hasANonNullValue(Vector2[] list){
+    for (Vector2 vector : list) {
+      if (vector != null) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void addNonNullCrossPoints(ArrayList<Vector2> allCrossPoints, Vector2[] crossPoints){
@@ -204,25 +213,19 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     Line2D perpendicularToPathAtFirstPosition = pathLine.getPerpendicularLineAtPoint(firstPosition);
     Line2D perpendicularToPathAtSecondPosition = pathLine.getPerpendicularLineAtPoint(secondPosition);
 
-    Line2D parallelLine = getTranslatedParallelLine(pathLine, reverseTranslation);
+    Vector2 lineDeltaPosition = perpendicularToPathAtFirstPosition.getDirectionVector(ballRadius);
+    if (reverseTranslation) {
+      lineDeltaPosition.reverse();
+    }
+    Vector2 lineFirstPosition = firstPosition.translated(lineDeltaPosition);
+    Vector2 lineSecondPosition = secondPosition.translated(lineDeltaPosition);
+    Line2D parallelLine = new Line2D(lineFirstPosition, lineSecondPosition);
 
     Vector2[] episode = new Vector2[2];
     episode[0] = UtilityClass.findLineIntersection(parallelLine, perpendicularToPathAtFirstPosition);
     episode[1] = UtilityClass.findLineIntersection(parallelLine, perpendicularToPathAtSecondPosition);
 
     return episode;
-  }
-
-  private Line2D getTranslatedParallelLine(Line2D pathLine, boolean reverseTranslation){
-    double horizontalOffset = ballRadius / Math.sin(pathLine.getSlopeAngle());
-    Vector2 translation = new Vector2(horizontalOffset, 0);
-
-    if (reverseTranslation) {
-      translation.reverse();
-    }
-    Line2D parallelLine = pathLine.getLineTranslatedByVector(translation); 
-    
-    return parallelLine;
   }
 
   /**
@@ -280,18 +283,18 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   public Vector2 getCollisionNormal(Vector2 position, Vector2 velocity) {
     boolean collidedFromLeft = position.x < bottomLeftCorner.x;
     if (collidedFromLeft) {
-      return Vector2.leftVector;
+      return Vector2.leftVector();
     }
     boolean collidedFromRight = position.x > topRightCorner.x;
     if (collidedFromRight) {
-      return Vector2.rightVector;
+      return Vector2.rightVector();
     }
     boolean collidedFromTop = position.y > topRightCorner.y;
     if (collidedFromTop) {
-      return Vector2.upVector;
+      return Vector2.upVector();
     }
     // collidedFromBottom = position.y < downLeftCorner.y;
-    return Vector2.downVector;
+    return Vector2.downVector();
   }
 
   @Override

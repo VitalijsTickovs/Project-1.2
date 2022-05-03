@@ -11,7 +11,7 @@ public class Line2D {
         this.slope = slope;
 
         if (Double.isInfinite(slope)) {
-            this.secondPosition = firstPosition.translated(Vector2.upVector);
+            this.secondPosition = firstPosition.translated(Vector2.upVector());
             yZero = 0;
             return;
         }
@@ -37,6 +37,14 @@ public class Line2D {
 
     double slope;
     double yZero;
+
+    public Vector2 getFirstPosition(){
+        return firstPosition.copy();
+    }
+    
+    public Vector2 getSecondPosition(){
+        return secondPosition.copy();
+    }
 
     public Line2D copy() {
         return new Line2D(firstPosition, secondPosition);
@@ -101,7 +109,7 @@ public class Line2D {
      */
     public Line2D getPerpendicularLineAtPoint(Vector2 point){
         double invertedCoefficient = -1 / slope;
-        return new Line2D(invertedCoefficient, point);
+        return new Line2D(invertedCoefficient, point.copy());
     }
     
     /**
@@ -109,7 +117,7 @@ public class Line2D {
      * @return A new line that is parallel to this line and passes through the given point
      */
     public Line2D getParallelLineAtPoint(Vector2 point){
-        return new Line2D(slope, point);
+        return new Line2D(slope, point.copy());
     }
 
     public Line2D getLineTranslatedByVector(Vector2 translation){
@@ -139,6 +147,30 @@ public class Line2D {
 
         Vector2 point = new Vector2((firstPosition.y - yZero) / slope, y);
         return point;
+    }
+
+    /**
+     * @param point
+     * @return an unit vector pointing in the direction of the line, such that the x coordinate is positive.
+     * If the line is vertical, the returned vector will be (0,1)
+     */
+    public Vector2 getDirectionVector(){
+        if (Double.isInfinite(slope)) {
+            return Vector2.upVector();
+        }
+
+        Vector2 zeroPos = getPointAtX(0);
+        Vector2 onePos = getPointAtX(1);
+        return zeroPos.deltaPositionTo(onePos).normalize();
+    }
+
+    /**
+     * @param point
+     * @return an unit vector pointing in the direction of the line, such that the x coordinate is positive.
+     * If the line is vertical, the returned vector will be (0, length)
+     */
+    public Vector2 getDirectionVector(double length){
+        return getDirectionVector().scale(length);
     }
 
     /**

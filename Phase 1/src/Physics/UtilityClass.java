@@ -32,14 +32,14 @@ public class UtilityClass {
     /**
      * 
      * @param point
-     * @param bottomLeft
-     * @param topRight
+     * @param firstPos
+     * @param secondPos
      * @return true, if the position is a part of an episode
      */
-    public static boolean isPointInEpisode(Vector2 point, Vector2 bottomLeft,Vector2 topRight){
-        double distanceA = point.distanceTo(bottomLeft);
-        double distanceB = point.distanceTo(topRight);
-        float distanceC =(float) bottomLeft.distanceTo(topRight);
+    public static boolean isPointInEpisode(Vector2 point, Vector2 firstPos, Vector2 secondPos){
+        double distanceA = point.distanceTo(firstPos);
+        double distanceB = point.distanceTo(secondPos);
+        float distanceC =(float) firstPos.distanceTo(secondPos);
         
         float sum = (float) (distanceA + distanceB);
         if (sum == distanceC)
@@ -55,8 +55,8 @@ public class UtilityClass {
             return null;
         }
 
-        return findLineIntersection(firstLine.getPointAtX(0), firstLine.getPointAtX(1),
-        secondLine.getPointAtX(0), secondLine.getPointAtX(1));
+        return findLineIntersection(firstLine.getFirstPosition(), firstLine.getSecondPosition(),
+        secondLine.getFirstPosition(), secondLine.getSecondPosition());
     }
 
     /**

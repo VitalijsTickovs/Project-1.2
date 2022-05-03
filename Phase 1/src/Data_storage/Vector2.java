@@ -15,12 +15,12 @@ public class Vector2 {
     }
 
     // readonly vectors
-    public final static Vector2 zeroVector = new Vector2(0, 0);
-    public final static Vector2 rightVector = new Vector2(1, 0);
-    public final static Vector2 leftVector = new Vector2(-1, 0);
-    public final static Vector2 upVector = new Vector2(0, 1);
-    public final static Vector2 downVector = new Vector2(0, -1);
-    public final static Vector2 unitVector = new Vector2(1, 1);
+    public final static Vector2 zeroVector(){ return new Vector2(0, 0);}
+    public final static Vector2 rightVector(){ return new Vector2(1, 0);}
+    public final static Vector2 leftVector(){ return new Vector2(-1, 0);}
+    public final static Vector2 upVector(){ return new Vector2(0, 1);}
+    public final static Vector2 downVector(){ return new Vector2(0, -1);}
+    public final static Vector2 unitVector(){ return new Vector2(1, 1);}
 
     // Helper methods
     public double length() {
@@ -143,8 +143,12 @@ public class Vector2 {
         return Math.sqrt((x - toVector.x) * (x - toVector.x) + (y - toVector.y) * (y - toVector.y));
     }
 
+    /**
+     * @param toPosition
+     * @return a delta position vector going from current position to the position given in the parameter. The arrow points to the target
+     */
     public Vector2 deltaPositionTo(Vector2 toPosition){
-        return new Vector2(x - toPosition.x, y - toPosition.y);
+        return new Vector2(toPosition.x - x, toPosition.y - y);
     }
 
     /**
@@ -177,8 +181,8 @@ public class Vector2 {
      * The perpendicular vector will always have a positive x coordinate
      */
     public Vector2 getPerpendicularVector(){
-        Line2D line = new Line2D(this, Vector2.zeroVector);
-        Line2D perpendicularLine = line.getPerpendicularLineAtPoint(Vector2.zeroVector);
+        Line2D line = new Line2D(this, Vector2.zeroVector());
+        Line2D perpendicularLine = line.getPerpendicularLineAtPoint(Vector2.zeroVector());
         return perpendicularLine.secondPosition;
     }
 

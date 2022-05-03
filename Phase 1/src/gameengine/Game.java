@@ -61,7 +61,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     private void createBall() {
-        ball = new Ball(terrain.ballStartingPosition, Vector2.zeroVector);
+        ball = new Ball(terrain.ballStartingPosition, Vector2.zeroVector());
         engine = new PhysicsEngine(terrain);
         engine.addBall(ball);
     }
@@ -214,8 +214,8 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void moveCamera() {
         final int MOVEMENT_SMOOTHNESS = 10;
-        cam.xPosition += (ball.state.position.x - cam.xPosition) / MOVEMENT_SMOOTHNESS; //TODO: Why is it 10 and not 2 as has been previously?
-        cam.yPosition += (ball.state.position.y - cam.yPosition) / MOVEMENT_SMOOTHNESS; //TODO:What does this number mean?
+        cam.xPosition += (ball.state.position.x - cam.xPosition) / MOVEMENT_SMOOTHNESS;
+        cam.yPosition += (ball.state.position.y - cam.yPosition) / MOVEMENT_SMOOTHNESS;
     }
     // endregion
 

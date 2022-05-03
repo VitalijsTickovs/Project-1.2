@@ -65,7 +65,7 @@ public class InputFileReader extends InputModule {
             String inputLine = fileScanner.nextLine();
             Vector2 vector = parseIntoVector(inputLine);
 
-            if (vector.equals(Vector2.zeroVector)) {
+            if (vector.equals(Vector2.zeroVector())) {
                 // Zero vector means that there was a problem with parsing. A zero vector is
                 // useless anyway
                 continue;
@@ -86,13 +86,13 @@ public class InputFileReader extends InputModule {
      */
     private static Vector2 parseIntoVector(String input) {
         if (checkNull(input)) {
-            return Vector2.zeroVector;
+            return Vector2.zeroVector();
         }
 
         String[] splitSequence = input.split(",");
 
         if (checkIncorrectLength(splitSequence)) {
-            return Vector2.zeroVector;
+            return Vector2.zeroVector();
         }
 
         return tryParse(splitSequence);
@@ -126,7 +126,7 @@ public class InputFileReader extends InputModule {
         } catch (Exception e) {
             System.out.println("The string does not contain a parsable dpuble.");
             System.out.println("The correct input should look like this: [double],[double]");
-            return Vector2.zeroVector;
+            return Vector2.zeroVector();
 
         }
     }

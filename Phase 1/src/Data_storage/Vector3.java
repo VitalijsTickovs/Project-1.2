@@ -18,14 +18,14 @@ public class Vector3 {
     }
 
     // readonly vectors
-    public final static Vector3 zeroVector = new Vector3(0, 0, 0);
-    public final static Vector3 rightVector = new Vector3(1, 0, 0);
-    public final static Vector3 leftVector = new Vector3(-1, 0, 0);
-    public final static Vector3 upVector = new Vector3(0, 0, 1);
-    public final static Vector3 downVector = new Vector3(0, 0, -1);
-    public final static Vector3 forwardVector = new Vector3(0, 1, 0);
-    public final static Vector3 backwardVector = new Vector3(0, -1, 0);
-    public final static Vector3 unitVector = new Vector3(1, 1, 1);
+    public final static Vector3 zeroVector(){ return new Vector3(0, 0, 0);}
+    public final static Vector3 rightVector(){ return new Vector3(1, 0, 0);}
+    public final static Vector3 leftVector(){ return new Vector3(-1, 0, 0);}
+    public final static Vector3 upVector(){ return new Vector3(0, 0, 1);}
+    public final static Vector3 downVector(){ return new Vector3(0, 0, -1);}
+    public final static Vector3 forwardVector(){ return new Vector3(0, 1, 0);}
+    public final static Vector3 backwardVector(){ return new Vector3(0, -1, 0);}
+    public final static Vector3 unitVector(){ return new Vector3(1, 1, 1);}
 
     // Helper methods
     public double length() {
