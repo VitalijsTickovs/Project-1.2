@@ -31,7 +31,6 @@ public class ShotInputWindow {
      */
     public void openWindow() {
         if (!wasCreated) {
-            System.out.println("created window");
             createWindow();
             wasCreated = true;
         }

@@ -117,19 +117,19 @@ public class CollisionSystem {
     private static Vector2 handleBallOutOfBounds(BallState state){
         Vector2 newPosition = state.position.copy();
         boolean reverseX = false;
-        if (newPosition.x > PhysicsEngine.terrain.limitingCorner.x) {
+        if (newPosition.x > PhysicsEngine.terrain.bottomRightCorner.x) {
             reverseX = true;
             Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(PhysicsEngine.terrain.limitingCorner.x, 0), new Vector2(PhysicsEngine.terrain.limitingCorner.x, 1));
+                    new Vector2(PhysicsEngine.terrain.bottomRightCorner.x, 0), new Vector2(PhysicsEngine.terrain.bottomRightCorner.x, 1));
             if (intersectionPoint != null) {
                 newPosition = intersectionPoint;
             } else {
                 newPosition = state.position;
             }
-        } else if (newPosition.x < PhysicsEngine.terrain.startingCorner.x) {
+        } else if (newPosition.x < PhysicsEngine.terrain.topLeftCorner.x) {
             reverseX = true;
             Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(PhysicsEngine.terrain.startingCorner.x, 0), new Vector2(PhysicsEngine.terrain.startingCorner.x, 1));
+                    new Vector2(PhysicsEngine.terrain.topLeftCorner.x, 0), new Vector2(PhysicsEngine.terrain.topLeftCorner.x, 1));
             if (intersectionPoint != null) {
                 newPosition = intersectionPoint;
             } else {
@@ -138,19 +138,19 @@ public class CollisionSystem {
         }
         // On y-axis
         boolean reverseY = false;
-        if (newPosition.y > PhysicsEngine.terrain.limitingCorner.y) {
+        if (newPosition.y > PhysicsEngine.terrain.bottomRightCorner.y) {
             reverseY = true;
             Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(0, PhysicsEngine.terrain.limitingCorner.y), new Vector2(0, PhysicsEngine.terrain.limitingCorner.y));
+                    new Vector2(0, PhysicsEngine.terrain.bottomRightCorner.y), new Vector2(0, PhysicsEngine.terrain.bottomRightCorner.y));
             if (intersectionPoint != null) {
                 newPosition = intersectionPoint;
             } else {
                 newPosition = state.position;
             }
-        } else if (newPosition.y < PhysicsEngine.terrain.startingCorner.y) {
+        } else if (newPosition.y < PhysicsEngine.terrain.topLeftCorner.y) {
             reverseY = true;
             Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(0, PhysicsEngine.terrain.startingCorner.y), new Vector2(0, PhysicsEngine.terrain.startingCorner.y));
+                    new Vector2(0, PhysicsEngine.terrain.topLeftCorner.y), new Vector2(0, PhysicsEngine.terrain.topLeftCorner.y));
             if (intersectionPoint != null) {
                 newPosition = intersectionPoint;
             } else {

@@ -17,8 +17,8 @@ public class Terrain {
     public Vector2 ballStartingPosition;
     
     //The corners of the whole map. The function is evaluated in this rectangle
-    public Vector2 startingCorner;
-    public Vector2 limitingCorner;
+    public Vector2 topLeftCorner;
+    public Vector2 bottomRightCorner;
 
     public double staticFriction;
     public double kineticFriction;
@@ -36,8 +36,8 @@ public class Terrain {
         this.terrainFunction = new TerrainFunction1(function);
         this.staticFriction = staticFriction;
         this.kineticFriction = kineticFriction;
-        this.startingCorner = startingCorner;
-        this.limitingCorner = limitingCorner;
+        this.topLeftCorner = startingCorner;
+        this.bottomRightCorner = limitingCorner;
         this.heightmap = null;
     }
 
@@ -68,8 +68,8 @@ public class Terrain {
     public double yOff;
 
     public boolean isValid(int accuracy) {
-        double xStep = (limitingCorner.x - startingCorner.x)/accuracy;
-        double yStep = (limitingCorner.y - startingCorner.y)/accuracy;
+        double xStep = (bottomRightCorner.x - topLeftCorner.x)/accuracy;
+        double yStep = (bottomRightCorner.y - topLeftCorner.y)/accuracy;
 
         Function dfxx = terrainFunction.dfx.getDerivative("x");
         Function dfyy = terrainFunction.dfy.getDerivative("y");
@@ -77,8 +77,8 @@ public class Terrain {
 
         for (int xx=0; xx<accuracy; xx++) {
             for (int yy=0; yy<accuracy; yy++) {
-                double x = startingCorner.x + xx*xStep;
-                double y = startingCorner.y + yy*yStep;
+                double x = topLeftCorner.x + xx*xStep;
+                double y = topLeftCorner.y + yy*yStep;
 
                 double fVal = Math.abs(terrainFunction.valueAt(x, y));
                 double dfxVal = Math.abs(terrainFunction.xDerivativeAt(x, y));
@@ -100,13 +100,13 @@ public class Terrain {
     public void calculateHeightMap(int numVerteces, double normalFactor) {
         heightmap = new float[numVerteces * numVerteces];
         int pos = 0;
-        this.xOff = (limitingCorner.x - startingCorner.x)/numVerteces;
-        this.yOff = (limitingCorner.y - startingCorner.y)/numVerteces;
+        this.xOff = (bottomRightCorner.x - topLeftCorner.x)/numVerteces;
+        this.yOff = (bottomRightCorner.y - topLeftCorner.y)/numVerteces;
         for (int x = 0; x < numVerteces; x++) {
             for (int y = 0; y < numVerteces; y++) {
 
-                double xx = startingCorner.x + x * this.xOff;
-                double yy = startingCorner.y + y * this.yOff;
+                double xx = topLeftCorner.x + x * this.xOff;
+                double yy = topLeftCorner.y + y * this.yOff;
                 float val = (float) terrainFunction.valueAt(xx, yy);
                 if (val > maxVal) {
                     maxVal = val;
@@ -138,9 +138,9 @@ public class Terrain {
         System.out.print("Starting position: ");
         System.out.println(ballStartingPosition);
         System.out.print("Starting corner: ");
-        System.out.println(startingCorner);
+        System.out.println(topLeftCorner);
         System.out.print("Limiting corner: ");
-        System.out.println(limitingCorner);
+        System.out.println(bottomRightCorner);
         System.out.print("Kinetic friction: ");
         System.out.println(kineticFriction);
         System.out.print("Static friction: ");

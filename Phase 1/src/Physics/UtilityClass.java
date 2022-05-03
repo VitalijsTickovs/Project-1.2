@@ -5,6 +5,10 @@ import Data_storage.Vector2;
 
 public class UtilityClass {
 
+    private UtilityClass(){
+        //Cannot instantiate this class - it's just static
+    }
+
     /**
      * 
      * @param p1 first point of the first line

@@ -299,14 +299,14 @@ public class TerrainLoader {
 
    private static void defineGreen() {
       if (terrainX0 == 0 && terrainY0 == 0) {
-         terrain.startingCorner = new Vector2(defx0, defy0);
+         terrain.topLeftCorner = new Vector2(defx0, defy0);
       } else {
-         terrain.startingCorner = new Vector2(terrainX0, terrainY0);
+         terrain.topLeftCorner = new Vector2(terrainX0, terrainY0);
       }
       if (terrainX1 == 0 && terrainY1 == 0) {
-         terrain.limitingCorner = new Vector2(defxt, defyt);
+         terrain.bottomRightCorner = new Vector2(defxt, defyt);
       } else {
-         terrain.limitingCorner = new Vector2(terrainX1, terrainY1);
+         terrain.bottomRightCorner = new Vector2(terrainX1, terrainY1);
       }
       if (greenKineticFriction == 0) {
          terrain.kineticFriction = defgreenKineticFriction;

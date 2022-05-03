@@ -70,8 +70,8 @@ public class Game extends Canvas implements Runnable, GameObject {
         cam = new Camera();
         cam.width = 75;
         cam.height = 75;
-        cam.x = ball.state.position.x;
-        cam.y = ball.state.position.y;
+        cam.xPosition = ball.state.position.x;
+        cam.yPosition = ball.state.position.y;
     }
 
     private void createRenderer() {
@@ -213,8 +213,9 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     private void moveCamera() {
-        cam.x += (ball.state.position.x - cam.x) / 10; //TODO: Why is it 10 and not 2 as has been previously?
-        cam.y += (ball.state.position.y - cam.y) / 10; //TODO:What does this number mean?
+        final int MOVEMENT_SMOOTHNESS = 10;
+        cam.xPosition += (ball.state.position.x - cam.xPosition) / MOVEMENT_SMOOTHNESS; //TODO: Why is it 10 and not 2 as has been previously?
+        cam.yPosition += (ball.state.position.y - cam.yPosition) / MOVEMENT_SMOOTHNESS; //TODO:What does this number mean?
     }
     // endregion
 
