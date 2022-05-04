@@ -85,7 +85,8 @@ public class CollisionSystem {
                 closestCollisionData = collisionData;
                 continue;
             }
-            if (previousPosition.distanceTo(closestCollisionData.collisionPosition) > previousPosition.distanceTo(collisionData.collisionPosition)) {
+            boolean foundACloserCollision = previousPosition.distanceTo(closestCollisionData.collisionPosition) > previousPosition.distanceTo(collisionData.collisionPosition);
+            if (foundACloserCollision) {
                 closestCollisionData = collisionData;
             }
         }

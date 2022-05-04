@@ -174,31 +174,14 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   private void addCrossPointsWithWalls(ArrayList<Vector2> allCrossPoints, Vector2 firstPosition, Vector2 secondPosition){
     Line2D pathLine = new Line2D(firstPosition, secondPosition);
     //Now we need the two lines that describe the edges of the ball's path
-    
     Vector2[] firstParallelEpisode = getPathTravelledEpisode(pathLine, firstPosition, secondPosition, true);
     Vector2[] secondParallelEpisode = getPathTravelledEpisode(pathLine, firstPosition, secondPosition, false);
     
-    Vector2[] crossPointsThroughMiddle = getCrossPointsWithWalls(firstPosition, secondPosition);
-    addNonNullCrossPoints(allCrossPoints, crossPointsThroughMiddle);
-    //If any collisions through the middle occured, then they are automatically most accurate solution. 
-    //No need to check any further
-    if (hasANonNullValue(crossPointsThroughMiddle)) {
-      return;
-    }
-    
+    //Check for the two side lines
     Vector2[] crossPointsThroughFirstParallel = getCrossPointsWithWalls(firstParallelEpisode[0], firstParallelEpisode[1]);
     Vector2[] crossPointsThroughSecondParallel = getCrossPointsWithWalls(secondParallelEpisode[0], secondParallelEpisode[1]);
     addNonNullCrossPoints(allCrossPoints, crossPointsThroughFirstParallel);
     addNonNullCrossPoints(allCrossPoints, crossPointsThroughSecondParallel);
-  }
-
-  private boolean hasANonNullValue(Vector2[] list){
-    for (Vector2 vector : list) {
-      if (vector != null) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private void addNonNullCrossPoints(ArrayList<Vector2> allCrossPoints, Vector2[] crossPoints){
@@ -214,6 +197,9 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     Line2D perpendicularToPathAtSecondPosition = pathLine.getPerpendicularLineAtPoint(secondPosition);
 
     Vector2 lineDeltaPosition = perpendicularToPathAtFirstPosition.getDirectionVector(ballRadius);
+    //Offset the lines by angle.
+    double offsetScale = 1 - Math.cos(pathLine.getSlopeAngle());
+    lineDeltaPosition.scale(offsetScale);
     if (reverseTranslation) {
       lineDeltaPosition.reverse();
     }

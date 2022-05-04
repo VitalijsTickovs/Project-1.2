@@ -104,6 +104,13 @@ public class Line2D {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    public Vector2 getShortestVectorToPoint(Vector2 point){
+        Line2D perpendicularLineThroughPoint = getPerpendicularLineAtPoint(point);
+        Vector2 crossPoint = getCrossPointWithLine(perpendicularLineThroughPoint);
+
+        return crossPoint.deltaPositionTo(point);
+    }
+
     /**
      * @return A new line that is perpendicular to this line and passes through the given point
      */
