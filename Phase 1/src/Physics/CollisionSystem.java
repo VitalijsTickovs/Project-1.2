@@ -49,7 +49,7 @@ public class CollisionSystem {
         CollisionData collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition, ballRadius);
         if (collisionData != null) {
             collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition, ballRadius);
-            bounceBall(state, previousPosition, collisionData, ballRadius);
+            bounceBall(state, collisionData);
         }
 
         state.position = handleBallOutOfBounds(state);
@@ -93,9 +93,9 @@ public class CollisionSystem {
         return closestCollisionData;
     }
 
-    private static void bounceBall(BallState state, Vector2 previousPosition, CollisionData collisionData, double ballRadius) {
+    private static void bounceBall(BallState state, CollisionData collisionData) {
         calculateVelocityAfterCollision(state, collisionData);
-        calculatePositionAfterCollision(state, previousPosition, collisionData, ballRadius);
+        calculatePositionAfterCollision(state, collisionData);
     }
 
     private static void calculateVelocityAfterCollision(BallState state, CollisionData collisionData){
@@ -104,9 +104,9 @@ public class CollisionSystem {
         state.velocity.scale(collisionData.bounciness);
     }
 
-    private static void calculatePositionAfterCollision(BallState state, Vector2 previousPosition, CollisionData collisionData, double ballRadius){
+    private static void calculatePositionAfterCollision(BallState state, CollisionData collisionData){
         //Calculation variables
-        Vector2 collisionPositionMinusRadius = countCollisionPositionMinusRadius(state, previousPosition, collisionData, ballRadius);
+        Vector2 collisionPositionMinusRadius = countCollisionPositionMinusRadius(state, collisionData);
         double moveDistanceAfterCollision = state.position.distanceTo(collisionPositionMinusRadius);
         Vector2 moveVectorAfterCollision = state.velocity.normalized().scale(moveDistanceAfterCollision);
         
@@ -115,11 +115,11 @@ public class CollisionSystem {
         state.position = positionAfterCollision;
     }
 
-    private static Vector2 countCollisionPositionMinusRadius(BallState state, Vector2 previousPosition, CollisionData collisionData, double ballRadius){
+    private static Vector2 countCollisionPositionMinusRadius(BallState state, CollisionData collisionData){
         Vector2 collisionPos =  collisionData.collisionPosition;
-        Vector2 translationByRadius = collisionData.collisionNormal.normalized().scale(ballRadius);
+        Vector2 translationByRadius = collisionData.collisionNormal.normalized().scale(collisionData.ballRadius);
         
-        Vector2 fromPreviousToCurrentPos = previousPosition.deltaPositionTo(state.position);
+        Vector2 fromPreviousToCurrentPos = collisionData.previousPosition.deltaPositionTo(state.position);
         double dot = Vector2.dotProduct(fromPreviousToCurrentPos, collisionData.collisionNormal);
         if (dot < 0) {
             return collisionPos.translated(translationByRadius);

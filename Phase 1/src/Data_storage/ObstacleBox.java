@@ -47,6 +47,9 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     collisionData.bounciness = bounciness;
     collisionData.collisionPosition = wall[2];
 
+    collisionData.ballRadius = ballRadius;
+    collisionData.previousPosition = previousPosition;
+
     return collisionData;
   }
 
