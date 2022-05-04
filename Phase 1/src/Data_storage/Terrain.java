@@ -50,6 +50,15 @@ public class Terrain {
         return false;
     }
 
+    public boolean isPointsInObstacle(Vector2 point){
+        for (IObstacle obstacle : obstacles) {
+            if (obstacle.isPositionColliding(point)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addZone(Vector2 bottomLeft, Vector2 topRight, double zoneStaticFriction, double zoneKineticFriction) {
         Zone[] temp = new Zone[zones.length+1];
         for (int i=0; i<zones.length; i++) {

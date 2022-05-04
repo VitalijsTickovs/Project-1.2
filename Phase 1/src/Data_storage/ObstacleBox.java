@@ -43,7 +43,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     
     Vector2 wallDirectionVector = wall[1].translated(wall[0].reversed());
     Vector2 normal = wallDirectionVector;
-    collisionData.collisionNormal = normal;
+    collisionData.collisionNormal = normal.getPerpendicularVector();
     
     collisionData.bounciness = bounciness;
     collisionData.collisionPosition = wall[2];

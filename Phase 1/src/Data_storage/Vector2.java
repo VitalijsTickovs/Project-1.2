@@ -172,9 +172,9 @@ public class Vector2 {
      * @return reflects this vector by a normal and returns the result
      */
     public Vector2 reflect(Vector2 normal) {
-        double dotProduct = dotProduct(this, normal.getPerpendicularVector().normalized());
+        double dotProduct = dotProduct(this, normal.normalized());
         // vector - 2 * (dotProduct) * normal;
-        return translate(normal.getPerpendicularVector().normalized().scale(2 * dotProduct).reversed());
+        return translate(normal.normalized().scale(2 * dotProduct).reversed());
     }
 
     /**

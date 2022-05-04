@@ -224,7 +224,13 @@ public class Renderer {
                 ObstacleTree t = (ObstacleTree) o;
                 drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, new Color(96, 69, 38), true);
             }
+            if (o instanceof ObstacleBox) {
+                ObstacleBox t = (ObstacleBox) o;
+                System.out.println("Drew box");
+                drawRectangle(g2, t.bottomLeftCorner, t.topRightCorner, new Color(96, 69, 38), true);
+            }
         }
+        
     }
 
     /**
@@ -271,5 +277,47 @@ public class Renderer {
         } else {
             g2.drawPolygon(xPoints, yPoints, 361);
         }
+    }
+    private void drawRectangle(Graphics2D g2, Vector2 bottomLeftCorner, Vector2 topRightCorner, Color color, boolean filled) {
+        int[] xPoints = new int[4];
+        int[] yPoints = new int[4];
+        g2.setColor(color);
+
+        fillListsWithRectangleCorners(xPoints, yPoints, bottomLeftCorner, topRightCorner);
+
+        // Draw the polygon
+        if (filled) {
+            g2.fillPolygon(xPoints, yPoints, 4);
+        } else {
+            g2.drawPolygon(xPoints, yPoints, 4);
+        }
+    }
+
+    private void fillListsWithRectangleCorners(int[] xPoints, int[] yPoints, Vector2 bottomLeftCorner, Vector2 topRightCorner){
+        Vector2 bottomRightCornerTranslated = getPointValue(new Vector2(topRightCorner.x, bottomLeftCorner.y));
+        assignTranslatedPoint(xPoints, yPoints, 0, bottomRightCornerTranslated);
+        
+        Vector2 bottomLeftCornerTranslated = getPointValue(new Vector2(bottomLeftCorner.x, bottomLeftCorner.y));
+        assignTranslatedPoint(xPoints, yPoints, 1, bottomLeftCornerTranslated);
+        
+        Vector2 topLeftCornerTranslated = getPointValue(new Vector2(bottomLeftCorner.x, topRightCorner.y));
+        assignTranslatedPoint(xPoints, yPoints, 2, topLeftCornerTranslated);
+        
+        Vector2 topRightCornerTranslated = getPointValue(new Vector2(topRightCorner.x, topRightCorner.y));
+        assignTranslatedPoint(xPoints, yPoints, 3, topRightCornerTranslated);
+    }
+
+    private void assignTranslatedPoint(int[] xPoints, int[] yPoints, int index, Vector2 point){
+        xPoints[index] = (int) point.x;
+        yPoints[index] = (int) point.y;
+    }
+
+    private Vector2 getPointValue(Vector2 point){
+        double xx = point.x;
+        double yy = point.y;
+        double h = terrain.terrainFunction.valueAt(xx, yy);
+        int renderX = (int) ((xx - terrain.topLeftCorner.x) * unitSizePixels);
+        int renderY = (int) ((yy - h - terrain.topLeftCorner.y + heightRange / 2) * unitSizePixels);
+        return new Vector2(renderX, renderY);
     }
 }

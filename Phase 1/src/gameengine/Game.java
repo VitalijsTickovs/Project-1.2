@@ -118,7 +118,7 @@ public class Game extends Canvas implements Runnable, GameObject {
             timer += now - last;
 
             if (numUpdates >= 1) {
-                printFPS(fps); // For debugging
+                // printFPS(fps); // For debugging
 
                 update();
                 render();
