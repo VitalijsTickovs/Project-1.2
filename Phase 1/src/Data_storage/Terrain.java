@@ -55,7 +55,7 @@ public class Terrain {
         return false;
     }
 
-    public boolean isPointsInObstacle(Vector2 point){
+    public boolean isPointInObstacle(Vector2 point){
         for (IObstacle obstacle : obstacles) {
             if (obstacle.isPositionColliding(point)) {
                 return true;
@@ -172,25 +172,36 @@ public class Terrain {
     }
 
     public double[][] getMap(){
-
-        int xSquares = (int) getTerrainWidth() * SQUARES_PER_GAME_UNIT;
-        int ySquares = (int) getTerrainHeight() * SQUARES_PER_GAME_UNIT;
-        double[][] map = new double[ySquares][xSquares];
-
+        double[][] map = createEmptyMap();
         //We add half a tile, to get a height value at the center of each square
         double halfTileOffset = (1d / (double) SQUARES_PER_GAME_UNIT) / 2d;
         
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
+
                 double value = terrainFunction.valueAt(x + halfTileOffset, y + halfTileOffset);
-                if(value > 0){
-                    map[y][x] = 1;
-                }else{
-                    map[y][x] = -1;
+                boolean cannotGoHere = value <= 0 || !isPointInObstacle(translateGridPositionIntoGameUnits(x,y));
+                if(cannotGoHere){
+                    map[y][x] = -1; // This value signifies an unpassable obstacle
+                    continue;
                 }
+                map[y][x] = 1;
             }
         }
         return map;
+    }
+
+    private double[][] createEmptyMap(){
+        int xSquares = (int) getTerrainWidth() * SQUARES_PER_GAME_UNIT;
+        int ySquares = (int) getTerrainHeight() * SQUARES_PER_GAME_UNIT;
+        double[][] map = new double[ySquares][xSquares];
+        return map;
+    }
+
+    private Vector2 translateGridPositionIntoGameUnits(int xPos, int yPos){
+        double newX = (double) xPos / (double) SQUARES_PER_GAME_UNIT;
+        double newY = (double) yPos / (double) SQUARES_PER_GAME_UNIT;
+        return new Vector2(newX, newY);
     }
 
     /**
