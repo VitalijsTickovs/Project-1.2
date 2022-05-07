@@ -224,6 +224,7 @@ public class Renderer {
                 ObstacleTree t = (ObstacleTree) o;
                 drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, new Color(96, 69, 38), true);
             }
+            //Box
             if (o instanceof ObstacleBox) {
                 ObstacleBox t = (ObstacleBox) o;
                 System.out.println("Drew box");
@@ -278,6 +279,7 @@ public class Renderer {
             g2.drawPolygon(xPoints, yPoints, 361);
         }
     }
+    
     private void drawRectangle(Graphics2D g2, Vector2 bottomLeftCorner, Vector2 topRightCorner, Color color, boolean filled) {
         int[] xPoints = new int[4];
         int[] yPoints = new int[4];
@@ -285,7 +287,6 @@ public class Renderer {
 
         fillListsWithRectangleCorners(xPoints, yPoints, bottomLeftCorner, topRightCorner);
 
-        // Draw the polygon
         if (filled) {
             g2.fillPolygon(xPoints, yPoints, 4);
         } else {

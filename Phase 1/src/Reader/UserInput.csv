@@ -16,8 +16,8 @@ targetY = 5;
 //Sand pit data
 sandZoneX = -10<x<10.1;
 sandZoneY = 12.78<y<20;
-sandKineticFriction = 0.25;
-sandStaticFriction = 0.3;
+sandKineticFriction = 0.35;
+sandStaticFriction = 0.4;
 
 sandZoneX = -20<x<3;
 sandZoneY = 0.1<y<12.5;

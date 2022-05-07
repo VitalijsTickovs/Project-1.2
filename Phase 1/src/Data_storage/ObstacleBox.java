@@ -109,7 +109,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
   private Vector2[] getAllCrossPoints(Vector2 firstPosition, Vector2 secondPosition){
     ArrayList<Vector2> allCrossPoints = new ArrayList<>();
     Line2D pathLine = new Line2D(firstPosition, secondPosition);
-    double offsetScale = 1 - Math.cos(pathLine.getSlopeAngle());
+    double offsetScale = 1 - Math.abs(Math.sin(pathLine.getSlopeAngle()));
 
     addCrossPointsWithWalls(allCrossPoints, firstPosition, secondPosition, offsetScale);
     //Internal lines have priority

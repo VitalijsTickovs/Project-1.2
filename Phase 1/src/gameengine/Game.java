@@ -31,7 +31,8 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     // region Startup
     /**
-     * @param fps The target FPS (frames per second) of the game
+     * @param fps
+     *            The target FPS (frames per second) of the game
      */
     public Game(int fps) {
         FPS = fps;
@@ -136,7 +137,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         }
     }
 
-    private void printFPS(int fps){
+    private void printFPS(int fps) {
         System.out.print("*");
         if (fps % 60 == 0) {
             System.out.println();
