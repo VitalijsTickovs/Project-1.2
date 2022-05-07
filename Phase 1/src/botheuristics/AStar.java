@@ -7,10 +7,8 @@ import Data_storage.Terrain;
 
 public class AStar {
     /**
-     * 
-     * @param newMap use -1 for an unpassable obstacle; values signify the cost to enter this tile
-     * @param targetX
-     * @param targetY
+     * Instantiate a new class for each new Terrain.
+     * Only call the "getDistanceToTarget" method for heuristic purposes
      */
     public AStar(Terrain terrain){
         checkForNullTerrain();
@@ -29,7 +27,6 @@ public class AStar {
     private boolean doDebugMessages = true;
     private Terrain terrain;
     
-    //These 2 methods shall be called before the first call of "getPositionDistance"
     private void setMap(double[][] newMap){
         map = newMap;
     }
