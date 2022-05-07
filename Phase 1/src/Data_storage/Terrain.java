@@ -29,6 +29,10 @@ public class Terrain {
     public int xRes = 500;
     public int yRes = 500;
 
+    public final int SQUARES_PER_GAME_UNIT = 4; // How many squares will the map used by AStar pathfinding generate per game unit.
+    //A game unit is a distance between two vectors (0,0) and (0,1);
+    //The map's size is calculated the "topLeftCorner" and "bottomRightCorner" vectors
+
     public Terrain(){
     }
 
@@ -166,10 +170,15 @@ public class Terrain {
         target.print();
     }
 
-    public double[][] getMap(int resolution){
-        double[][] map = new double[resolution][resolution];
+    public double[][] getMap(){
+
+        int xSquares = (int) getTerrainWidth() * SQUARES_PER_GAME_UNIT;
+        int ySquares = (int) getTerrainHeight() * SQUARES_PER_GAME_UNIT;
+        double[][] map = new double[ySquares][xSquares];
+
         //We add half a tile, to get a height value at the center of each square
-        double halfTileOffset = resolution/2;
+        double halfTileOffset = (1d / (double) SQUARES_PER_GAME_UNIT) / 2d;
+        
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
                 double value = terrainFunction.valueAt(x + halfTileOffset, y + halfTileOffset);
@@ -181,5 +190,19 @@ public class Terrain {
             }
         }
         return map;
+    }
+
+    /**
+     * @return terrain width in game units
+     */
+    public double getTerrainWidth(){
+        return Math.abs(bottomRightCorner.x - topLeftCorner.x);
+    }
+
+    /**
+     * @return terrain height in game units
+     */
+    public double getTerrainHeight(){
+        return Math.abs(bottomRightCorner.y - topLeftCorner.y);
     }
 }

@@ -2,30 +2,18 @@ package botheuristics;
 
 import java.util.LinkedList;
 
+import Data_storage.Terrain;
+
 public class AStar {
-
-    public static void main(String[] args) {
-        double[][] map = {
-            { 1, 1, 1, 1, 1, 1},
-            { 1,-1, 1,-1,-1, 1 },
-            { 1,-1,-1, 1,-1, 1 },
-            { 1, 1, 1, 1,-1, 1 },
-            { 1, 1,-1,-1,-1, 1 },
-            { 1, 1, 1, 1, 1, 1 },};
-            AStar aStar = new AStar(map, 5, 5);
-            double distance = aStar.getPositionDistance(0, 0);
-            System.out.println(distance);
-    }
-
     /**
      * 
      * @param newMap use -1 for an unpassable obstacle; values signify the cost to enter this tile
      * @param targetX
      * @param targetY
      */
-    public AStar(double[][] newMap, int targetX, int targetY){
-        setMap(newMap);
-        setTarget(targetX, targetY);
+    public AStar(Terrain terrain){
+        setMap(terrain.getMap());
+        setTarget(terrain);
         checkForNullValues();
     }
     
@@ -41,7 +29,9 @@ public class AStar {
         map = newMap;
     }
     
-    public void setTarget(int targetX, int targetY){
+    public void setTarget(Terrain terrain){
+    int targetX = (int) (terrain.target.position.x * terrain.SQUARES_PER_GAME_UNIT);
+    int targetY = (int) (terrain.target.position.y * terrain.SQUARES_PER_GAME_UNIT);
         targetNode = new Node(targetX, targetY);
     }
     
