@@ -3,14 +3,17 @@ package gameengine;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import Data_storage.Ball;
+import Data_storage.GameState;
 import Data_storage.Terrain;
 import Data_storage.Vector2;
 import GUI.InterfaceFactory;
 import GUI.ShotInputWindow;
 import Physics.PhysicsEngine;
+import Physics.RungeKutta;
 import Reader.*;
 
 public class Game extends Canvas implements Runnable, GameObject {
@@ -22,12 +25,10 @@ public class Game extends Canvas implements Runnable, GameObject {
     private boolean running;
     private Thread thread;
     private BufferedImage terrainImage;
-    private Terrain terrain;
-    private Ball ball;
-    private PhysicsEngine engine;
     private Renderer renderer;
     private Camera cam;
     private ShotInputWindow shotInputWindow;
+    private GameState gameState;
 
     // region Startup
     /**
@@ -37,12 +38,17 @@ public class Game extends Canvas implements Runnable, GameObject {
         FPS = fps;
         resetStartingVariables();
         createInputWindow();
-        createTerrain();
-        createBall();
+        createGameState();
+        //createTerrain();
         createCamera();
         createRenderer();
         createTerrainImage();
         createFrame();
+    }
+
+    private void createGameState() {
+        gameState = Reader.readFile();
+        gameState.getTerrain().calculateHeightMap(1024, 1.0);
     }
 
     private void resetStartingVariables() {
@@ -55,34 +61,21 @@ public class Game extends Canvas implements Runnable, GameObject {
         shotInputWindow = new ShotInputWindow(this);
     }
 
-    private void createTerrain() {
-        terrain = Reader.readFile();
-        terrain.calculateHeightMap(1024, 1.0);
-    }
-
-    private void createBall() {
-        ball = new Ball(terrain.ballStartingPosition, Vector2.zeroVector);
-        engine = new PhysicsEngine();
-        engine.terrain = terrain;
-        engine.addBall(ball);
-    }
-
     private void createCamera() {
         cam = new Camera();
         cam.width = 75;
         cam.height = 75;
-        cam.x = ball.state.position.x;
-        cam.y = ball.state.position.y;
+        cam.x = gameState.getBall().state.position.x;
+        cam.y = gameState.getBall().state.position.y;
     }
 
     private void createRenderer() {
         renderer = new Renderer();
         renderer.heightRange = 20;
-        renderer.terrain = terrain;
+        renderer.terrain = gameState.getTerrain();
         renderer.cam = cam;
-        renderer.ball = ball;
+        renderer.ball = gameState.getBall();
         renderer.unitSizePixels = 10;
-        renderer.game = this;
         renderer.createTerrainImage();
     }
 
@@ -137,7 +130,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     // endregion
 
     // region Update
-    private LinkedList<Vector2> ballPositions = new LinkedList<Vector2>();
+    private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
 
     /**
      * Updates the state of the game each step
@@ -154,7 +147,7 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void handleBallInWater() {
         if (isSimulationFinished()) {
-            boolean isBallInWater = terrain.terrainFunction.valueAt(ball.state.position.x, ball.state.position.y) <= 0;
+            boolean isBallInWater = gameState.getTerrain().terrainFunction.valueAt(gameState.getBall().state.position.x, gameState.getBall().state.position.y) <= 0;
             if (isBallInWater) {
                 resetGame();
             }
@@ -162,7 +155,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     private void resetGame() {
-        ball.state.position = terrain.ballStartingPosition;
+        gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
         numShots = 0;
     }
 
@@ -184,7 +177,7 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void simulateShot() {
         if (shouldPushBall()) {
-            ballPositions = engine.simulateShot(shotVector, ball);
+            ballPositions = gameState.simulateShot(shotVector);
             numShots++;
             shotVector = null;
         }
@@ -199,14 +192,14 @@ public class Game extends Canvas implements Runnable, GameObject {
     private void moveBall() {
         boolean ballMoving = ballPositions.size() != 0;
         if (ballMoving) {
-            ball.state.position = ballPositions.get(0);
+            gameState.setBallPosition(ballPositions.get(0));
             ballPositions.remove(0);
         }
     }
 
     private void moveCamera() {
-        cam.x += (ball.state.position.x - cam.x) / 10;
-        cam.y += (ball.state.position.y - cam.y) / 10;
+        cam.x += (gameState.getBall().state.position.x - cam.x) / 10;
+        cam.y += (gameState.getBall().state.position.y - cam.y) / 10;
     }
     // endregion
 
@@ -254,7 +247,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     public static void main(String[] args) {
-        Game g = new Game(60);
+        Game g = new Game(256);
         g.start();
     }
 }

@@ -1,53 +1,48 @@
 package Physics;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import Data_storage.*;
+import function.Function;
 
-public class PhysicsEngine {
+public abstract class PhysicsEngine {
 
-    public double h = 0.05; // The step of the Euler's method
-    public Terrain terrain;
-    public ArrayList<Ball> ballsToSimulate;
-    private final double G = 9.81;
+    public boolean testing = false;
 
-    public PhysicsEngine() {
-        ballsToSimulate = new ArrayList<Ball>();
-        terrain = null;
-    }
-
-    /**
-     * Adds a ball to the list of balls that should be processed
-     * @param ball The new Ball to process
-     */
-    public void addBall(Ball ball) {
-        ballsToSimulate.add(ball);
-    }
-
-    /**
-     * Moves all balls by a timeframe h using Euler's integration method. Call this
-     * at a regular (frame independent) rate.
-     */
-    public void fixedUpdate() {
-        for (Ball ball : ballsToSimulate) {
-            ball.state = countNewBallState(ball);
-        }
-    }
+    public double h = 0.01; // The step of the Euler's method
+    public final double G = 9.81;
 
     /**
      * Simulates a shot and stores the positions until the ball stops
      * @param initialSpeed The inital speed of the ball
      * @param ball The ball to shoot
+     * @param terrain The terrain to shoot the ball on
      * @return ArrayList containing ball positions throughout the shot
      */
-    public LinkedList<Vector2> simulateShot(Vector2 initialSpeed, Ball ball) {
-        LinkedList<Vector2> coordinates = new LinkedList<Vector2>();
-        ball.state.velocity = initialSpeed;
+    public ArrayList<Vector2> simulateShot(Vector2 initialSpeed, Ball ball, Terrain terrain) {
+        Ball tempBall = ball.copy();
+        ArrayList<Vector2> coordinates = new ArrayList<Vector2>();
+        tempBall.state.velocity = initialSpeed.copy();
+        // Add the initial position
+        coordinates.add(tempBall.state.position.copy());
         do {
-            ball.state = countNewBallState(ball);
-            coordinates.add(new Vector2(ball.state.position.x, ball.state.position.y));
-        } while (ball.state.velocity.length() != 0);
+            tempBall.state = countNewBallState(tempBall, terrain);
+            coordinates.add(tempBall.state.position.copy());
+            //System.out.println("p="+ball.state.position+" v="+ball.state.velocity);
+            /*try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
+        } while (
+                tempBall.state.velocity.length() != 0 /*||
+            new Vector2(
+                getXSlopeAt(ball.state.position.x, ball.state.position.y),
+                getYSlopeAt(ball.state.position.y, ball.state.position.y)
+            ).length() > getStaticFrictionAtPosition(ball.state.position)*/
+        );
         return coordinates;
     }
 
@@ -56,150 +51,20 @@ public class PhysicsEngine {
      * @param ball The ball to calculate the new state for
      * @return The new state of the ball
      */
-    private BallState countNewBallState(Ball ball) {
-        BallState newState = ball.state.copy();
-        newState.position = countNewPosition(newState, ball.radius);
-        newState.velocity = countNewVelocity(ball);
-
-        return newState;
-    }
-
-    private Vector2 countNewPosition(BallState state, double radius) {
-        Vector2 newPosition = state.position.copy();
-        doEulerPositionStep(state, h);
-
-        IObstacle collidesWith = isTouchingAnObstacle(newPosition, radius);
-        if (collidesWith != null) {
-            bounceBall(state, collidesWith, h, radius);
-            newPosition = state.position;
-        }
-
-        // Check out of bounds
-        state.position = checkBallOutOfBounds(state);
-        return state.position;
-    }
-
-    private void doEulerPositionStep(BallState state, double h) {
-        state.position.translate(new Vector2(h * state.velocity.x, h * state.velocity.y));
-    }
+    protected abstract BallState countNewBallState(Ball ball, Terrain terrain);
 
     /**
-     * 
-     * @param position
-     * @return the obstacle that the ball collided with or null if it didn't
+     * Checks if a position is colliding with an obstacle
+     * @param position The position to check for
+     * @return {@code true} if colliding and {@code false} otherwise
      */
-    private IObstacle isTouchingAnObstacle(Vector2 position, double radius) {
+    protected boolean isTouchingAnObstacle(Vector2 position, Terrain terrain){
         for (IObstacle obstacle : terrain.obstacles) {
-            if (obstacle.isBallColliding(position, radius)) {
-                return obstacle;
+            if (obstacle.isPositionColliding(position)) {
+                return true;
             }
         }
-        return null;
-    }
-
-    private void bounceBall(BallState state, IObstacle collidesWith, double h, double radius) {
-        collidesWith.bounceVector(state.position, state.velocity, h, radius);
-    }
-
-    private Vector2 checkBallOutOfBounds(BallState state){
-        Vector2 newPosition = state.position.copy();
-        boolean reverseX = false;
-        if (newPosition.x > terrain.limitingCorner.x) {
-            reverseX = true;
-            Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(terrain.limitingCorner.x, 0), new Vector2(terrain.limitingCorner.x, 1));
-            if (intersectionPoint != null) {
-                newPosition = intersectionPoint;
-            } else {
-                newPosition = state.position;
-            }
-        } else if (newPosition.x < terrain.startingCorner.x) {
-            reverseX = true;
-            Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(terrain.startingCorner.x, 0), new Vector2(terrain.startingCorner.x, 1));
-            if (intersectionPoint != null) {
-                newPosition = intersectionPoint;
-            } else {
-                newPosition = state.position;
-            }
-        }
-        // On y-axis
-        boolean reverseY = false;
-        if (newPosition.y > terrain.limitingCorner.y) {
-            reverseY = true;
-            Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(0, terrain.limitingCorner.y), new Vector2(0, terrain.limitingCorner.y));
-            if (intersectionPoint != null) {
-                newPosition = intersectionPoint;
-            } else {
-                newPosition = state.position;
-            }
-        } else if (newPosition.y < terrain.startingCorner.y) {
-            reverseY = true;
-            Vector2 intersectionPoint = UtilityClass.findLineIntersection(state.position, newPosition,
-                    new Vector2(0, terrain.startingCorner.y), new Vector2(0, terrain.startingCorner.y));
-            if (intersectionPoint != null) {
-                newPosition = intersectionPoint;
-            } else {
-                newPosition = state.position;
-            }
-        }
-        // Reverse the velocity if needed
-        if (reverseX) {
-            state.velocity.x = -state.velocity.x;
-        }
-        if (reverseY) {
-            state.velocity.y = -state.velocity.y;
-        }
-        return newPosition;
-    }
-
-    private Vector2 countNewVelocity(Ball ball) {
-        Vector2 newVelocity = ball.state.velocity.copy();
-        Vector2 ballPosition = ball.state.position;
-        double xSlope = getXSlopeAt(ballPosition.x, ballPosition.y);
-        double ySlope = getYSlopeAt(ballPosition.x, ballPosition.y);
-
-        // Check if in water
-        if (terrain.terrainFunction.valueAt(ball.state.position.x, ball.state.position.y) <= 0) {
-            return Vector2.zeroVector;
-        }
-
-        double kineticFriction = getKineticFrictionAtPosition(ball.state.position);
-
-        double xAcceleration = 0, yAcceleration = 0;
-
-        boolean ballInMotion = newVelocity.length() > h;
-
-        // Set velocity to max speed if too big
-        clampBallVelocity(newVelocity);
-        Vector2 slope = new Vector2(xSlope, ySlope);
-
-        if (ballInMotion) {
-            xAcceleration = xAcceleration(slope, ball.state.velocity, kineticFriction);
-            yAcceleration = yAcceleration(slope, ball.state.velocity, kineticFriction);
-        } else {
-            // Stop the ball first
-            newVelocity = Vector2.zeroVector;
-
-            double staticFriction = getStaticFrictionAtPosition(ball.state.position);
-            boolean staticFrictionLessThanDownwardForce = staticFriction < slope.length();
-
-            if (staticFrictionLessThanDownwardForce) {
-                xAcceleration = xAcceleration(slope, slope, kineticFriction);
-                yAcceleration = yAcceleration(slope, slope, kineticFriction);
-            } else {
-                xAcceleration = 0;
-                yAcceleration = 0;
-            }
-        }
-
-        newVelocity.translate(new Vector2(h * xAcceleration, h * yAcceleration));
-
-        // Set velocity to max speed if too big
-        clampBallVelocity(newVelocity);
-
-        return newVelocity;
+        return false;
     }
 
     /**
@@ -208,7 +73,7 @@ public class PhysicsEngine {
      * @param y The y coordinate
      * @return The derivative value
      */
-    private double getXSlopeAt(double x, double y) {
+    double getXSlopeAt(double x, double y, Terrain terrain) {
         double functionValue = terrain.terrainFunction.valueAt(x, y);
         if (functionValue > 10 || functionValue < -10) {
             return 0;
@@ -223,7 +88,7 @@ public class PhysicsEngine {
      * @param y THe y coordinate
      * @return The derivative value
      */
-    private double getYSlopeAt(double x, double y) {
+    protected double getYSlopeAt(double x, double y, Terrain terrain) {
         double functionValue = terrain.terrainFunction.valueAt(x, y);
         if (functionValue > 10 || functionValue < -10) {
             return 0;
@@ -237,7 +102,7 @@ public class PhysicsEngine {
      * @param position The position to check
      * @return The kinetic friction value
      */
-    private double getKineticFrictionAtPosition(Vector2 position) {
+    protected double getKineticFrictionAtPosition(Vector2 position, Terrain terrain) {
         double friction = terrain.kineticFriction;
         for (Zone zone : terrain.zones) {
             if (zone.isPositionInside(position)) {
@@ -252,7 +117,7 @@ public class PhysicsEngine {
      * @param position The position to check
      * @return The static friction value
      */
-    private double getStaticFrictionAtPosition(Vector2 position) {
+    protected double getStaticFrictionAtPosition(Vector2 position, Terrain terrain) {
         double friction = terrain.staticFriction;
         for (Zone zone : terrain.zones) {
             if (zone.isPositionInside(position)) {
@@ -269,7 +134,7 @@ public class PhysicsEngine {
      * @param friction The friction to use
      * @return The x-acceleration value
      */
-    private double xAcceleration(Vector2 slope, Vector2 speed, double friction) {
+    protected double xAcceleration(Vector2 slope, Vector2 speed, double friction) {
         double downHillForce = -G * slope.x;
         double frictionForce = G * friction * speed.x / speed.length();
         return (downHillForce - frictionForce);
@@ -282,29 +147,186 @@ public class PhysicsEngine {
      * @param friction The friction to use
      * @return The y-acceleration value
      */
-    private double yAcceleration(Vector2 slope, Vector2 speed, double friction) {
+    protected double yAcceleration(Vector2 slope, Vector2 speed, double friction) {
         double downHillForce = -G * slope.y;
         double frictionForce = G * friction * speed.y / speed.length();
         return (downHillForce - frictionForce);
     }
 
-    private void clampBallVelocity(Vector2 velocity) {
-        if (velocity.length() > Ball.maxSpeed) {
-            velocity = velocity.normalized().scale(Ball.maxSpeed);
+    protected BallState handleCollisions(BallState oldState, BallState newState, Terrain terrain) {
+        BallState state = newState.copy();
+        // Check for collision
+        if (isTouchingAnObstacle(state.position, terrain)) {
+            state.position = oldState.position.copy();
+            //System.out.println("1");
+            state.velocity = Vector2.zeroVector.copy();
+        }
+        // Check for out of bounds
+        // On x-axis
+        boolean reverseX = false;
+        if (state.position.x > terrain.limitingCorner.x || state.position.x < terrain.startingCorner.x) {
+            reverseX = true;
+            state.position = oldState.position.copy();
+            //state.velocity = Vector2.zeroVector.copy();
+            //System.out.println("2");
+        }
+        // On y-axis
+        boolean reverseY = false;
+        if (state.position.y > terrain.limitingCorner.y || state.position.y < terrain.startingCorner.y) {
+            reverseY = true;
+            state.position = oldState.position.copy();
+            //state.velocity = Vector2.zeroVector.copy();
+            //System.out.println("3");
+        }
+        // Reverse the velocity if needed
+        if (reverseX) {
+            state.velocity.x = -state.velocity.x;
+            state.velocity.scale(0.5);
+        }
+        if (reverseY) {
+            state.velocity.y = -state.velocity.y;
+            state.velocity.scale(0.5);
+        }
+        return state;
+    }
+
+    /**
+     * Tests a physics engine
+     * Creates a .csv file storing lines in the form:
+     *     - h, error, log10(h), log10(error)
+     * @param engine The engine to test
+     * @param minH The starting h (step size)
+     * @param maxH The final h (step size)
+     * @param numTests The number of tests to do between minH and maxH
+     * @param expectedResult The expected final position of the shot
+     * @param ballStart The starting position of the ball
+     * @param initialSpeed The initial velocity of the ball
+     */
+    public static void testEngine(PhysicsEngine engine, double minH, double maxH, int numTests, Vector2 expectedResult, Vector2 ballStart, Vector2 initialSpeed, Terrain terrain) {
+        try {
+            File f = new File("src/physics/results/results-"+engine.getClass().getName()+"-"+System.nanoTime()+".csv");
+            FileWriter fw = new FileWriter(f);
+            Ball ball = new Ball(ballStart.copy(), Vector2.zeroVector.copy());
+            for (double h=minH; h<maxH; h+=(maxH-minH)/numTests) {
+                engine.h = h;
+                ArrayList<Vector2> positions = engine.simulateShot(initialSpeed.copy(), ball, terrain);
+                Vector2 result = positions.get(positions.size()-1);
+                double error = expectedResult.copy().translate(result.copy().scale(-1)).length();
+                fw.append(h+", "+error+", "+Math.log10(h)+", "+Math.log10(error)+"\n");
+                ball.state.position = ballStart.copy();
+                System.out.println(h+", x="+result.x+", y="+result.y);
+            }
+            fw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Tests a physics engine for a given step size.
+     * This can only be used if the acceleration is constant.
+     * Creates a .csv file storing lines in the form:
+     *     - t, xA(t), yA(t), x(t), y(t)
+     *
+     * - xA(t) -> The actual value of x at time t
+     * - yA(t) -> The actual value of y at time t
+     * - x(t) -> The found value of x at time t
+     * - y(t) -> The found value of y at time t
+     *
+     * Example:
+     *     - xA(t) = xActual[0] if t >= 0 & t < tSplit[0]
+     *               xActual[1] if t >= tSplit[0] & t < tSplit[1]
+     *               ...
+     *               xActual[n] if t >= tSplit[n-1]
+     *
+     * <Same for yA(t)>
+     *
+     * @param engine The engine to test
+     * @param h The step size to be used
+     * @param p0 The starting position of the ball
+     * @param v0 The initial speed of the ball
+     * @param xActual The string representations of the actual x function parts
+     * @param yActual The string representations of the actual y function parts
+     * @param tSplit The values of t for which the functions get split (must be in ascending order)
+     * @param a The constant acceleration of the system
+     */
+    public static void testEngine(PhysicsEngine engine, double h, Vector2 p0, Vector2 v0, String xActual[], String yActual[], double[] tSplit, Vector2 a, Terrain terrain) {
+        if (xActual.length != yActual.length || xActual.length != tSplit.length+1) {
+            throw new RuntimeException("Wrong number of functions or t splits.");
+        }
+        try {
+            File f = new File("src/physics/results/results-"+engine.getClass().getName()+"-"+System.nanoTime()+".csv");
+            FileWriter fw = new FileWriter(f);
+            Ball ball = new Ball(p0.copy(), Vector2.zeroVector.copy());
+            engine.h = h;
+            Function[] yAs = new Function[yActual.length];
+            Function[] xAs = new Function[xActual.length];
+            for (int i=0; i<yActual.length; i++) {
+                xAs[i] = new Function(xActual[i]);
+                yAs[i] = new Function(yActual[i]);
+            }
+            ArrayList<Vector2> positions = engine.simulateShot(v0.copy(), ball, terrain);
+            for (int i=0; i<positions.size(); i++) {
+                Vector2 position = positions.get(i);
+                double t = h*i;
+                double x = position.x;
+                double y = position.y;
+                // Find where the t belongs in tSplit
+                int pos = 0;
+                for (int j=1; j<=tSplit.length; j++) {
+                    if (tSplit[pos] > t) {
+                        break;
+                    }
+                    pos = j;
+                }
+                Function yA = yAs[pos];
+                Function xA = xAs[pos];
 
+                double xValActual = xA.evaluate(new String[] {"t", "vx0", "ax", "x0"}, new double[] {t, v0.x, a.x, p0.x});
+                double yValActual = yA.evaluate(new String[] {"t", "vy0", "ay", "y0"}, new double[] {t, v0.y, a.y, p0.y});
+
+                fw.append(t+", "+xValActual+", "+yValActual+", "+x+", "+y+"\n");
+            }
+            /*Vector2 result = positions.get(positions.size()-1);
+            double error = expectedResult.copy().translate(result.copy().scale(-1)).length();
+            fw.append(h+", "+error+", "+Math.log10(h)+", "+Math.log10(error)+"\n");
+            ball.state.position = ballStart.copy();
+            System.out.println(h+", x="+result.x+", y="+result.y);*/
+            fw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
-        PhysicsEngine e = new PhysicsEngine();
-        e.terrain = new Terrain("e**(-(x**2 + y**2)/40)", 0.2, 0.1, new Vector2(-10, -10), new Vector2(10, 10));
-        System.out.println(e.terrain.terrainFunction);
-        Ball ball = new Ball(new Vector2(-1, -0.5), new Vector2(1, 0));
-        e.addBall(ball);
-        LinkedList<Vector2> positions = e.simulateShot(new Vector2(3, 0), ball);
+        PhysicsEngine rk = new RungeKutta();
+        PhysicsEngine ei =  new EulerIntegration();
+        //rk.terrain = new Terrain("0", 0.2, 0.1, new Vector2(-50, -50), new Vector2(50, 50));
+        //ei.terrain = rk.terrain;
+        //rk.h = 0.09060939999999999;//0.05;//0.0493507;
+        //rk.simulateShot(new Vector2(2, 0), new Ball(new Vector2(0, 0), Vector2.zeroVector.copy()));
+        //PhysicsEngine.testEngine(ei, 0.0001, 0.1, 1000, new Vector2(0.5096839959, 0), new Vector2(0, 0), new Vector2(1, 0));
+        //PhysicsEngine.testEngine(rk, 0.0001, 0.1, 1000, new Vector2(0.5096839959, 0), new Vector2(0, 0), new Vector2(1, 0));
 
-        System.out.println("Position: (x=" + ball.state.position.x + ", y=" + ball.state.position.y + ")");
-        System.out.println("Velocity: (v(x)=" + ball.state.velocity.x + ", v(y)=" + ball.state.velocity.y + ")");
+        PhysicsEngine.testEngine(
+                rk,
+                0.05,
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new String[] {"x0 + t*(2*vx0 + ax*t)/2", "0.5096839959"},
+                new String[] {"0", "0"},
+                new double[] {1.019367992},
+                new Vector2(-0.1*9.81, 0),
+                new Terrain("0", 0.2, 0.1, new Vector2(-50, -50), new Vector2(50, 50))
+        );
+
+        //rk.terrain = new Terrain("0.1*x+1", 0.2, 0.05, new Vector2(-50, -50), new Vector2(50, 50));
+        //PhysicsEngine.testEngine(rk, 0.0001, 0.1, 1000, new Vector2(1.359157322, 0), new Vector2(0, 0), new Vector2(2, 0));
+        /*for (double h=0.001; h<1; h+=0.001) {
+            System.out.println("h="+h);
+            rk.h = h;
+            rk.simulateShot(new Vector2(1, 0), new Ball(new Vector2(0, 0), Vector2.zeroVector.copy()));
+        }*/
+        //rk.simulateShot(new Vector2(2, 0), new Ball(new Vector2(0, 0), Vector2.zeroVector.copy()));
     }
 }

@@ -4,13 +4,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import Data_storage.IObstacle;
-import Data_storage.ObstacleTree;
-import Data_storage.Target;
-import Data_storage.Terrain;
-import Data_storage.TerrainFunction1;
-import Data_storage.Vector2;
-import Data_storage.Zone;
+import Data_storage.*;
+import Physics.RungeKutta;
 
 public class Reader {
 
@@ -97,7 +92,7 @@ public class Reader {
    }
 
 
-   public static Terrain readFile() {
+   public static GameState readFile() {
 
       if (!createScanner()) {
          return null;
@@ -106,7 +101,11 @@ public class Reader {
       String[] allLinesSplit = splitLines();
       readVariables(allLinesSplit);
 
-      return saveDataIntoObject();
+      return new GameState(
+              saveDataIntoObject(),
+              new Ball(new Vector2(defx0, defy0), Vector2.zeroVector.copy()),
+              new RungeKutta()
+      );
    }
 
    /**
