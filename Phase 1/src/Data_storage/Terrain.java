@@ -165,4 +165,21 @@ public class Terrain {
         }
         target.print();
     }
+
+    public double[][] getMap(int resolution){
+        double[][] map = new double[resolution][resolution];
+        //We add half a tile, to get a height value at the center of each square
+        double halfTileOffset = resolution/2;
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[y].length; x++) {
+                double value = terrainFunction.valueAt(x + halfTileOffset, y + halfTileOffset);
+                if(value > 0){
+                    map[y][x] = 1;
+                }else{
+                    map[y][x] = -1;
+                }
+            }
+        }
+        return map;
+    }
 }

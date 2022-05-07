@@ -6,11 +6,13 @@ public class AStar {
 
     public static void main(String[] args) {
         double[][] map = {
-            {1, 1,-1, 1},
-            {1, 1,-1, 1},
-            {1,-1,-1, 1},
-            {1, 1, 1, 1}};
-            AStar aStar = new AStar(map, 3, 3);
+            { 1, 1, 1, 1, 1, 1},
+            { 1,-1, 1,-1,-1, 1 },
+            { 1,-1,-1, 1,-1, 1 },
+            { 1, 1, 1, 1,-1, 1 },
+            { 1, 1,-1,-1,-1, 1 },
+            { 1, 1, 1, 1, 1, 1 },};
+            AStar aStar = new AStar(map, 5, 5);
             double distance = aStar.getPositionDistance(0, 0);
             System.out.println(distance);
     }
@@ -31,6 +33,8 @@ public class AStar {
     
     private Node originNode;
     private Node targetNode;
+
+    private boolean doDebugMessages = true;
     
     //These 2 methods shall be called before the first call of "getPositionDistance"
     public void setMap(double[][] newMap){
@@ -76,6 +80,14 @@ public class AStar {
         while (!foundPath) {
             createSorroundingNodes(currentNode, createdNodes, uncheckedNodes);
             currentNode = findNodeWithLowestValue(uncheckedNodes);
+
+            if (doDebugMessages) {
+                System.out.println(currentNode);
+            }
+            if (currentNode == null) {
+                return -1;
+                //This means that there exists no path to the target
+            }
             uncheckedNodes.remove(currentNode);
 
             if (currentNode.equals(targetNode)) {
@@ -140,10 +152,20 @@ public class AStar {
     }
 
     private Node findNodeWithLowestValue(LinkedList<Node> createdNodes){
+        if (createdNodes.size() == 0) {
+            return null;
+        }
+
         Node nodeWithLowestValue = createdNodes.getFirst();
         for (Node node : createdNodes) {
             if (node.nodeValue < nodeWithLowestValue.nodeValue) {
                 nodeWithLowestValue = node;
+                continue;
+            }
+            if (node.nodeValue == nodeWithLowestValue.nodeValue) {
+                if (node.distanceToTarget < nodeWithLowestValue.distanceToTarget) {
+                    nodeWithLowestValue = node;
+                }
             }
         }
         return nodeWithLowestValue;
