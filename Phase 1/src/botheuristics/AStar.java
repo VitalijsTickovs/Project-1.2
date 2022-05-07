@@ -2,6 +2,7 @@ package botheuristics;
 
 import java.util.LinkedList;
 
+import Data_storage.Ball;
 import Data_storage.Terrain;
 
 public class AStar {
@@ -12,9 +13,12 @@ public class AStar {
      * @param targetY
      */
     public AStar(Terrain terrain){
+        checkForNullTerrain();
+
+        this.terrain = terrain;
         setMap(terrain.getMap());
         setTarget(terrain);
-        checkForNullValues();
+        checkForNullMapAndTarget();
     }
     
     private double[][] map;
@@ -23,25 +27,42 @@ public class AStar {
     private Node targetNode;
 
     private boolean doDebugMessages = true;
+    private Terrain terrain;
     
     //These 2 methods shall be called before the first call of "getPositionDistance"
-    public void setMap(double[][] newMap){
+    private void setMap(double[][] newMap){
         map = newMap;
     }
     
-    public void setTarget(Terrain terrain){
-    int targetX = (int) (terrain.target.position.x * terrain.SQUARES_PER_GAME_UNIT);
-    int targetY = (int) (terrain.target.position.y * terrain.SQUARES_PER_GAME_UNIT);
-        targetNode = new Node(targetX, targetY);
+    private void setTarget(Terrain terrain){
+        int gridXPosition = translateToGridPosition(terrain.target.position.x);
+        int gridYPosition = translateToGridPosition(terrain.target.position.y);
+        targetNode = new Node(gridXPosition, gridYPosition);
     }
-    
-    public double getPositionDistance(int originXPosition, int originYPosition){
-        checkForNullValues();
+
+    public double getDistanceToTarget(Ball ball){
+        checkForNullBall(ball);
+        checkForNullMapAndTarget();
+
+        int originXPosition = translateToGridPosition(ball.state.position.x);
+        int originYPosition = translateToGridPosition(ball.state.position.y);
         setupSearch(originXPosition, originYPosition);
         return aStarPathfinding(originXPosition, originYPosition);
     }
+
+    private void checkForNullBall(Ball ball){
+        if (ball == null){
+            throw new NullPointerException("Ball was null");
+        }
+    }
+
+    private void checkForNullTerrain(){
+        if (terrain == null) {
+            throw new NullPointerException("Terrain was null");
+        }
+    }
     
-    private void checkForNullValues(){
+    private void checkForNullMapAndTarget(){
         if (map == null) {
             throw new NullPointerException("Map instance was null");
         }
@@ -57,6 +78,13 @@ public class AStar {
         originNode.setOrigin(originNode);
         targetNode.setTarget(targetNode);
         targetNode.setOrigin(originNode);
+    }
+
+    /**
+     * @return a game unit position translated into a grid position used by the pathfinding algorithm
+     */
+    private int translateToGridPosition(double axisPosition){
+        return (int) (terrain.target.position.x * terrain.SQUARES_PER_GAME_UNIT);
     }
 
     private double aStarPathfinding(int originXPosition, int originYPosition){

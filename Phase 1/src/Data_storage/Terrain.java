@@ -34,6 +34,7 @@ public class Terrain {
     //The map's size is calculated the "topLeftCorner" and "bottomRightCorner" vectors
 
     public Terrain(){
+
     }
 
     public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner, Vector2 limitingCorner) {
