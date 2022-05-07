@@ -15,6 +15,10 @@ import GUI.ShotInputWindow;
 import Physics.PhysicsEngine;
 import Physics.RungeKutta;
 import Reader.*;
+import bot.Bot;
+import bot.ClosestEuclidianDistanceHeuristic;
+import bot.FinalEuclidianDistanceHeuristic;
+import bot.HillClimbingBot;
 
 public class Game extends Canvas implements Runnable, GameObject {
     public JFrame frame;
@@ -29,12 +33,21 @@ public class Game extends Canvas implements Runnable, GameObject {
     private Camera cam;
     private ShotInputWindow shotInputWindow;
     private GameState gameState;
+    private Bot bot;
+    private Thread botThread;
 
     // region Startup
     /**
      * @param fps The target FPS (frames per second) of the game
      */
     public Game(int fps) {
+        bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.1);
+        botThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                shotVector = bot.findBestShot(gameState);
+            }
+        });
         FPS = fps;
         resetStartingVariables();
         createInputWindow();
@@ -63,8 +76,8 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void createCamera() {
         cam = new Camera();
-        cam.width = 75;
-        cam.height = 75;
+        cam.width = 25;
+        cam.height = 25;
         cam.x = gameState.getBall().state.position.x;
         cam.y = gameState.getBall().state.position.y;
     }
@@ -75,7 +88,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         renderer.terrain = gameState.getTerrain();
         renderer.cam = cam;
         renderer.ball = gameState.getBall();
-        renderer.unitSizePixels = 10;
+        renderer.unitSizePixels = 20;
         renderer.createTerrainImage();
     }
 
@@ -161,7 +174,13 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void handleOpenWindow() {
         if (isSimulationFinished()) {
-            shotInputWindow.openWindow();
+            if (bot == null) {
+                shotInputWindow.openWindow();
+            } else {
+                if (!botThread.isAlive()) {
+                    botThread.start();
+                }
+            }
         }
     }
 
@@ -170,7 +189,7 @@ public class Game extends Canvas implements Runnable, GameObject {
      */
     private boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
-        boolean inputWindowClosed = !shotInputWindow.isOpen;
+        boolean inputWindowClosed = (bot != null && !botThread.isAlive()) || (bot == null && !shotInputWindow.isOpen);
         boolean ballHasBeenPushed = shotVector == null;
         return ballHasBeenPushed && inputWindowClosed && ballStopped;
     }

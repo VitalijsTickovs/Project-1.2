@@ -2,30 +2,13 @@ terrainX0 = -50;
 terrainY0 = -50;
 terrainX1 = 50;
 terrainY1 = 50;
-greenKineticFriction = 0.1;
+greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
-terrainFunction = sin(y/10) + sin(x/10) + 2);
+terrainFunction = 0.4*(0.9-e**(-(x*x + y*y)/8));
 
-ballStartPointX = -1;
-ballStartPointY = -0.5;
+ballStartPointX = -3;
+ballStartPointY = 0;
 
-targetRadius = 1;
-targetX = 1.5;
-targetY = 5;
-
-//Sand pit data
-sandZoneX = -10<x<10.1;
-sandZoneY = 12.78<y<20;
-sandKineticFriction = 0.25;
-sandStaticFriction = 0.3;
-
-sandZoneX = -20<x<3;
-sandZoneY = 0.1<y<12.5;
-sandKineticFriction = 0.35;
-sandStaticFriction = 0.4;
-
-//Tree data
-treeRadius = 4;
-treeX = -5;
-treeY = 0;
-treeBounciness = 0.55;
+targetRadius = 0.15;
+targetX = 4;
+targetY = 1;

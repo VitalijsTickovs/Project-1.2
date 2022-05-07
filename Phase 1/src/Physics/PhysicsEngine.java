@@ -242,50 +242,67 @@ public abstract class PhysicsEngine {
      * <Same for yA(t)>
      *
      * @param engine The engine to test
-     * @param h The step size to be used
+     * @param hStart The smallest step size to use
+     * @param hEnd The largest step size to use
+     * @param hNum The total number of step sizes to test
+     * @param numSteps The number of steps to take for simulation
      * @param p0 The starting position of the ball
      * @param v0 The initial speed of the ball
      * @param xActual The string representations of the actual x function parts
      * @param yActual The string representations of the actual y function parts
      * @param tSplit The values of t for which the functions get split (must be in ascending order)
      * @param a The constant acceleration of the system
+     * @param terrain The terrain to use
      */
-    public static void testEngine(PhysicsEngine engine, double h, Vector2 p0, Vector2 v0, String xActual[], String yActual[], double[] tSplit, Vector2 a, Terrain terrain) {
+    public static void testEngine(PhysicsEngine engine, double hStart, double hEnd, double hNum, int numSteps, Vector2 p0, Vector2 v0, String xActual[], String yActual[], double[] tSplit, Vector2 a, Terrain terrain) {
         if (xActual.length != yActual.length || xActual.length != tSplit.length+1) {
             throw new RuntimeException("Wrong number of functions or t splits.");
         }
         try {
-            File f = new File("src/physics/results/results-"+engine.getClass().getName()+"-"+System.nanoTime()+".csv");
+            File f = new File("Phase 1/src/Physics/results/results-"+engine.getClass().getName()+"-"+System.nanoTime()+".csv");
             FileWriter fw = new FileWriter(f);
-            Ball ball = new Ball(p0.copy(), Vector2.zeroVector.copy());
-            engine.h = h;
-            Function[] yAs = new Function[yActual.length];
-            Function[] xAs = new Function[xActual.length];
-            for (int i=0; i<yActual.length; i++) {
-                xAs[i] = new Function(xActual[i]);
-                yAs[i] = new Function(yActual[i]);
-            }
-            ArrayList<Vector2> positions = engine.simulateShot(v0.copy(), ball, terrain);
-            for (int i=0; i<positions.size(); i++) {
-                Vector2 position = positions.get(i);
-                double t = h*i;
-                double x = position.x;
-                double y = position.y;
-                // Find where the t belongs in tSplit
-                int pos = 0;
-                for (int j=1; j<=tSplit.length; j++) {
-                    if (tSplit[pos] > t) {
+            for (double h = hStart; h<=hEnd; h+=(hEnd-hStart)/hNum) {
+                Ball ball = new Ball(p0.copy(), Vector2.zeroVector.copy());
+                engine.h = h;
+                Function[] yAs = new Function[yActual.length];
+                Function[] xAs = new Function[xActual.length];
+                for (int i=0; i<yActual.length; i++) {
+                    xAs[i] = new Function(xActual[i]);
+                    yAs[i] = new Function(yActual[i]);
+                }
+                ArrayList<Vector2> positions = engine.simulateShot(v0.copy(), ball, terrain);
+                for (int i=0; i<positions.size(); i++) {
+                    double t = h * i;
+                    if (i == numSteps) {
+                        Vector2 position = positions.get(i);
+                        double x = position.x;
+                        double y = position.y;
+                        // Find where the t belongs in tSplit
+                        int pos = 0;
+                        for (int j = 1; j <= tSplit.length; j++) {
+                            if (tSplit[pos] > t) {
+                                break;
+                            }
+                            pos = j;
+                        }
+                        Function yA = yAs[pos];
+                        Function xA = xAs[pos];
+
+                        double xValActual = xA.evaluate(new String[]{"t", "vx0", "ax", "x0"}, new double[]{t, v0.x, a.x, p0.x});
+                        double yValActual = yA.evaluate(new String[]{"t", "vy0", "ay", "y0"}, new double[]{t, v0.y, a.y, p0.y});
+
+                        double xError = xValActual - x;
+                        double yError = yValActual - y;
+
+                        double error = Math.sqrt(xError*xError + yError*yError);
+
+                        System.out.println(x);
+
+                        fw.append(h + ", " + xValActual + ", " + yValActual + ", " + x + ", " + y + ", " + error + "\n");
+
                         break;
                     }
-                    pos = j;
                 }
-                Function yA = yAs[pos];
-                Function xA = xAs[pos];
-
-                double xValActual = xA.evaluate(new String[] {"t", "vx0", "ax", "x0"}, new double[] {t, v0.x, a.x, p0.x});
-                double yValActual = yA.evaluate(new String[] {"t", "vy0", "ay", "y0"}, new double[] {t, v0.y, a.y, p0.y});
-
-                fw.append(t+", "+xValActual+", "+yValActual+", "+x+", "+y+"\n");
             }
             /*Vector2 result = positions.get(positions.size()-1);
             double error = expectedResult.copy().translate(result.copy().scale(-1)).length();
@@ -310,7 +327,10 @@ public abstract class PhysicsEngine {
 
         PhysicsEngine.testEngine(
                 rk,
-                0.05,
+                0.0001,
+                0.1,
+                1000,
+                10,
                 new Vector2(0, 0),
                 new Vector2(1, 0),
                 new String[] {"x0 + t*(2*vx0 + ax*t)/2", "0.5096839959"},
