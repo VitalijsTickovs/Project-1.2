@@ -300,6 +300,24 @@ public class AStar {
         }
     }
 
+    /**
+     * Prints the map such that all obstacles are coded as {@code x} and walkable tiles as {@code o}
+     */
+    public void printMap(){
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                if (map[i][j] == -1) {
+                    //Tile blocked
+                    System.out.print("x");
+                }else{
+                    //Tile walkable
+                    System.out.print("o");
+                }
+            }
+            System.out.println();
+        }
+    }
+
     //region Generate Grid from Terrain
     public double[][] getMap() {
         double[][] map = createEmptyMap();
