@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import Data_storage.Ball;
 import Data_storage.Terrain;
+import Data_storage.Vector2;
 
 public class AStar {
     /**
@@ -14,7 +15,7 @@ public class AStar {
         checkForNullTerrain();
 
         this.terrain = terrain;
-        setMap(terrain.getMap());
+        setMap(getMap());
         setTarget(terrain);
         checkForNullMapAndTarget();
     }
@@ -271,4 +272,53 @@ public class AStar {
             return xPositionEquals && yPositionEquals;
         }
     }
+
+    //region Generate Grid from Terrain
+    public double[][] getMap() {
+        double[][] map = createEmptyMap();
+        // We add half a tile, to get a height value at the center of each square
+        double halfTileOffset = (1d / (double) terrain.SQUARES_PER_GAME_UNIT) / 2d;
+
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[y].length; x++) {
+
+                double value = terrain.terrainFunction.valueAt(x + halfTileOffset, y + halfTileOffset);
+                boolean cannotGoHere = value <= 0 || !terrain.isPointInObstacle(translateGridPositionIntoGameUnits(x, y));
+                if (cannotGoHere) {
+                    map[y][x] = -1; // This value signifies an unpassable obstacle
+                    continue;
+                }
+                map[y][x] = 1;
+            }
+        }
+        return map;
+    }
+
+    private double[][] createEmptyMap() {
+        int xSquares = (int) getTerrainWidth() * terrain.SQUARES_PER_GAME_UNIT;
+        int ySquares = (int) getTerrainHeight() * terrain.SQUARES_PER_GAME_UNIT;
+        double[][] map = new double[ySquares][xSquares];
+        return map;
+    }
+
+    private Vector2 translateGridPositionIntoGameUnits(int xPos, int yPos) {
+        double newX = (double) xPos / (double) terrain.SQUARES_PER_GAME_UNIT;
+        double newY = (double) yPos / (double) terrain.SQUARES_PER_GAME_UNIT;
+        return new Vector2(newX, newY);
+    }
+
+    /**
+     * @return terrain width in game units
+     */
+    public double getTerrainWidth() {
+        return Math.abs(terrain.bottomRightCorner.x - terrain.topLeftCorner.x);
+    }
+
+    /**
+     * @return terrain height in game units
+     */
+    public double getTerrainHeight() {
+        return Math.abs(terrain.bottomRightCorner.y - terrain.topLeftCorner.y);
+    }
+    //endregion
 }
