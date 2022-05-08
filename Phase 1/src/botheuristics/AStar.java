@@ -8,8 +8,8 @@ import Data_storage.Vector2;
 
 public class AStar {
     /**
-     * Instantiate a new class for each new Terrain.
-     * Only call the "getDistanceToTarget" method for heuristic purposes
+     * Instantiate a new class for each new {@code Terrain}.
+     * Only call the {@code getDistanceToTarget} method for heuristic purposes
      */
     public AStar(Terrain terrain){
         checkForNullTerrain();
@@ -33,11 +33,20 @@ public class AStar {
     }
     
     private void setTarget(Terrain terrain){
+        if (terrain.target == null) {
+            throw new NullPointerException("Target was null");
+        }
+
         int gridXPosition = translateToGridPosition(terrain.target.position.x);
         int gridYPosition = translateToGridPosition(terrain.target.position.y);
         targetNode = new Node(gridXPosition, gridYPosition);
     }
 
+    /**
+     * @param ball the ball to check its distance from the target
+     * @return the {@code length} of the shortest path from the ball to the target while avoiding water and obstacles.
+     * Returns {@code -1} if an unobstructed path does not exist
+     */
     public double getDistanceToTarget(Ball ball){
         checkForNullBall(ball);
         checkForNullMapAndTarget();
@@ -45,7 +54,7 @@ public class AStar {
         int originXPosition = translateToGridPosition(ball.state.position.x);
         int originYPosition = translateToGridPosition(ball.state.position.y);
         setupSearch(originXPosition, originYPosition);
-        return aStarPathfinding(originXPosition, originYPosition);
+        return aStarPathfinding();
     }
 
     private void checkForNullBall(Ball ball){
@@ -85,7 +94,11 @@ public class AStar {
         return (int) (terrain.target.position.x * terrain.SQUARES_PER_GAME_UNIT);
     }
 
-    private double aStarPathfinding(int originXPosition, int originYPosition){
+    /**
+     * @return the {@code length} of the shortest path from the ball to the target while avoiding water and obstacles.
+     * Returns {@code -1} if an unobstructed path does not exist.
+     */
+    private double aStarPathfinding(){
         LinkedList<Node> createdNodes = new LinkedList<>();
         LinkedList<Node> uncheckedNodes = new LinkedList<>();
         createdNodes.add(originNode);
@@ -101,8 +114,8 @@ public class AStar {
                 System.out.println(currentNode);
             }
             if (currentNode == null) {
-                return -1;
                 //This means that there exists no path to the target
+                return -1;
             }
             uncheckedNodes.remove(currentNode);
 
@@ -167,13 +180,19 @@ public class AStar {
         return null;
     }
 
-    private Node findNodeWithLowestValue(LinkedList<Node> createdNodes){
-        if (createdNodes.size() == 0) {
+    /**
+     * 
+     * @param uncheckedNodes the list containing all created but yet unchecked {@code Nodes}
+     * @return a {@code Node} from the list with the lowest {@code nodeValue} or {@code null} if the list was empty.
+     * When the list is empty, it means that there exists no path that would not pass through an obstacle
+     */
+    private Node findNodeWithLowestValue(LinkedList<Node> uncheckedNodes){
+        if (uncheckedNodes.size() == 0) {
             return null;
         }
 
-        Node nodeWithLowestValue = createdNodes.getFirst();
-        for (Node node : createdNodes) {
+        Node nodeWithLowestValue = uncheckedNodes.getFirst();
+        for (Node node : uncheckedNodes) {
             if (node.nodeValue < nodeWithLowestValue.nodeValue) {
                 nodeWithLowestValue = node;
                 continue;
@@ -224,8 +243,16 @@ public class AStar {
 
         private double distanceToTarget;
         private double distanceToOrigin;
+        /**
+         * Cost of entering this node taken from the grid map generated using the
+         * {@code Terrain}'s {@code terrainFunction}
+         */
         private double costToEnter;
 
+        /**
+         * The sum of {@code distanceToOrigin}, {@code distanceToTarget} and
+         * {@code costToEnter}.
+         */
         public double nodeValue;
 
         public double distanceToNode(Node node){
