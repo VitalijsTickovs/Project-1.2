@@ -6,35 +6,54 @@ greenKineticFriction = 0.1;
 greenStaticFriction = 0.2;
 terrainFunction = 5;
 
-ballStartPointX = -20;
-ballStartPointY = -10;
+ballStartPointX = -5;
+ballStartPointY = 8;
 
 targetRadius = 1;
 targetX = 1.5;
 targetY = 5;
 
 //Sand pit data
-sandZoneX = -10<x<10.1;
-sandZoneY = 12.78<y<20;
-sandKineticFriction = 0.35;
-sandStaticFriction = 0.4;
-
-sandZoneX = -20<x<3;
-sandZoneY = 0.1<y<12.5;
-sandKineticFriction = 0.35;
+sandZoneX = 10<x<10.1;
+sandZoneY = 12.78<y<30;
+sandKineticFriction = 0.25;
 sandStaticFriction = 0.4;
 
 //Tree data
 treeRadius = 4;
 treeX = -5;
 treeY = 0;
-treeBounciness = 0.55;
+treeBounciness = 0.95;
 
 //Tree data
 treeRadius = 4;
 treeX = -5;
 treeY = -8;
-treeBounciness = 0.55;
+treeBounciness = 0.95;
+
+//Tree data
+treeRadius = 4;
+treeX = -5;
+treeY = -8;
+treeBounciness = 0.95;
+
+//Tree data
+treeRadius = 3;
+treeX = -10;
+treeY = -6;
+treeBounciness = 0.95;
+
+//Tree data
+treeRadius = 5;
+treeX = 10;
+treeY = 6.5;
+treeBounciness = 0.95;
+
+//Tree data
+treeRadius = 5;
+treeX = -22;
+treeY = 4.5;
+treeBounciness = 0.95;
 
 //Box data
 boxX = 5<x<18;;

@@ -12,6 +12,7 @@ import GUI.InterfaceFactory;
 import GUI.ShotInputWindow;
 import Physics.PhysicsEngine;
 import Reader.*;
+import botheuristics.AStar;
 
 public class Game extends Canvas implements Runnable, GameObject {
     public JFrame frame;

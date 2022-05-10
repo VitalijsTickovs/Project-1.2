@@ -36,9 +36,9 @@ public class ObstacleTree extends Circle implements IObstacle {
         collisionData.collisionPosition = closestCollisionPoint;
         
         collisionData.bounciness = bounciness;
-        collisionData.collisionNormal = getNormal(closestCollisionPoint).getPerpendicularVector();
+        collisionData.collisionNormal = getNormal(closestCollisionPoint);
 
-        collisionData.ballRadius = ballRadius;
+        collisionData.ballRadius = 0;
         collisionData.previousPosition = previousPosition;
 
         return collisionData;
@@ -58,7 +58,8 @@ public class ObstacleTree extends Circle implements IObstacle {
             return null; 
         }
 
-        Vector2 deltaPositionToCollisionPoint = previousPosition.translated(collisionsWithLine.get(0).reversed()).normalize().scale(ballRadius).reverse();
+        // Vector2 deltaPositionToCollisionPoint = previousPosition.translated(collisionsWithLine.get(0).reversed()).normalize().scale(ballRadius).reverse();
+        Vector2 deltaPositionToCollisionPoint = Vector2.zeroVector();
         Vector2[] collisionPoints = new Vector2[2];
         collisionPoints[0] = collisionsWithLine.get(0).translated(deltaPositionToCollisionPoint);
         collisionPoints[1] = collisionsWithLine.get(1).translated(deltaPositionToCollisionPoint);
