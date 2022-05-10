@@ -41,7 +41,7 @@ public class Game extends Canvas implements Runnable, GameObject {
      * @param fps The target FPS (frames per second) of the game
      */
     public Game(int fps) {
-        bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.1);
+        bot = new HillClimbingBot(new ClosestEuclidianDistanceHeuristic(), 0.01, 8);
         botThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -177,11 +177,20 @@ public class Game extends Canvas implements Runnable, GameObject {
             if (bot == null) {
                 shotInputWindow.openWindow();
             } else {
-                if (!botThread.isAlive()) {
-                    botThread.start();
-                }
+                botThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        shotVector = bot.findBestShot(gameState);
+                    }
+                });
+                botThread.start();
             }
         }
+    }
+
+    private boolean hasReachedTarget() {
+        double distance = gameState.getBall().state.position.copy().translate(gameState.getTerrain().target.position.copy().scale(-1)).length();
+        return distance <= gameState.getTerrain().target.radius;
     }
 
     /**
@@ -205,7 +214,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     private boolean shouldPushBall() {
         boolean ballStopped = ballPositions.size() == 0;
         boolean ballHasNotBeenPushed = shotVector != null;
-        return ballStopped && ballHasNotBeenPushed;
+        return ballStopped && ballHasNotBeenPushed && !hasReachedTarget();
     }
 
     private void moveBall() {

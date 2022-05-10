@@ -9,14 +9,12 @@ import function.Function;
 
 public abstract class PhysicsEngine {
 
-    public boolean testing = false;
-
     public double h = 0.01; // The step of the Euler's method
     public final double G = 9.81;
 
     /**
      * Simulates a shot and stores the positions until the ball stops
-     * @param initialSpeed The inital speed of the ball
+     * @param initialSpeed The initial speed of the ball
      * @param ball The ball to shoot
      * @param terrain The terrain to shoot the ball on
      * @return ArrayList containing ball positions throughout the shot
@@ -27,22 +25,12 @@ public abstract class PhysicsEngine {
         tempBall.state.velocity = initialSpeed.copy();
         // Add the initial position
         coordinates.add(tempBall.state.position.copy());
+
         do {
             tempBall.state = countNewBallState(tempBall, terrain);
             coordinates.add(tempBall.state.position.copy());
-            //System.out.println("p="+ball.state.position+" v="+ball.state.velocity);
-            /*try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
-        } while (
-                tempBall.state.velocity.length() != 0 /*||
-            new Vector2(
-                getXSlopeAt(ball.state.position.x, ball.state.position.y),
-                getYSlopeAt(ball.state.position.y, ball.state.position.y)
-            ).length() > getStaticFrictionAtPosition(ball.state.position)*/
-        );
+        } while (tempBall.state.velocity.length() != 0);
+
         return coordinates;
     }
 

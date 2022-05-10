@@ -148,7 +148,7 @@ public class EulerIntegration extends PhysicsEngine {
             }
         }*/
         Vector2 tempVelocity = newState.velocity.copy().translate(update.acceleration.copy().scale(h));
-        if (stop && Vector2.dotProduct(tempVelocity, newState.velocity) <= 0 || update.velocity.length() == 0) {
+        if (stop && Vector2.dotProduct(tempVelocity, newState.velocity) <= 0 || update.velocity.length() < h) {
             //if (stop) {
             newState.velocity = Vector2.zeroVector.copy();
             //} else {
@@ -158,14 +158,14 @@ public class EulerIntegration extends PhysicsEngine {
             //newState.velocity = Vector2.zeroVector.copy();
             //}
             Vector2 slope = new Vector2(
-                    getXSlopeAt(newState.position.x, newState.position.y, terrain),
-                    getYSlopeAt(newState.position.x, newState.position.y, terrain)
+                getXSlopeAt(newState.position.x, newState.position.y, terrain),
+                getYSlopeAt(newState.position.x, newState.position.y, terrain)
             );
             if (slope.length() > getStaticFrictionAtPosition(newState.position, terrain)) {
                 double kineticFriction = getKineticFrictionAtPosition(newState.position, terrain);
                 _update.acceleration = new Vector2(
-                        xAcceleration(slope, slope, kineticFriction),
-                        yAcceleration(slope, slope, kineticFriction)
+                    xAcceleration(slope, slope, kineticFriction),
+                    yAcceleration(slope, slope, kineticFriction)
                 );
             } else {
                 _update.acceleration = Vector2.zeroVector.copy();

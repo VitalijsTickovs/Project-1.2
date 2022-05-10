@@ -22,6 +22,6 @@ public class ClosestEuclidianDistanceHeuristic implements Heuristic {
 
     @Override
     public boolean firstBetterThanSecond(double heuristic1, double heuristic2) {
-        return heuristic1 <= heuristic2;
+        return heuristic1 < heuristic2;
     }
 }

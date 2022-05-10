@@ -37,10 +37,10 @@ public class RungeKutta extends EulerIntegration {
 
         // Enforce stopping condition
         if (
-                k1.velocity.length() == 0 && k1.acceleration.length() == 0 ||
-                        k2.velocity.length() == 0 && k2.acceleration.length() == 0 ||
-                        k3.velocity.length() == 0 && k3.acceleration.length() == 0 ||
-                        k4.velocity.length() == 0 && k4.acceleration.length() == 0
+            k1.velocity.length() == 0 && k1.acceleration.length() == 0 ||
+            k2.velocity.length() == 0 && k2.acceleration.length() == 0 ||
+            k3.velocity.length() == 0 && k3.acceleration.length() == 0 ||
+            k4.velocity.length() == 0 && k4.acceleration.length() == 0
         ) {
             //System.out.println("Stopping condition in one of the k-s");
             //k.velocity = Vector2.zeroVector.copy();
