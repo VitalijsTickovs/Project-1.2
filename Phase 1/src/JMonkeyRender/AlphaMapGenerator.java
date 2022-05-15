@@ -1,8 +1,11 @@
 package JMonkeyRender;
 
-import Reader.TerrainLoader;
+import Reader.GameStateLoader;
 
 import javax.imageio.ImageIO;
+
+import Data_storage.Terrain;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -13,7 +16,7 @@ public final class AlphaMapGenerator {
 
     private static final int DEFAULT_WIDTH = 1024;
 
-    public static void generateAlphaMap() {
+    public static void generateAlphaMap(Terrain terrain) {
         final BufferedImage image = new BufferedImage ( DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB );
         final Graphics2D graphics2D = image.createGraphics ();
 
@@ -24,11 +27,9 @@ public final class AlphaMapGenerator {
         //This sets any sandpit that is required
         for(int x=0; x<1024; x++){
             for(int y=0; y<1024; y++){
-                if(x>TerrainLoader.getSandX()[0] && x< TerrainLoader.getSandX()[1]){
-                    if(y>TerrainLoader.getSandY()[0] && y<TerrainLoader.getSandY()[1]) {
-                        graphics2D.setColor(Color.GREEN);
-                        graphics2D.drawLine(x, y, x, y);
-                    }
+                if (terrain.isPointInZone(x,y)) {
+                    graphics2D.setColor(Color.GREEN);
+                    graphics2D.drawLine(x, y, x, y);
                 }
             }
         }

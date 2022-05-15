@@ -3,7 +3,7 @@ package JMonkeyRender;
 import Data_storage.*;
 import GUI.MenuGUI;
 import Physics.*;
-import Reader.TerrainLoader;
+import Reader.GameStateLoader;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
 import com.jme3.light.AmbientLight;
@@ -69,7 +69,7 @@ public class Renderer extends Cam {
         this.yoff = (float) (this.ballStartPos.y - this.totalSize/2);
 
         //Creating heightmap representation of the terrain
-        AlphaMapGenerator.generateAlphaMap();
+        AlphaMapGenerator.generateAlphaMap(terrain);
 
         //Setting terrain using heightmap
         this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
@@ -268,7 +268,7 @@ public class Renderer extends Cam {
      */
     public void initPhysics(){
         //Attaches the input values to Terrain object
-        this.terrain = TerrainLoader.readFile().getTerrain();
+        this.terrain = GameStateLoader.readFile().getTerrain();
 
         this.ballStartPos = this.terrain.ballStartingPosition;
         this.targetRadius = this.terrain.target.radius;

@@ -55,7 +55,7 @@ public class Game extends Canvas implements Runnable, GameObject {
     }
 
     private void createGameState() {
-        gameState = TerrainLoader.readFile();
+        gameState = GameStateLoader.readFile();
     }
 
     private void resetStartingVariables() {

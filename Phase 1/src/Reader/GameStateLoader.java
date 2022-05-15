@@ -7,7 +7,7 @@ import java.util.Scanner;
 import Data_storage.*;
 import Physics.*;
 
-public class TerrainLoader {
+public class GameStateLoader {
 
    private static final String delimiter = ";";
    private static Scanner scanner;
