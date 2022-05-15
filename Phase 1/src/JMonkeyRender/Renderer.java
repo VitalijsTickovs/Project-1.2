@@ -69,7 +69,6 @@ public class Renderer extends Cam {
         this.yoff = (float) (this.ballStartPos.y - this.totalSize/2);
 
         //Creating heightmap representation of the terrain
-        terrain.calculateHeightMap((int) totalSize+1, normalFactor);
         AlphaMapGenerator.generateAlphaMap();
 
         //Setting terrain using heightmap
@@ -280,7 +279,7 @@ public class Renderer extends Cam {
 
         //setting the physics engine
         ball = new Ball(this.ballStartPos, new Vector2(3, -5));
-        engine = new PhysicsEngine(9.81, new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem());
+        engine = new PhysicsEngine(new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem());
     }
 
     /**

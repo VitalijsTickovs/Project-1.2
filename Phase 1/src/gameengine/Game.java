@@ -33,10 +33,10 @@ public class Game extends Canvas implements Runnable, GameObject {
      */
     public Game(int fps) {
         FPS = fps;
+        createGameState();
         startBotThread();
         resetStartingVariables();
         createInputWindow();
-        createGameState();
         //createTerrain();
         createCamera();
         createRenderer();
@@ -56,7 +56,6 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void createGameState() {
         gameState = Reader.readFile();
-        gameState.getTerrain().calculateHeightMap(1024, 1.0);
     }
 
     private void resetStartingVariables() {

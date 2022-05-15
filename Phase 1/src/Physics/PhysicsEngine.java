@@ -9,7 +9,7 @@ import function.Function;
 
 public class PhysicsEngine {
 
-    public final double G; // Gravitational constant
+    public final double G = 9.81; // Gravitational constant
 
     public final ODESolver odeSolver;
     public final StoppingCondition stoppingCondition;
@@ -17,13 +17,11 @@ public class PhysicsEngine {
 
     /**
      * Constructor. Creates a new instance of the physics engine
-     * @param G The gravitational constant to use
      * @param odeSolver The ODE solver to use
      * @param stoppingCondition The stopping condition to use
      * @param collisionSystem The collision system to use
      */
-    public PhysicsEngine(double G, ODESolver odeSolver, StoppingCondition stoppingCondition, CollisionSystem collisionSystem) {
-        this.G = G;
+    public PhysicsEngine(ODESolver odeSolver, StoppingCondition stoppingCondition, CollisionSystem collisionSystem) {
         this.odeSolver = odeSolver;
         this.stoppingCondition = stoppingCondition;
         this.collisionSystem = collisionSystem;

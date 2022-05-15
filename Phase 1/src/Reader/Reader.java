@@ -75,38 +75,35 @@ public class Reader {
    private final static double deftreeRadius = 0.5;
    private final static double deftreeBounciness = 1;
 
-   public static double[]getSandX(){
-      return new double[]{defsandPitX0, defsandPitX1};
+   public static double[] getSandX() {
+      return new double[] { defsandPitX0, defsandPitX1 };
    }
 
-   public static double[] getSandY(){
-      return new double[]{defsandPitY0, defsandPitY1};
+   public static double[] getSandY() {
+      return new double[] { defsandPitY0, defsandPitY1 };
    }
 
-   public double getBallX(){
+   public double getBallX() {
       return defx0;
    }
 
-   public double getBallY(){
+   public double getBallY() {
       return defy0;
    }
 
-
-   public static GameState readFile() {
-
-      if (!createScanner()) {
-         return null;
-      }
+   public static GameState readFile(){
+      createScanner();
 
       String[] allLinesSplit = splitLines();
       readVariables(allLinesSplit);
 
-      return new GameState(
-              saveDataIntoObject(),
-              new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector()),
-              //new RungeKutta()
-              new PhysicsEngine(9.81, new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem())
-      );
+      Terrain generatedTerrain = saveDataIntoObject();
+      Ball startingBall = new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector());
+      PhysicsEngine hardcodedEngine = new PhysicsEngine(new RungeKutta4Solver(0.01),
+            new SmallVelocityStoppingCondition(), new StopCollisionSystem());
+      GameState gameState = new GameState(generatedTerrain, startingBall, hardcodedEngine);
+
+      return gameState;
    }
 
    /**
@@ -114,18 +111,18 @@ public class Reader {
     * 
     * @return true, if the reader has been successfully created
     */
-   private static boolean createScanner() {
+   private static void createScanner() {
       try {
-         scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/userInput.csv"));
-         return true;
-
+         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/userInput.csv"));
+         //The top line does not work on my computer, so I put the one at the bottom - comment it out and switch.
+         //I was not able to come up with a line of code that would work on everyone's computer
+         scanner = new Scanner(new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/userInput.csv")); 
+         
       } catch (FileNotFoundException e) {
-         System.out.println("File not found");
-         return false;
-
-      } catch (NullPointerException e) {
-         System.out.println("File was null");
-         return false;
+         throw new NullPointerException("File not found - the path to the save file is wrong, see comment above");
+      }
+      catch(NullPointerException e){
+         throw new NullPointerException("The path to the save file itself was null");
       }
    }
 
@@ -285,10 +282,11 @@ public class Reader {
          terrain.topLeftCorner = new Vector2(terrainX0, terrainY0);
       }
       if (terrainX1 == 0 && terrainY1 == 0) {
-         terrain.bottomRightCorner= new Vector2(defxt, defyt);
+         terrain.bottomRightCorner = new Vector2(defxt, defyt);
       } else {
          terrain.bottomRightCorner = new Vector2(terrainX1, terrainY1);
       }
+
       if (greenKineticFriction == 0) {
          terrain.kineticFriction = defgreenKineticFriction;
       } else {
@@ -299,11 +297,14 @@ public class Reader {
       } else {
          terrain.staticFriction = greenStaticFriction;
       }
+      TerrainFunction1 decodedFunction;
       if (terrainFunction == null) {
-         terrain.terrainFunction = new TerrainFunction1(defterrainFunction);
+         decodedFunction = new TerrainFunction1(defterrainFunction);
       } else {
-         terrain.terrainFunction = new TerrainFunction1(terrainFunction);
+         decodedFunction = new TerrainFunction1(terrainFunction);
       }
+      terrain.setTerrainFunction(decodedFunction);
+
    }
 
    private static void defineTarget() {
@@ -320,7 +321,7 @@ public class Reader {
       }
       terrain.target = target;
    }
-   
+
    private static void defineStartingPoint() {
       if (ballStartPointX == 0 && ballStartPointY == 0) {
          terrain.ballStartingPosition = new Vector2(defballStartPointX, defballStartPointY);
