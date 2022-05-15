@@ -97,12 +97,16 @@ public class Reader {
       String[] allLinesSplit = splitLines();
       readVariables(allLinesSplit);
 
+      return createGameStateUsingGeneratedData();
+   }
+
+   private static GameState createGameStateUsingGeneratedData(){
       Terrain generatedTerrain = saveDataIntoObject();
       Ball startingBall = new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector());
       PhysicsEngine hardcodedEngine = new PhysicsEngine(new RungeKutta4Solver(0.01),
             new SmallVelocityStoppingCondition(), new StopCollisionSystem());
+            
       GameState gameState = new GameState(generatedTerrain, startingBall, hardcodedEngine);
-
       return gameState;
    }
 

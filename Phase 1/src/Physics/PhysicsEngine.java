@@ -1,11 +1,7 @@
 package Physics;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
-
 import Data_storage.*;
-import function.Function;
 
 public class PhysicsEngine {
 
