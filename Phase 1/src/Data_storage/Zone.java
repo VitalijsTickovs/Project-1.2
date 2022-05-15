@@ -5,6 +5,12 @@ public class Zone extends Rectangle {
     public double staticFriction = 0.4;
     public double kineticFriction = 0.3;
 
+    public Zone() {}
+
+    public Zone(Vector2 bottomLeftCorner, Vector2 topRightCorner) {
+        super(bottomLeftCorner, topRightCorner);
+    }
+
     public double getStaticFriction() {
         return staticFriction;
     }

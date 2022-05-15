@@ -2,9 +2,7 @@ package JMonkeyRender;
 
 import Data_storage.*;
 import GUI.MenuGUI;
-import Physics.PhysicsEngine;
-import Physics.RungeKutta;
-import Physics.VectorsReader;
+import Physics.*;
 import Reader.Reader;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
@@ -282,7 +280,7 @@ public class Renderer extends Cam {
 
         //setting the physics engine
         ball = new Ball(this.ballStartPos, new Vector2(3, -5));
-        engine = new RungeKutta();
+        engine = new PhysicsEngine(9.81, new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem());
     }
 
     /**

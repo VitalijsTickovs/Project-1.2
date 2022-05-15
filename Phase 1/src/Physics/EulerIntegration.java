@@ -2,7 +2,7 @@ package Physics;
 
 import Data_storage.*;
 
-public class EulerIntegration extends PhysicsEngine {
+public class EulerIntegration extends PhysicsEngine2 {
 
     @Override
     protected BallState countNewBallState(Ball ball, Terrain terrain) {
@@ -150,7 +150,7 @@ public class EulerIntegration extends PhysicsEngine {
         Vector2 tempVelocity = newState.velocity.copy().translate(update.acceleration.copy().scale(h));
         if (stop && Vector2.dotProduct(tempVelocity, newState.velocity) <= 0 || update.velocity.length() < h) {
             //if (stop) {
-            newState.velocity = Vector2.zeroVector.copy();
+            newState.velocity = Vector2.zeroVector();
             //} else {
             //_update.velocity = Vector2.zeroVector.copy();
             //double length = _update.velocity.length();
@@ -168,14 +168,14 @@ public class EulerIntegration extends PhysicsEngine {
                     yAcceleration(slope, slope, kineticFriction)
                 );
             } else {
-                _update.acceleration = Vector2.zeroVector.copy();
+                _update.acceleration = Vector2.zeroVector();
             }
         }
         // Set the new position based on velocity
         newState.position.translate(_update.velocity.copy().scale(h));
         // Check if in water
         if (terrain.terrainFunction.valueAt(newState.position.x, newState.position.y) < 0) {
-            newState.velocity = Vector2.zeroVector.copy();
+            newState.velocity = Vector2.zeroVector();
             return newState;
         }
         // Set new velocity based on acceleration
@@ -203,7 +203,7 @@ public class EulerIntegration extends PhysicsEngine {
         double kineticFriction = getKineticFrictionAtPosition(state.position, terrain);
         //double staticFriction = getStaticFrictionAtPosition(state.position);
         // Initialize acceleration to 0
-        Vector2 acceleration = Vector2.zeroVector.copy();
+        Vector2 acceleration = Vector2.zeroVector();
         Vector2 velocity = state.velocity.copy();
         // Calculate the slope at the position of the state
         Vector2 slope = new Vector2(

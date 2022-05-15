@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import Data_storage.*;
-import Physics.RungeKutta;
+import Physics.*;
 
 public class Reader {
 
@@ -103,8 +103,9 @@ public class Reader {
 
       return new GameState(
               saveDataIntoObject(),
-              new Ball(new Vector2(defx0, defy0), Vector2.zeroVector.copy()),
-              new RungeKutta()
+              new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector()),
+              //new RungeKutta()
+              new PhysicsEngine(9.81, new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem())
       );
    }
 
@@ -279,14 +280,14 @@ public class Reader {
 
    private static void defineGreen() {
       if (terrainX0 == 0 && terrainY0 == 0) {
-         terrain.startingCorner = new Vector2(defx0, defy0);
+         terrain.topLeftCorner = new Vector2(defx0, defy0);
       } else {
-         terrain.startingCorner = new Vector2(terrainX0, terrainY0);
+         terrain.topLeftCorner = new Vector2(terrainX0, terrainY0);
       }
       if (terrainX1 == 0 && terrainY1 == 0) {
-         terrain.limitingCorner = new Vector2(defxt, defyt);
+         terrain.bottomRightCorner= new Vector2(defxt, defyt);
       } else {
-         terrain.limitingCorner = new Vector2(terrainX1, terrainY1);
+         terrain.bottomRightCorner = new Vector2(terrainX1, terrainY1);
       }
       if (greenKineticFriction == 0) {
          terrain.kineticFriction = defgreenKineticFriction;

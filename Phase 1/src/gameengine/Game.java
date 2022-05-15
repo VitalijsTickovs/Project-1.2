@@ -41,7 +41,7 @@ public class Game extends Canvas implements Runnable, GameObject {
      * @param fps The target FPS (frames per second) of the game
      */
     public Game(int fps) {
-        bot = new HillClimbingBot(new ClosestEuclidianDistanceHeuristic(), 0.01, 8);
+        bot = null;//new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 8);
         botThread = new Thread(new Runnable() {
             @Override
             public void run() {

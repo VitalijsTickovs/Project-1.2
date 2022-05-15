@@ -48,15 +48,15 @@ public class HeuristicPlotter {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         PhysicsEngine engine = new RungeKutta();
         Terrain terrain = new Terrain("0.4*(0.9-e**(-(x*x + y*y)/8))", 0.2, 0.08, new Vector2(-50, -50), new Vector2(50, 50));
         terrain.target = new Target();
         terrain.target.setPosition(new Vector2(4, 1));
         terrain.target.setRadius(0.15);
-        Ball ball = new Ball(new Vector2(-3, 0), Vector2.zeroVector.copy());
+        Ball ball = new Ball(new Vector2(-3, 0), Vector2.zeroVector());
         GameState gameState = new GameState(terrain, ball, engine);
         HeuristicPlotter hp = new HeuristicPlotter(new ClosestEuclidianDistanceHeuristic(), gameState);
         hp.generateTestData();
-    }
+    }*/
 }

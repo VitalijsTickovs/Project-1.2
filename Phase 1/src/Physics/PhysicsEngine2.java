@@ -7,27 +7,10 @@ import java.util.ArrayList;
 import Data_storage.*;
 import function.Function;
 
-public class PhysicsEngine {
+public abstract class PhysicsEngine2 {
 
-    public final double G; // Gravitational constant
-
-    public final ODESolver odeSolver;
-    public final StoppingCondition stoppingCondition;
-    public final CollisionSystem collisionSystem;
-
-    /**
-     * Constructor. Creates a new instance of the physics engine
-     * @param G The gravitational constant to use
-     * @param odeSolver The ODE solver to use
-     * @param stoppingCondition The stopping condition to use
-     * @param collisionSystem The collision system to use
-     */
-    public PhysicsEngine(double G, ODESolver odeSolver, StoppingCondition stoppingCondition, CollisionSystem collisionSystem) {
-        this.G = G;
-        this.odeSolver = odeSolver;
-        this.stoppingCondition = stoppingCondition;
-        this.collisionSystem = collisionSystem;
-    }
+    public double h = 0.01; // The step of the Euler's method
+    public final double G = 9.81;
 
     /**
      * Simulates a shot and stores the positions until the ball stops
@@ -43,40 +26,119 @@ public class PhysicsEngine {
         // Add the initial position
         coordinates.add(tempBall.state.position.copy());
 
-        while (tempBall.state.velocity.length() != 0) {
-            // Clamp the velocity to the ball max speed
-            if (tempBall.state.velocity.length() > Ball.maxSpeed) {
-                tempBall.state.velocity.normalize().scale(Ball.maxSpeed);
-            }
-            // Store the previous state
-            BallState prevState = tempBall.state.copy();
-            // Perform a single step using the ODE solver
-            tempBall.state = odeSolver.calculateNewBallState(tempBall.state, terrain, this);
-            // Perform collisions
-            tempBall.state = collisionSystem.modifyStateDueToCollisions(tempBall.state, prevState, ball.radius, terrain);
-            // Check if velocity should be 0
-            if (stoppingCondition.shouldStop(tempBall.state, prevState, odeSolver.getStepSize())) {
-                Vector2 slope = new Vector2(
-                        terrain.xDerivativeAt(tempBall.state.position),
-                        terrain.yDerivativeAt(tempBall.state.position)
-                );
-                // If the static friction is smaller than the slope then set the velocity to the slope
-                if (terrain.getStaticFriction(tempBall.state.position) < slope.length()) {
-                    tempBall.state.velocity = slope.copy().reversed();
-                } else {
-                    // Otherwise, make the velocity 0
-                    tempBall.state.velocity = Vector2.zeroVector();
-                }
-            }
-            // Check if in water, and if so, stop
-            if (tempBall.getZCoordinate(terrain) < 0) {
-                tempBall.state.velocity = Vector2.zeroVector();
-            }
-            // Store the new position
+        do {
+            tempBall.state = countNewBallState(tempBall, terrain);
             coordinates.add(tempBall.state.position.copy());
-        }
+        } while (tempBall.state.velocity.length() != 0);
 
         return coordinates;
+    }
+
+    /**
+     * Creates the new state of the ball after an iteration step
+     * @param ball The ball to calculate the new state for
+     * @return The new state of the ball
+     */
+    protected abstract BallState countNewBallState(Ball ball, Terrain terrain);
+
+    /**
+     * Checks if a position is colliding with an obstacle
+     * @param position The position to check for
+     * @return {@code true} if colliding and {@code false} otherwise
+     */
+    protected boolean isTouchingAnObstacle(Vector2 position, Terrain terrain){
+        for (IObstacle obstacle : terrain.obstacles) {
+            if (obstacle.isPositionColliding(position)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the x derivative at a given position
+     * @param x The x coordinate
+     * @param y The y coordinate
+     * @return The derivative value
+     */
+    double getXSlopeAt(double x, double y, Terrain terrain) {
+        double functionValue = terrain.terrainFunction.valueAt(x, y);
+        if (functionValue > 10 || functionValue < -10) {
+            return 0;
+        } else {
+            return terrain.terrainFunction.xDerivativeAt(x, y);
+        }
+    }
+
+    /**
+     * Gets the y derivative at a given position
+     * @param x The x coordinate
+     * @param y THe y coordinate
+     * @return The derivative value
+     */
+    protected double getYSlopeAt(double x, double y, Terrain terrain) {
+        double functionValue = terrain.terrainFunction.valueAt(x, y);
+        if (functionValue > 10 || functionValue < -10) {
+            return 0;
+        } else {
+            return terrain.terrainFunction.yDerivativeAt(x, y);
+        }
+    }
+
+    /**
+     * Gets the kinetic friction at a given position
+     * @param position The position to check
+     * @return The kinetic friction value
+     */
+    protected double getKineticFrictionAtPosition(Vector2 position, Terrain terrain) {
+        double friction = terrain.kineticFriction;
+        for (Zone zone : terrain.zones) {
+            if (zone.isPositionInside(position)) {
+                friction = zone.kineticFriction;
+            }
+        }
+        return friction;
+    }
+
+    /**
+     * Gets the static friction at a given position
+     * @param position The position to check
+     * @return The static friction value
+     */
+    protected double getStaticFrictionAtPosition(Vector2 position, Terrain terrain) {
+        double friction = terrain.staticFriction;
+        for (Zone zone : terrain.zones) {
+            if (zone.isPositionInside(position)) {
+                friction = zone.staticFriction;
+            }
+        }
+        return friction;
+    }
+
+    /**
+     * Gets the x-acceleration
+     * @param slope The terrain derivative vector
+     * @param speed The current velocity vector
+     * @param friction The friction to use
+     * @return The x-acceleration value
+     */
+    protected double xAcceleration(Vector2 slope, Vector2 speed, double friction) {
+        double downHillForce = -G * slope.x;
+        double frictionForce = G * friction * speed.x / speed.length();
+        return (downHillForce - frictionForce);
+    }
+
+    /**
+     * Gets the y-acceleration
+     * @param slope The terrain derivative vector
+     * @param speed The current velocity vector
+     * @param friction The friction to use
+     * @return The y-acceleration value
+     */
+    protected double yAcceleration(Vector2 slope, Vector2 speed, double friction) {
+        double downHillForce = -G * slope.y;
+        double frictionForce = G * friction * speed.y / speed.length();
+        return (downHillForce - frictionForce);
     }
 
     /**
@@ -111,6 +173,43 @@ public class PhysicsEngine {
         double downHillForce = -G * slope.y;
         double frictionForce = G * friction * state.velocity.y / state.velocity.length();
         return (downHillForce - frictionForce);
+    }
+
+    protected BallState handleCollisions(BallState oldState, BallState newState, Terrain terrain) {
+        BallState state = newState.copy();
+        // Check for collision
+        if (isTouchingAnObstacle(state.position, terrain)) {
+            state.position = oldState.position.copy();
+            //System.out.println("1");
+            state.velocity = Vector2.zeroVector();
+        }
+        // Check for out of bounds
+        // On x-axis
+        boolean reverseX = false;
+        if (state.position.x > terrain.bottomRightCorner.x || state.position.x < terrain.topLeftCorner.x) {
+            reverseX = true;
+            state.position = oldState.position.copy();
+            //state.velocity = Vector2.zeroVector.copy();
+            //System.out.println("2");
+        }
+        // On y-axis
+        boolean reverseY = false;
+        if (state.position.y > terrain.bottomRightCorner.y || state.position.y < terrain.topLeftCorner.y) {
+            reverseY = true;
+            state.position = oldState.position.copy();
+            //state.velocity = Vector2.zeroVector.copy();
+            //System.out.println("3");
+        }
+        // Reverse the velocity if needed
+        if (reverseX) {
+            state.velocity.x = -state.velocity.x;
+            state.velocity.scale(0.5);
+        }
+        if (reverseY) {
+            state.velocity.y = -state.velocity.y;
+            state.velocity.scale(0.5);
+        }
+        return state;
     }
 
     /**
@@ -236,9 +335,9 @@ public class PhysicsEngine {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
         PhysicsEngine rk = new RungeKutta();
         PhysicsEngine ei =  new EulerIntegration();
         //rk.terrain = new Terrain("0", 0.2, 0.1, new Vector2(-50, -50), new Vector2(50, 50));

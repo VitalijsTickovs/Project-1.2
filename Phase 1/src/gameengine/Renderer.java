@@ -37,42 +37,42 @@ public class Renderer {
         int xTL=-1, yTL=-1, xBR=-1, yBR=-1;
 
         // Check if the terrain is on-screen and find the range of the drawing part
-        if (camTLx < terrain.limitingCorner.x && camTLy < terrain.limitingCorner.y
+        if (camTLx < terrain.bottomRightCorner.x && camTLy < terrain.bottomRightCorner.y
                 &&
-                camBRx > terrain.startingCorner.x && camBRy > terrain.startingCorner.y) {
+                camBRx > terrain.topLeftCorner.x && camBRy > terrain.topLeftCorner.y) {
 
-            if (camTLx < terrain.startingCorner.x) {
+            if (camTLx < terrain.topLeftCorner.x) {
                 xTL = 0;
             } else {
                 // Calculate x top left
-                xTL = (int) ((camTLx - terrain.startingCorner.x)*unitSizePixels);
+                xTL = (int) ((camTLx - terrain.topLeftCorner.x)*unitSizePixels);
             }
 
-            if (camTLy < terrain.startingCorner.y - heightRange/2) {
+            if (camTLy < terrain.topLeftCorner.y - heightRange/2) {
                 yTL = 0;
             } else {
                 // Calculate y top left
-                yTL = (int) ((camTLy - (terrain.startingCorner.y - heightRange/2))*unitSizePixels);
+                yTL = (int) ((camTLy - (terrain.topLeftCorner.y - heightRange/2))*unitSizePixels);
             }
 
-            if (camBRx > terrain.limitingCorner.x) {
+            if (camBRx > terrain.bottomRightCorner.x) {
                 xBR = terrainImage.getWidth();
             } else {
                 // Calculate x bottom right
-                xBR = (int) ((camBRx - terrain.startingCorner.x)*unitSizePixels);
+                xBR = (int) ((camBRx - terrain.topLeftCorner.x)*unitSizePixels);
             }
 
-            if (camBRy > terrain.limitingCorner.y+heightRange/2) {
+            if (camBRy > terrain.bottomRightCorner.y+heightRange/2) {
                 yBR = terrainImage.getHeight();
             } else {
                 // Calculate y bottom right
-                yBR = (int) ((camBRy - (terrain.startingCorner.y - heightRange/2))*unitSizePixels);
+                yBR = (int) ((camBRy - (terrain.topLeftCorner.y - heightRange/2))*unitSizePixels);
             }
         }
 
         if (xTL != -1) {
-            int xDraw = (int) ((terrain.startingCorner.x - camTLx)*unitSizePixels);
-            int yDraw = (int) ((terrain.startingCorner.y-heightRange/2 - camTLy)*unitSizePixels);
+            int xDraw = (int) ((terrain.topLeftCorner.x - camTLx)*unitSizePixels);
+            int yDraw = (int) ((terrain.topLeftCorner.y-heightRange/2 - camTLy)*unitSizePixels);
             if (xDraw < 0) {
                 xDraw = 0;
             }
@@ -121,8 +121,8 @@ public class Renderer {
      */
     public void createTerrainImage() {
         terrainImage = new BufferedImage(
-                (int) ((terrain.limitingCorner.x-terrain.startingCorner.x)*unitSizePixels),
-                (int) ((terrain.limitingCorner.y-terrain.startingCorner.y)*unitSizePixels + heightRange*unitSizePixels),
+                (int) ((terrain.bottomRightCorner.x-terrain.topLeftCorner.x)*unitSizePixels),
+                (int) ((terrain.bottomRightCorner.y-terrain.topLeftCorner.y)*unitSizePixels + heightRange*unitSizePixels),
                 BufferedImage.TYPE_4BYTE_ABGR
         );
         Graphics2D g2 = (Graphics2D) terrainImage.getGraphics();
@@ -133,15 +133,15 @@ public class Renderer {
         g2.fillRect(0, 0, terrainImage.getWidth(), terrainImage.getHeight());
         // Render the terrain
         int numVertices = (int) Math.sqrt(terrain.heightmap.length);
-        double xStep = (terrain.limitingCorner.x - terrain.startingCorner.x) / numVertices;
-        double yStep = (terrain.limitingCorner.y - terrain.startingCorner.y) / numVertices;
+        double xStep = (terrain.bottomRightCorner.x - terrain.topLeftCorner.x) / numVertices;
+        double yStep = (terrain.bottomRightCorner.y - terrain.topLeftCorner.y) / numVertices;
         // Find the max and min height in the terrain
         double totalMaxHeight = -10;
         double totalMinHeight = 10;
         for (int yy=0; yy<numVertices; yy++) {
             for (int xx=0; xx<numVertices; xx++) {
-                double x = terrain.startingCorner.x + xx * xStep;
-                double y = terrain.startingCorner.y + yy * yStep;
+                double x = terrain.topLeftCorner.x + xx * xStep;
+                double y = terrain.topLeftCorner.y + yy * yStep;
                 double h = terrain.terrainFunction.valueAt(x, y);
                 if (h > 10) {
                     h = 10;
@@ -163,8 +163,8 @@ public class Renderer {
         for (int yy=0; yy<numVertices-1; yy++) {
             for (int xx=0; xx<numVertices-1; xx++) {
                 // First point
-                double x1 = terrain.startingCorner.x + xx * xStep;
-                double y1 = terrain.startingCorner.y + yy * yStep;
+                double x1 = terrain.topLeftCorner.x + xx * xStep;
+                double y1 = terrain.topLeftCorner.y + yy * yStep;
                 double h1 = terrain.terrainFunction.valueAt(x1, y1);//terrain.heightmap[i1] * heightRange - heightRange/2;
                 if (h1 > 10) {
                     h1 = 10;
@@ -173,8 +173,8 @@ public class Renderer {
                     h1 = -10;
                 }
                 // Second point
-                double x2 = terrain.startingCorner.x + (xx+1) * xStep;
-                double y2 = terrain.startingCorner.y + yy * yStep;
+                double x2 = terrain.topLeftCorner.x + (xx+1) * xStep;
+                double y2 = terrain.topLeftCorner.y + yy * yStep;
                 double h2 = terrain.terrainFunction.valueAt(x2, y2);//terrain.heightmap[i2] * heightRange - heightRange/2;
                 if (h2 > 10) {
                     h2 = 10;
@@ -183,8 +183,8 @@ public class Renderer {
                     h2 = -10;
                 }
                 // Third point
-                double x3 = terrain.startingCorner.x + xx * xStep;
-                double y3 = terrain.startingCorner.y + (yy+1) * yStep;
+                double x3 = terrain.topLeftCorner.x + xx * xStep;
+                double y3 = terrain.topLeftCorner.y + (yy+1) * yStep;
                 double h3 = terrain.terrainFunction.valueAt(x3, y3);//terrain.heightmap[i3] * heightRange - heightRange/2;
                 if (h3 > 10) {
                     h3 = 10;
@@ -193,8 +193,8 @@ public class Renderer {
                     h3 = -10;
                 }
                 // Fourth point
-                double x4 = terrain.startingCorner.x + (xx+1) * xStep;
-                double y4 = terrain.startingCorner.y + (yy+1) * yStep;
+                double x4 = terrain.topLeftCorner.x + (xx+1) * xStep;
+                double y4 = terrain.topLeftCorner.y + (yy+1) * yStep;
                 double h4 = terrain.terrainFunction.valueAt(x4, y4);//terrain.heightmap[i4] * heightRange - heightRange/2;
                 if (h4 > 10) {
                     h4 = 10;
@@ -207,21 +207,21 @@ public class Renderer {
                 maxHeight = Math.max(maxHeight, h3);
                 maxHeight = Math.max(maxHeight, h4);
 
-                int renderPixelX1 = (int) ((x1 - terrain.startingCorner.x) * unitSizePixels);
-                int renderPixelY1 = (int) ((y1 - h1 - terrain.startingCorner.y + heightRange/2) * unitSizePixels);
+                int renderPixelX1 = (int) ((x1 - terrain.topLeftCorner.x) * unitSizePixels);
+                int renderPixelY1 = (int) ((y1 - h1 - terrain.topLeftCorner.y + heightRange/2) * unitSizePixels);
 
-                int renderPixelX2 = (int) ((x2 - terrain.startingCorner.x) * unitSizePixels);
-                int renderPixelY2 = (int) ((y2 - h2 - terrain.startingCorner.y + heightRange/2) * unitSizePixels);
+                int renderPixelX2 = (int) ((x2 - terrain.topLeftCorner.x) * unitSizePixels);
+                int renderPixelY2 = (int) ((y2 - h2 - terrain.topLeftCorner.y + heightRange/2) * unitSizePixels);
 
-                int renderPixelX3 = (int) ((x3 - terrain.startingCorner.x) * unitSizePixels);
-                int renderPixelY3 = (int) ((y3 - h3 - terrain.startingCorner.y + heightRange/2) * unitSizePixels);
+                int renderPixelX3 = (int) ((x3 - terrain.topLeftCorner.x) * unitSizePixels);
+                int renderPixelY3 = (int) ((y3 - h3 - terrain.topLeftCorner.y + heightRange/2) * unitSizePixels);
 
-                int renderPixelX4 = (int) ((x4 - terrain.startingCorner.x) * unitSizePixels);
-                int renderPixelY4 = (int) ((y4 - h4 - terrain.startingCorner.y + heightRange/2) * unitSizePixels);
+                int renderPixelX4 = (int) ((x4 - terrain.topLeftCorner.x) * unitSizePixels);
+                int renderPixelY4 = (int) ((y4 - h4 - terrain.topLeftCorner.y + heightRange/2) * unitSizePixels);
 
                 double lighting = (maxHeight-totalMinHeight)/(totalMaxHeight-totalMinHeight);
-                int numBlockX = (int) ((x1-terrain.startingCorner.x)/sizeColored);
-                int numBlockY = (int) ((y1-terrain.startingCorner.y)/sizeColored);
+                int numBlockX = (int) ((x1-terrain.topLeftCorner.x)/sizeColored);
+                int numBlockY = (int) ((y1-terrain.topLeftCorner.y)/sizeColored);
 
                 // Land
                 if (maxHeight >= 0) {
@@ -254,8 +254,8 @@ public class Renderer {
         }
         // Render target
         double targetHeight = terrain.terrainFunction.valueAt(terrain.target.position.x, terrain.target.position.y);
-        int targetRenderX = (int) ((terrain.target.position.x - terrain.startingCorner.x)*unitSizePixels);
-        int targetRenderY = (int) ((terrain.target.position.y - targetHeight - terrain.startingCorner.y + heightRange/2)*unitSizePixels);
+        int targetRenderX = (int) ((terrain.target.position.x - terrain.topLeftCorner.x)*unitSizePixels);
+        int targetRenderY = (int) ((terrain.target.position.y - targetHeight - terrain.topLeftCorner.y + heightRange/2)*unitSizePixels);
         double radius = terrain.target.radius;
         drawCircle(g2, terrain.target.position.x, terrain.target.position.y, radius, Color.BLACK, false);
         // Draw flag
@@ -274,6 +274,9 @@ public class Renderer {
             if (o instanceof ObstacleTree) {
                 ObstacleTree t = (ObstacleTree) o;
                 drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, new Color(96, 69, 38), true);
+            } else if (o instanceof ObstacleBox) {
+                ObstacleBox b = (ObstacleBox) o;
+                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, new Color(96, 69, 38), true);
             }
         }
 
@@ -309,8 +312,8 @@ public class Renderer {
             if (h < -10) {
                 h = -10;
             }
-            int renderX = (int) ((xx - terrain.startingCorner.x)*unitSizePixels);
-            int renderY = (int) ((yy - h - terrain.startingCorner.y + heightRange/2)*unitSizePixels);
+            int renderX = (int) ((xx - terrain.topLeftCorner.x)*unitSizePixels);
+            int renderY = (int) ((yy - h - terrain.topLeftCorner.y + heightRange/2)*unitSizePixels);
             xPoints[deg] = renderX;
             yPoints[deg] = renderY;
             if (firstPointX == -1) {
@@ -335,8 +338,8 @@ public class Renderer {
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             for (int pixelX = 0; pixelX < width; pixelX++) {
                 for (int pixelY = 0; pixelY < height; pixelY++) {
-                    double x = terrain.startingCorner.x + (double) pixelX/width * (terrain.limitingCorner.x-terrain.startingCorner.x);
-                    double y = terrain.startingCorner.y + (double) pixelY/height * (terrain.limitingCorner.y-terrain.startingCorner.y);
+                    double x = terrain.topLeftCorner.x + (double) pixelX/width * (terrain.bottomRightCorner.x-terrain.topLeftCorner.x);
+                    double y = terrain.topLeftCorner.y + (double) pixelY/height * (terrain.bottomRightCorner.y-terrain.topLeftCorner.y);
 
                     double z = terrain.terrainFunction.valueAt(x, y);
 
@@ -378,8 +381,8 @@ public class Renderer {
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             for (int pixelX = 0; pixelX < width; pixelX++) {
                 for (int pixelY = 0; pixelY < height; pixelY++) {
-                    double x = terrain.startingCorner.x + (double) pixelX/width * (terrain.limitingCorner.x-terrain.startingCorner.x);
-                    double y = terrain.startingCorner.y + (double) pixelY/height * (terrain.limitingCorner.y-terrain.startingCorner.y);
+                    double x = terrain.topLeftCorner.x + (double) pixelX/width * (terrain.bottomRightCorner.x-terrain.topLeftCorner.x);
+                    double y = terrain.topLeftCorner.y + (double) pixelY/height * (terrain.bottomRightCorner.y-terrain.topLeftCorner.y);
 
                     double z = terrain.terrainFunction.valueAt(x, y);
                     if (z > 10) {
@@ -415,7 +418,7 @@ public class Renderer {
     }
 
     public void generateTerrainImage(Terrain terrain, int width, int height) {
-        int unitSizePixelsY = (int) (height / (terrain.limitingCorner.y - terrain.startingCorner.y));
+        int unitSizePixelsY = (int) (height / (terrain.bottomRightCorner.y - terrain.topLeftCorner.y));
 
         int minZ = -10;
         int maxZ = 10;
@@ -438,8 +441,8 @@ public class Renderer {
             for (int py=0; py<height; py++) {
                 int startZ = (maxZ-minZ)*unitSizePixelsY;
 
-                double x = terrain.startingCorner.x + px/width * (terrain.limitingCorner.x - terrain.startingCorner.x); // X in-game coordinate
-                double y = terrain.startingCorner.y + py/height * (terrain.limitingCorner.y - terrain.startingCorner.y); // Y in-game coordinate
+                double x = terrain.topLeftCorner.x + px/width * (terrain.bottomRightCorner.x - terrain.topLeftCorner.x); // X in-game coordinate
+                double y = terrain.topLeftCorner.y + py/height * (terrain.bottomRightCorner.y - terrain.topLeftCorner.y); // Y in-game coordinate
                 double z = (heightMap.getRGB(px, py) & 0x0000ff)/255.0 * 2 - 1; // z in [0, 1]
                 z = z*(maxZ - minZ) + minZ; // get h in [minZ, maxZ] Z in-game coordinate
 
@@ -510,7 +513,7 @@ public class Renderer {
     }
 
     public BufferedImage generateWaterfallPlot(Terrain terrain, int width, int height) {
-        int unitSizePixelsY = (int) (height / (terrain.limitingCorner.y - terrain.startingCorner.y));
+        int unitSizePixelsY = (int) (height / (terrain.bottomRightCorner.y - terrain.topLeftCorner.y));
 
         BufferedImage heightMap = generateHeightMap(terrain, width, height);
 
@@ -561,6 +564,48 @@ public class Renderer {
 
         return image;
 
+    }
+
+    private void drawRectangle(Graphics2D g2, Vector2 bottomLeftCorner, Vector2 topRightCorner, Color color, boolean filled) {
+        int[] xPoints = new int[4];
+        int[] yPoints = new int[4];
+        g2.setColor(color);
+
+        fillListsWithRectangleCorners(xPoints, yPoints, bottomLeftCorner, topRightCorner);
+
+        if (filled) {
+            g2.fillPolygon(xPoints, yPoints, 4);
+        } else {
+            g2.drawPolygon(xPoints, yPoints, 4);
+        }
+    }
+
+    private void fillListsWithRectangleCorners(int[] xPoints, int[] yPoints, Vector2 bottomLeftCorner, Vector2 topRightCorner){
+        Vector2 bottomRightCornerTranslated = getPointValue(new Vector2(topRightCorner.x, bottomLeftCorner.y));
+        assignTranslatedPoint(xPoints, yPoints, 0, bottomRightCornerTranslated);
+
+        Vector2 bottomLeftCornerTranslated = getPointValue(new Vector2(bottomLeftCorner.x, bottomLeftCorner.y));
+        assignTranslatedPoint(xPoints, yPoints, 1, bottomLeftCornerTranslated);
+
+        Vector2 topLeftCornerTranslated = getPointValue(new Vector2(bottomLeftCorner.x, topRightCorner.y));
+        assignTranslatedPoint(xPoints, yPoints, 2, topLeftCornerTranslated);
+
+        Vector2 topRightCornerTranslated = getPointValue(new Vector2(topRightCorner.x, topRightCorner.y));
+        assignTranslatedPoint(xPoints, yPoints, 3, topRightCornerTranslated);
+    }
+
+    private void assignTranslatedPoint(int[] xPoints, int[] yPoints, int index, Vector2 point){
+        xPoints[index] = (int) point.x;
+        yPoints[index] = (int) point.y;
+    }
+
+    private Vector2 getPointValue(Vector2 point){
+        double xx = point.x;
+        double yy = point.y;
+        double h = terrain.terrainFunction.valueAt(xx, yy);
+        int renderX = (int) ((xx - terrain.topLeftCorner.x) * unitSizePixels);
+        int renderY = (int) ((yy - h - terrain.topLeftCorner.y + heightRange / 2) * unitSizePixels);
+        return new Vector2(renderX, renderY);
     }
 
     /*public static void main(String[] args) {

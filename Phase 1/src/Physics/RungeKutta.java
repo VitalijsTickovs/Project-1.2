@@ -20,6 +20,8 @@ public class RungeKutta extends EulerIntegration {
 
     public BallState rk4(BallState state, Terrain terrain) {
 
+        //return s.calculateNewBallState(state, terrain, this, new SmallVelocityStoppingCondition());
+
         UpdateVector k1 = F(eulerStep(state, F(state, terrain), 0, true, terrain), terrain);
         UpdateVector k2 = F(eulerStep(state, k1, h/2, true, terrain), terrain);
         UpdateVector k3 = F(eulerStep(state, k2, h/2, true, terrain), terrain);
@@ -44,8 +46,8 @@ public class RungeKutta extends EulerIntegration {
         ) {
             //System.out.println("Stopping condition in one of the k-s");
             //k.velocity = Vector2.zeroVector.copy();
-            k.acceleration = Vector2.zeroVector.copy();
-            state.velocity = Vector2.zeroVector.copy();
+            k.acceleration = Vector2.zeroVector();
+            state.velocity = Vector2.zeroVector();
         }
 
         /*k.velocity = ak1.velocity.copy();

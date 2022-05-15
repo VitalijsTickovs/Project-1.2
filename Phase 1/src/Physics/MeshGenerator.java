@@ -16,8 +16,8 @@ import com.jme3.scene.VertexBuffer.Type;
 public class MeshGenerator extends SimpleApplication {
 
     public static Vector3[][] generateVertices(Terrain terrain, double resolution) {
-        double xSpan = terrain.limitingCorner.x - terrain.startingCorner.x;
-        double ySpan = terrain.limitingCorner.y - terrain.startingCorner.y;
+        double xSpan = terrain.bottomRightCorner.x - terrain.topLeftCorner.x;
+        double ySpan = terrain.bottomRightCorner.y - terrain.topLeftCorner.y;
         int xRepetitions = (int) (xSpan / resolution) + 1;
         int yRepetitions = (int) (ySpan / resolution) + 1;
         Vector3[][] vertices = new Vector3[yRepetitions][xRepetitions];
@@ -100,8 +100,8 @@ public class MeshGenerator extends SimpleApplication {
     public static Mesh createTerrainMesh(TerrainFunction1 t) {
         Terrain terrain = new Terrain();
         terrain.terrainFunction = t;
-        terrain.startingCorner = new Vector2(0, 0);
-        terrain.limitingCorner = new Vector2(2, 3);
+        terrain.topLeftCorner = new Vector2(0, 0);
+        terrain.bottomRightCorner = new Vector2(2, 3);
 
         Vector3[][] vertices = generateVertices(terrain, 1);
 
