@@ -7,9 +7,9 @@ public class PhysicsEngine {
 
     public final double G = 9.81; // Gravitational constant
 
-    public final ODESolver odeSolver;
-    public final StoppingCondition stoppingCondition;
-    public final CollisionSystem collisionSystem;
+    public final IODESolver odeSolver;
+    public final IStoppingCondition stoppingCondition;
+    public final ICollisionSystem collisionSystem;
 
     /**
      * Constructor. Creates a new instance of the physics engine
@@ -17,7 +17,7 @@ public class PhysicsEngine {
      * @param stoppingCondition The stopping condition to use
      * @param collisionSystem The collision system to use
      */
-    public PhysicsEngine(ODESolver odeSolver, StoppingCondition stoppingCondition, CollisionSystem collisionSystem) {
+    public PhysicsEngine(IODESolver odeSolver, IStoppingCondition stoppingCondition, ICollisionSystem collisionSystem) {
         this.odeSolver = odeSolver;
         this.stoppingCondition = stoppingCondition;
         this.collisionSystem = collisionSystem;

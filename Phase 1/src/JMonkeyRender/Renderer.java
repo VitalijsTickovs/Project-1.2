@@ -3,7 +3,7 @@ package JMonkeyRender;
 import Data_storage.*;
 import GUI.MenuGUI;
 import Physics.*;
-import Reader.Reader;
+import Reader.TerrainLoader;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
 import com.jme3.light.AmbientLight;
@@ -268,7 +268,7 @@ public class Renderer extends Cam {
      */
     public void initPhysics(){
         //Attaches the input values to Terrain object
-        this.terrain = Reader.readFile().getTerrain();
+        this.terrain = TerrainLoader.readFile().getTerrain();
 
         this.ballStartPos = this.terrain.ballStartingPosition;
         this.targetRadius = this.terrain.target.radius;

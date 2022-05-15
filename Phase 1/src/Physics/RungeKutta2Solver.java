@@ -4,7 +4,7 @@ import Data_storage.BallState;
 import Data_storage.Terrain;
 import Data_storage.Vector2;
 
-public class RungeKutta2Solver implements ODESolver {
+public class RungeKutta2Solver implements IODESolver {
     private double h;
 
     public RungeKutta2Solver(double h) {

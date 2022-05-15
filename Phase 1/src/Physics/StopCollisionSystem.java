@@ -4,7 +4,7 @@ import Data_storage.BallState;
 import Data_storage.IObstacle;
 import Data_storage.Terrain;
 
-public class StopCollisionSystem implements CollisionSystem {
+public class StopCollisionSystem implements ICollisionSystem {
 
     @Override
     public BallState modifyStateDueToCollisions(BallState state, BallState previousState, double ballRadius, Terrain terrain) {

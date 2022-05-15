@@ -7,13 +7,19 @@ import java.util.Scanner;
 import Data_storage.*;
 import Physics.*;
 
-public class Reader {
+public class TerrainLoader {
 
    private static final String delimiter = ";";
    private static Scanner scanner;
 
    // region private Variables
    // Singular values
+   private static double solverStep;
+
+   private static IODESolver solver;
+   private static IStoppingCondition stoppingCondition;
+   private static ICollisionSystem collisionSystem;
+
    private static double terrainX0;
    private static double terrainY0;
    private static double terrainX1;
@@ -42,10 +48,22 @@ public class Reader {
    private static ArrayList<Double> treeRadius = new ArrayList<Double>();
    private static ArrayList<Double> treeBounciness = new ArrayList<Double>();
 
+   private static ArrayList<Double> boxX0 = new ArrayList<Double>();
+   private static ArrayList<Double> boxY0 = new ArrayList<Double>();
+   private static ArrayList<Double> boxX1 = new ArrayList<Double>();
+   private static ArrayList<Double> boxY1 = new ArrayList<Double>();
+   private static ArrayList<Double> boxBounciness = new ArrayList<Double>();
+
    private static Terrain terrain; // The generated terrain that will be returned
    // endregion
 
    // region default variable values
+   private final static double defsolverStep = 0.01;
+
+   private final static IODESolver defsolver = new RungeKutta4Solver(defsolverStep);
+   private final static IStoppingCondition defstoppingCondition = new SmallVelocityStoppingCondition();
+   private final static ICollisionSystem defcollisionSystem = new BounceCollisionSystem();
+
    private final static double defx0 = 0;
    private final static double defy0 = 0;
    private final static double defxt = 5;
@@ -75,6 +93,12 @@ public class Reader {
    private final static double deftreeRadius = 0.5;
    private final static double deftreeBounciness = 1;
 
+   private final static double defBoxX0 = 0;
+   private final static double defBoxY0 = 0;
+   private final static double defBoxX1 = 1;
+   private final static double defBoxY1 = 1;
+   private final static double defBoxBounciness = 1;
+
    public static double[] getSandX() {
       return new double[] { defsandPitX0, defsandPitX1 };
    }
@@ -83,15 +107,7 @@ public class Reader {
       return new double[] { defsandPitY0, defsandPitY1 };
    }
 
-   public double getBallX() {
-      return defx0;
-   }
-
-   public double getBallY() {
-      return defy0;
-   }
-
-   public static GameState readFile(){
+   public static GameState readFile() {
       createScanner();
 
       String[] allLinesSplit = splitLines();
@@ -100,12 +116,12 @@ public class Reader {
       return createGameStateUsingGeneratedData();
    }
 
-   private static GameState createGameStateUsingGeneratedData(){
-      Terrain generatedTerrain = saveDataIntoObject();
+   private static GameState createGameStateUsingGeneratedData() {
+      Terrain generatedTerrain = saveDataIntoTerrain();
       Ball startingBall = new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector());
-      PhysicsEngine hardcodedEngine = new PhysicsEngine(new RungeKutta4Solver(0.01),
-            new SmallVelocityStoppingCondition(), new StopCollisionSystem());
-            
+      PhysicsEngine hardcodedEngine = new PhysicsEngine(solver,
+            stoppingCondition, collisionSystem);
+
       GameState gameState = new GameState(generatedTerrain, startingBall, hardcodedEngine);
       return gameState;
    }
@@ -117,15 +133,18 @@ public class Reader {
     */
    private static void createScanner() {
       try {
-         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/userInput.csv"));
-         //The top line does not work on my computer, so I put the one at the bottom - comment it out and switch.
-         //I was not able to come up with a line of code that would work on everyone's computer
-         scanner = new Scanner(new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/userInput.csv")); 
-         
+         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase
+         // 1/src/Reader/userInput.csv"));
+         // The top line does not work on my computer, so I put the one at the bottom -
+         // comment it out and switch.
+         // I was not able to come up with a line of code that would work on everyone's
+         // computer
+         scanner = new Scanner(
+               new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/userInput.csv"));
+
       } catch (FileNotFoundException e) {
          throw new NullPointerException("File not found - the path to the save file is wrong, see comment above");
-      }
-      catch(NullPointerException e){
+      } catch (NullPointerException e) {
          throw new NullPointerException("The path to the save file itself was null");
       }
    }
@@ -146,77 +165,173 @@ public class Reader {
    }
 
    private static void checkLineForVariables(String line) {
+      //Physics engine
+      if (lineContainsKeywordAndEqualSign(line,"solverStep")) {
+         solverStep = readDouble(line);
+      }
+      if (lineContainsKeywordAndEqualSign(line,"solver")) {
+         solver = readSolver(line);
+      }
+      if (lineContainsKeywordAndEqualSign(line,"stoppingCondition")) {
+         stoppingCondition = readStoppingCondition(line);
+      }
+      if (lineContainsKeywordAndEqualSign(line,"collisionSystem")) {
+         collisionSystem = readCollisionSystem(line);
+      }
       // Green
-      if (line.contains("terrainX0")) {
+      if (lineContainsKeywordAndEqualSign(line,"terrainX0")) {
          terrainX0 = readDouble(line);
       }
-      if (line.contains("terrainY0")) {
+      if (lineContainsKeywordAndEqualSign(line,"terrainY0")) {
          terrainY0 = readDouble(line);
       }
-      if (line.contains("terrainX1")) {
+      if (lineContainsKeywordAndEqualSign(line,"terrainX1")) {
          terrainX1 = readDouble(line);
       }
-      if (line.contains("terrainY1")) {
+      if (lineContainsKeywordAndEqualSign(line,"terrainY1")) {
          terrainY1 = readDouble(line);
       }
-      if (line.contains("greenKineticFriction")) {
+      if (lineContainsKeywordAndEqualSign(line,"greenKineticFriction")) {
          greenKineticFriction = readDouble(line);
       }
-      if (line.contains("greenStaticFriction")) {
+      if (lineContainsKeywordAndEqualSign(line,"greenStaticFriction")) {
          greenStaticFriction = readDouble(line);
       }
-      if (line.contains("terrainFunction")) {
+      if (lineContainsKeywordAndEqualSign(line,"terrainFunction")) {
          terrainFunction = readString(line);
       }
       // Ball start point
-      if (line.contains("ballStartPointX")) {
+      if (lineContainsKeywordAndEqualSign(line,"ballStartPointX")) {
          ballStartPointX = readDouble(line);
       }
-      if (line.contains("ballStartPointY")) {
+      if (lineContainsKeywordAndEqualSign(line,"ballStartPointY")) {
          ballStartPointY = readDouble(line);
       }
       // Target
-      if (line.contains("targetRadius")) {
+      if (lineContainsKeywordAndEqualSign(line,"targetRadius")) {
          targetRadius = readDouble(line);
       }
-      if (line.contains("targetX")) {
+      if (lineContainsKeywordAndEqualSign(line,"targetX")) {
          targetX = readDouble(line);
       }
-      if (line.contains("targetY")) {
+      if (lineContainsKeywordAndEqualSign(line,"targetY")) {
          targetY = readDouble(line);
       }
       // Sand zone
-      if (line.contains("sandZoneX")) {
+      if (lineContainsKeywordAndEqualSign(line,"sandZoneX")) {
          double[] range = readRange(line);
          sandZoneX0.add(range[0]);
          sandZoneX1.add(range[1]);
       }
-      if (line.contains("sandZoneY")) {
+      if (lineContainsKeywordAndEqualSign(line,"sandZoneY")) {
          double[] range = readRange(line);
          sandZoneY0.add(range[0]);
          sandZoneY1.add(range[1]);
       }
-      if (line.contains("sandKineticFriction")) {
+      if (lineContainsKeywordAndEqualSign(line,"sandKineticFriction")) {
          sandKineticFriction.add(readDouble(line));
       }
-      if (line.contains("sandStaticFriction")) {
+      if (lineContainsKeywordAndEqualSign(line,"sandStaticFriction")) {
          sandStaticFriction.add(readDouble(line));
       }
       // Tree
-      if (line.contains("treeX")) {
+      if (lineContainsKeywordAndEqualSign(line,"treeX")) {
          treeX.add(readDouble(line));
       }
-      if (line.contains("treeY")) {
+      if (lineContainsKeywordAndEqualSign(line,"treeY")) {
          treeY.add(readDouble(line));
       }
-      if (line.contains("treeRadius")) {
+      if (lineContainsKeywordAndEqualSign(line,"treeRadius")) {
          treeRadius.add(readDouble(line));
       }
-      if (line.contains("treeBounciness")) {
+      if (lineContainsKeywordAndEqualSign(line,"treeBounciness")) {
          treeBounciness.add(readDouble(line));
+      }
+      // Box
+      if (lineContainsKeywordAndEqualSign(line,"boxX")) {
+         double[] range = readRange(line);
+         boxX0.add(range[0]);
+         boxX1.add(range[1]);
+      }
+      if (lineContainsKeywordAndEqualSign(line,"boxY")) {
+         double[] range = readRange(line);
+         boxY0.add(range[0]);
+         boxY1.add(range[1]);
+      }
+      if (lineContainsKeywordAndEqualSign(line,"boxBounciness")) {
+         boxBounciness.add(readDouble(line));
+      }
+   }
+   private static boolean lineContainsKeywordAndEqualSign(String line, String keyword){
+      return line.contains(keyword) && line.contains("=");
+   }
+
+   // region Read Objects
+   private static IODESolver readSolver(String line) {
+      try {
+         String name = line.substring(line.lastIndexOf("=") + 1);
+         return getSolverFromName(name);
+      } catch (IndexOutOfBoundsException e) {
+         System.out.println("There was nothing after the = sign");
+         return defsolver;
       }
    }
 
+   private static IODESolver getSolverFromName(String name) {
+      if (name.compareTo("Euler") == 0) {
+         return new EulerSolver(solverStep);
+      }
+      if (name.compareTo("RK2") == 0) {
+         return new RungeKutta2Solver(solverStep);
+      }
+      if (name.compareTo("RK4") == 0) {
+         return new RungeKutta4Solver(solverStep);
+      } else {
+         return defsolver;
+      }
+   }
+
+   private static IStoppingCondition readStoppingCondition(String line) {
+      try {
+         String name = line.substring(line.lastIndexOf("=") + 1);
+         return getStoppingConditionFromName(name);
+      } catch (IndexOutOfBoundsException e) {
+         System.out.println("There was nothing after the = sign");
+         return defstoppingCondition;
+      }
+   }
+
+   private static IStoppingCondition getStoppingConditionFromName(String name) {
+      if (name.compareTo("smallV") == 0) {
+         return new SmallVelocityStoppingCondition();
+      } else {
+         return defstoppingCondition;
+      }
+   }
+
+   private static ICollisionSystem readCollisionSystem(String line) {
+      try {
+         String name = line.substring(line.lastIndexOf("=") + 1);
+         return getCollisionSystemFromName(name);
+      } catch (IndexOutOfBoundsException e) {
+         System.out.println("There was nothing after the = sign");
+         return defcollisionSystem;
+      }
+   }
+
+   private static ICollisionSystem getCollisionSystemFromName(String name) {
+      if (name.compareTo("bounce") == 0) {
+         return new BounceCollisionSystem();
+      }
+      if (name.compareTo("stop") == 0) {
+         return new StopCollisionSystem();
+      } else {
+         return defcollisionSystem;
+      }
+   }
+   // endregion
+
+   // region Read Values
    private static double readDouble(String line) {
       try {
          if (line.contains("=")) {
@@ -263,9 +378,10 @@ public class Reader {
          return null;
       }
    }
+   // endregion
 
    // region Create Terrain
-   private static Terrain saveDataIntoObject() {
+   private static Terrain saveDataIntoTerrain() {
       terrain = new Terrain();
       // Singular values
       defineGreen();
@@ -339,6 +455,7 @@ public class Reader {
       ArrayList<IObstacle> obstacles = new ArrayList<>();
 
       obstacles.addAll(createTrees());
+      obstacles.addAll(createBoxes());
 
       terrain.obstacles = obstacles.toArray(new IObstacle[0]);
    }
@@ -384,6 +501,58 @@ public class Reader {
       }
       tree.originPosition = position;
       return tree;
+   }
+
+   private static ArrayList<IObstacle> createBoxes() {
+      ArrayList<IObstacle> boxes = new ArrayList<>();
+      while (hasBox()) {
+         boxes.add(createBox());
+      }
+      return boxes;
+   }
+
+   private static boolean hasBox() {
+      return boxX0.size() > 0 || boxX1.size() > 0 || boxY0.size() > 0 || boxY1.size() > 0 || boxBounciness.size() > 0;
+   }
+
+   private static IObstacle createBox() {
+      // Position
+      Vector2 position0 = new Vector2();
+      Vector2 position1 = new Vector2();
+      if (boxX0.size() > 0) {
+         position0.x = boxX0.get(0);
+         boxX0.remove(0);
+      } else {
+         position0.x = defBoxX0;
+      }
+      if (boxY0.size() > 0) {
+         position0.y = boxY0.get(0);
+         boxY0.remove(0);
+      } else {
+         position0.y = defBoxY0;
+      }
+      if (boxX1.size() > 0) {
+         position1.x = boxX1.get(0);
+         boxX1.remove(0);
+      } else {
+         position1.x = defBoxX1;
+      }
+      if (boxY1.size() > 0) {
+         position1.y = boxY1.get(0);
+         boxY1.remove(0);
+      } else {
+         position1.y = defBoxY1;
+      }
+      ObstacleBox box = new ObstacleBox(position0, position1);
+      // Bounciness
+      if (boxBounciness.size() > 0) {
+         box.bounciness = boxBounciness.get(0);
+         boxBounciness.remove(0);
+      } else {
+         box.bounciness = defBoxBounciness;
+      }
+
+      return box;
    }
    // endregion
 

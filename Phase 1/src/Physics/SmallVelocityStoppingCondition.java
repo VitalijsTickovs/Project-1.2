@@ -2,7 +2,7 @@ package Physics;
 
 import Data_storage.BallState;
 
-public class SmallVelocityStoppingCondition implements StoppingCondition {
+public class SmallVelocityStoppingCondition implements IStoppingCondition {
 
     @Override
     public boolean shouldStop(BallState newState, BallState previousState, double h) {

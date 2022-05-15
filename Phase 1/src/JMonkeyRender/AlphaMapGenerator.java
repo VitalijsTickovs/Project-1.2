@@ -1,6 +1,6 @@
 package JMonkeyRender;
 
-import Reader.Reader;
+import Reader.TerrainLoader;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -24,8 +24,8 @@ public final class AlphaMapGenerator {
         //This sets any sandpit that is required
         for(int x=0; x<1024; x++){
             for(int y=0; y<1024; y++){
-                if(x>Reader.getSandX()[0] && x< Reader.getSandX()[1]){
-                    if(y>Reader.getSandY()[0] && y<Reader.getSandY()[1]) {
+                if(x>TerrainLoader.getSandX()[0] && x< TerrainLoader.getSandX()[1]){
+                    if(y>TerrainLoader.getSandY()[0] && y<TerrainLoader.getSandY()[1]) {
                         graphics2D.setColor(Color.GREEN);
                         graphics2D.drawLine(x, y, x, y);
                     }

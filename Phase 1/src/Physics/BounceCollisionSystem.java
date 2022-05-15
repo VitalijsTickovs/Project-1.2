@@ -4,33 +4,8 @@ import Data_storage.*;
 
 import java.util.ArrayList;
 
-public class BounceCollisionSystem implements CollisionSystem {
+public class BounceCollisionSystem implements ICollisionSystem {
     public IObstacle[] obstacles;
-
-    /*public static void main(String[] args) {
-        setObstacles();
-
-        Ball ball = new Ball(new Vector2(-2, -2), new Vector2(1, 1));
-        ball.radius = 0.5;
-        Vector2 previousPosition = new Vector2(-0.9, 2);
-        modifyPosition(ball.state);
-        double searchRadius = ball.state.position.distanceTo(previousPosition) + ball.radius;
-        ArrayList<IObstacle> collidesWith = getTouchedObstacles(previousPosition, searchRadius);
-        CollisionData data = getClosestCollisionData(collidesWith, ball.state.position, previousPosition, ball.radius);
-        System.out.println(data);
-    }*/
-
-    private void setObstacles() {
-        obstacles = new IObstacle[2];
-        ObstacleBox box = new ObstacleBox(new Vector2(-1.5, -1.5), new Vector2(1, 1));
-        box.bounciness = 1;
-        obstacles[0] = box;
-        ObstacleTree tree = new ObstacleTree();
-        tree.bounciness = 1;
-        tree.radius = 0.5;
-        tree.originPosition = new Vector2(0.5, 1.5);
-        obstacles[1] = tree;
-    }
 
     public BallState modifyStateDueToCollisions(BallState state, BallState previousState, double ballRadius, Terrain terrain) {
         Vector2 previousPosition = previousState.velocity;
