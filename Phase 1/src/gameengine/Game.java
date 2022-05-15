@@ -4,21 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
-
-import Data_storage.Ball;
 import Data_storage.GameState;
-import Data_storage.Terrain;
 import Data_storage.Vector2;
 import GUI.InterfaceFactory;
 import GUI.ShotInputWindow;
-import Physics.PhysicsEngine;
-import Physics.RungeKutta;
 import Reader.*;
 import bot.Bot;
-import bot.ClosestEuclidianDistanceHeuristic;
-import bot.FinalEuclidianDistanceHeuristic;
-import bot.HillClimbingBot;
 
 public class Game extends Canvas implements Runnable, GameObject {
     public JFrame frame;
@@ -41,14 +32,8 @@ public class Game extends Canvas implements Runnable, GameObject {
      * @param fps The target FPS (frames per second) of the game
      */
     public Game(int fps) {
-        bot = null;//new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 8);
-        botThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                shotVector = bot.findBestShot(gameState);
-            }
-        });
         FPS = fps;
+        startBotThread();
         resetStartingVariables();
         createInputWindow();
         createGameState();
@@ -57,6 +42,16 @@ public class Game extends Canvas implements Runnable, GameObject {
         createRenderer();
         createTerrainImage();
         createFrame();
+    }
+    
+    private void startBotThread(){
+        bot = null;//new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 8);
+        botThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                shotVector = bot.findBestShot(gameState);
+            }
+        });
     }
 
     private void createGameState() {
