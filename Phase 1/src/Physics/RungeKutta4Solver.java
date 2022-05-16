@@ -70,4 +70,10 @@ public class RungeKutta4Solver implements IODESolver {
     public void setStepSize(double h) {
         this.h = h;
     }
+    
+    @Override
+    public String getSolverName() {
+        // TODO Auto-generated method stub
+        return "RK4";
+    }
 }

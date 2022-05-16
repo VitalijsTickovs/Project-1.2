@@ -38,4 +38,10 @@ public class EulerSolver implements IODESolver {
         this.h = h;
     }
 
+    @Override
+    public String getSolverName() {
+        // TODO Auto-generated method stub
+        return "Euler";
+    }
+
 }

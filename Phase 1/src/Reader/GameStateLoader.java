@@ -110,19 +110,23 @@ public class GameStateLoader {
    public static GameState readFile() {
       createScanner();
 
+      resetVariables();
       String[] allLinesSplit = splitLines();
       readVariables(allLinesSplit);
 
       return createGameStateUsingGeneratedData();
    }
 
+   private static void resetVariables() {
+
+   }
+
    private static GameState createGameStateUsingGeneratedData() {
       Terrain generatedTerrain = saveDataIntoTerrain();
       Ball startingBall = new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector());
-      PhysicsEngine hardcodedEngine = new PhysicsEngine(solver,
-            stoppingCondition, collisionSystem);
+      PhysicsEngine engine = createEngine();
 
-      GameState gameState = new GameState(generatedTerrain, startingBall, hardcodedEngine);
+      GameState gameState = new GameState(generatedTerrain, startingBall, engine);
       return gameState;
    }
 
@@ -139,7 +143,8 @@ public class GameStateLoader {
          // I was not able to come up with a line of code that would work on everyone's
          // computer
          // scanner = new Scanner(
-         //       new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/userInput.csv"));
+         // new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase
+         // 1/src/Reader/userInput.csv"));
 
       } catch (FileNotFoundException e) {
          throw new NullPointerException("File not found - the path to the save file is wrong, see comment above");
@@ -164,104 +169,105 @@ public class GameStateLoader {
    }
 
    private static void checkLineForVariables(String line) {
-      //Physics engine
-      if (lineContainsKeywordAndEqualSign(line,"solverStep")) {
+      // Physics engine
+      if (lineContainsKeywordAndEqualSign(line, "solverStep")) {
          solverStep = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"solver")) {
+      if (lineContainsKeywordAndEqualSign(line, "solver")) {
          solver = readSolver(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"stoppingCondition")) {
+      if (lineContainsKeywordAndEqualSign(line, "stoppingCondition")) {
          stoppingCondition = readStoppingCondition(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"collisionSystem")) {
+      if (lineContainsKeywordAndEqualSign(line, "collisionSystem")) {
          collisionSystem = readCollisionSystem(line);
       }
       // Green
-      if (lineContainsKeywordAndEqualSign(line,"terrainX0")) {
+      if (lineContainsKeywordAndEqualSign(line, "terrainX0")) {
          terrainX0 = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"terrainY0")) {
+      if (lineContainsKeywordAndEqualSign(line, "terrainY0")) {
          terrainY0 = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"terrainX1")) {
+      if (lineContainsKeywordAndEqualSign(line, "terrainX1")) {
          terrainX1 = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"terrainY1")) {
+      if (lineContainsKeywordAndEqualSign(line, "terrainY1")) {
          terrainY1 = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"greenKineticFriction")) {
+      if (lineContainsKeywordAndEqualSign(line, "greenKineticFriction")) {
          greenKineticFriction = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"greenStaticFriction")) {
+      if (lineContainsKeywordAndEqualSign(line, "greenStaticFriction")) {
          greenStaticFriction = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"terrainFunction")) {
+      if (lineContainsKeywordAndEqualSign(line, "terrainFunction")) {
          terrainFunction = readString(line);
       }
       // Ball start point
-      if (lineContainsKeywordAndEqualSign(line,"ballStartPointX")) {
+      if (lineContainsKeywordAndEqualSign(line, "ballStartPointX")) {
          ballStartPointX = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"ballStartPointY")) {
+      if (lineContainsKeywordAndEqualSign(line, "ballStartPointY")) {
          ballStartPointY = readDouble(line);
       }
       // Target
-      if (lineContainsKeywordAndEqualSign(line,"targetRadius")) {
+      if (lineContainsKeywordAndEqualSign(line, "targetRadius")) {
          targetRadius = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"targetX")) {
+      if (lineContainsKeywordAndEqualSign(line, "targetX")) {
          targetX = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line,"targetY")) {
+      if (lineContainsKeywordAndEqualSign(line, "targetY")) {
          targetY = readDouble(line);
       }
       // Sand zone
-      if (lineContainsKeywordAndEqualSign(line,"sandZoneX")) {
+      if (lineContainsKeywordAndEqualSign(line, "sandZoneX")) {
          double[] range = readRange(line);
          sandZoneX0.add(range[0]);
          sandZoneX1.add(range[1]);
       }
-      if (lineContainsKeywordAndEqualSign(line,"sandZoneY")) {
+      if (lineContainsKeywordAndEqualSign(line, "sandZoneY")) {
          double[] range = readRange(line);
          sandZoneY0.add(range[0]);
          sandZoneY1.add(range[1]);
       }
-      if (lineContainsKeywordAndEqualSign(line,"sandKineticFriction")) {
+      if (lineContainsKeywordAndEqualSign(line, "sandKineticFriction")) {
          sandKineticFriction.add(readDouble(line));
       }
-      if (lineContainsKeywordAndEqualSign(line,"sandStaticFriction")) {
+      if (lineContainsKeywordAndEqualSign(line, "sandStaticFriction")) {
          sandStaticFriction.add(readDouble(line));
       }
       // Tree
-      if (lineContainsKeywordAndEqualSign(line,"treeX")) {
+      if (lineContainsKeywordAndEqualSign(line, "treeX")) {
          treeX.add(readDouble(line));
       }
-      if (lineContainsKeywordAndEqualSign(line,"treeY")) {
+      if (lineContainsKeywordAndEqualSign(line, "treeY")) {
          treeY.add(readDouble(line));
       }
-      if (lineContainsKeywordAndEqualSign(line,"treeRadius")) {
+      if (lineContainsKeywordAndEqualSign(line, "treeRadius")) {
          treeRadius.add(readDouble(line));
       }
-      if (lineContainsKeywordAndEqualSign(line,"treeBounciness")) {
+      if (lineContainsKeywordAndEqualSign(line, "treeBounciness")) {
          treeBounciness.add(readDouble(line));
       }
       // Box
-      if (lineContainsKeywordAndEqualSign(line,"boxX")) {
+      if (lineContainsKeywordAndEqualSign(line, "boxX")) {
          double[] range = readRange(line);
          boxX0.add(range[0]);
          boxX1.add(range[1]);
       }
-      if (lineContainsKeywordAndEqualSign(line,"boxY")) {
+      if (lineContainsKeywordAndEqualSign(line, "boxY")) {
          double[] range = readRange(line);
          boxY0.add(range[0]);
          boxY1.add(range[1]);
       }
-      if (lineContainsKeywordAndEqualSign(line,"boxBounciness")) {
+      if (lineContainsKeywordAndEqualSign(line, "boxBounciness")) {
          boxBounciness.add(readDouble(line));
       }
    }
-   private static boolean lineContainsKeywordAndEqualSign(String line, String keyword){
+
+   private static boolean lineContainsKeywordAndEqualSign(String line, String keyword) {
       return line.contains(keyword) && line.contains("=");
    }
 
@@ -277,6 +283,10 @@ public class GameStateLoader {
    }
 
    private static IODESolver getSolverFromName(String name) {
+      if (solverStep == 0) {
+         solverStep = defsolverStep;
+      }
+
       if (name.compareTo("Euler") == 0) {
          return new EulerSolver(solverStep);
       }
@@ -624,5 +634,31 @@ public class GameStateLoader {
       return zone;
    }
    // endregion
+   // endregion
+
+   // region Create Engine
+   private static PhysicsEngine createEngine() {
+      IODESolver savedSolver;
+      IStoppingCondition savedCondition;
+      ICollisionSystem savedCollisionSystem;
+
+      if (solver == null) {
+         savedSolver = defsolver;
+      } else {
+         savedSolver = solver;
+      }
+      if (stoppingCondition == null) {
+         savedCondition = defstoppingCondition;
+      } else {
+         savedCondition = stoppingCondition;
+      }
+      if (collisionSystem == null) {
+         savedCollisionSystem = defcollisionSystem;
+      } else {
+         savedCollisionSystem = collisionSystem;
+      }
+
+      return new PhysicsEngine(savedSolver, savedCondition, savedCollisionSystem);
+   }
    // endregion
 }

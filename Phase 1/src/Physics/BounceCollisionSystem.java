@@ -154,4 +154,10 @@ public class BounceCollisionSystem implements ICollisionSystem {
         }
         return newPosition;
     }
+    
+    @Override
+    public String getCollisionSystemName() {
+        // TODO Auto-generated method stub
+        return "bounce";
+    }
 }
