@@ -11,19 +11,26 @@ public class HillClimbingBot implements Bot {
     private final Heuristic heuristic;
     private final double learningRate;
     private final int numNeighbours;
+    private final Bot initialShotTaker;
 
-    public HillClimbingBot(Heuristic heuristic, double learningRate, int numNeighbours) {
+    public HillClimbingBot(Heuristic heuristic, double learningRate, int numNeighbours, Bot initialShotTaker) {
         this.heuristic = heuristic;
         this.learningRate = learningRate;
         this.numNeighbours = numNeighbours;
+        this.initialShotTaker = initialShotTaker;
     }
 
     @Override
     public Vector2 findBestShot(GameState gameState) {
-        System.out.println("Calculating shot...");
-        gameState = gameState.copy();
-        Vector2 bestShot = new Vector2(Math.random()*2-1, Math.random()*2-1);
-        bestShot = bestShot.normalized().scale(Math.random()*Ball.maxSpeed);
+        gameState = gameState.copy();// Take an initial shot
+        Vector2 bestShot;
+        if (initialShotTaker == null) {
+            bestShot = new Vector2(Math.random() * 2 - 1, Math.random() * 2 - 1);
+            bestShot.normalize().scale(Math.random()*Ball.maxSpeed);
+        } else {
+            bestShot = initialShotTaker.findBestShot(gameState);
+        }
+
         boolean bestShotUpdated = true;
 
         // Initial heuristic calculation
@@ -35,19 +42,24 @@ public class HillClimbingBot implements Bot {
             bestShotUpdated = false;
             Vector2 tempBestShot = bestShot.copy();
 
-            for (double degree = 0; degree < 360; degree += 360.0/numNeighbours) {
+            for (int neighbour = 0; neighbour < numNeighbours; neighbour++) {
+
+                double degree = 360.0*neighbour/numNeighbours;
 
                 Vector2 changeVector = new Vector2(Math.cos(degree * Math.PI / 180), Math.sin(degree * Math.PI / 180)).scale(learningRate);
-
-                Vector2 velocity = bestShot.copy().translate(changeVector);
+                Vector2 velocity = bestShot.translated(changeVector);
 
                 if (velocity.length() > Ball.maxSpeed) {
-                    velocity = velocity.normalized().scale(Ball.maxSpeed);
+                    velocity.normalize().scale(Ball.maxSpeed);
                 }
 
                 positions = gameState.simulateShot(velocity);
 
                 double heuristicVal = heuristic.getShotValue(positions, gameState);
+
+                if (heuristicVal == bestHeuristicVal) {
+                    System.out.println("Same: "+"new shot: "+velocity+" best shot: "+tempBestShot);
+                }
 
                 if (heuristic.firstBetterThanSecond(heuristicVal, bestHeuristicVal)) {
                     tempBestShot = velocity.copy();
@@ -58,9 +70,6 @@ public class HillClimbingBot implements Bot {
 
             bestShot = tempBestShot;
         }
-
-        //System.out.println("v(x)="+bestShot.x+" v(y)="+bestShot.y);
-        //System.out.println("Best Distance:  "+bestHeuristicVal);
         return bestShot;
     }
 }

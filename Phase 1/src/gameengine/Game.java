@@ -15,12 +15,9 @@ import GUI.ShotInputWindow;
 import Physics.PhysicsEngine;
 import Physics.RungeKutta;
 import Reader.*;
-import bot.Bot;
-import bot.ClosestEuclidianDistanceHeuristic;
-import bot.FinalEuclidianDistanceHeuristic;
-import bot.HillClimbingBot;
+import bot.*;
 
-public class Game extends Canvas implements Runnable, GameObject {
+public class Game extends JPanel implements Runnable, GameObject {
     public JFrame frame;
     public Vector2 shotVector;
     public int numShots;
@@ -35,13 +32,31 @@ public class Game extends Canvas implements Runnable, GameObject {
     private GameState gameState;
     private Bot bot;
     private Thread botThread;
+    private Input input;
+    private static Game game;
+
+    public static Game getInstance() {
+        if (game == null) {
+            game = new Game(60);
+        }
+        return game;
+    }
 
     // region Startup
     /**
      * @param fps The target FPS (frames per second) of the game
      */
     public Game(int fps) {
-        bot = null;//new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 8);
+        game = this;
+        //bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16, null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));
+        //bot = new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10);
+        //bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16, null);
+        bot = new HillClimbingBot(
+                new FinalEuclidianDistanceHeuristic(),
+                0.01,
+                16,
+                new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)
+        );
         botThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -57,6 +72,14 @@ public class Game extends Canvas implements Runnable, GameObject {
         createRenderer();
         createTerrainImage();
         createFrame();
+        createInput();
+    }
+
+    private void createInput() {
+        input = new Input();
+        setFocusable(true);
+        requestFocus();
+        addKeyListener(input);
     }
 
     private void createGameState() {
@@ -76,8 +99,8 @@ public class Game extends Canvas implements Runnable, GameObject {
 
     private void createCamera() {
         cam = new Camera();
-        cam.width = 25;
-        cam.height = 25;
+        cam.width = 15;
+        cam.height = 15;
         cam.x = gameState.getBall().state.position.x;
         cam.y = gameState.getBall().state.position.y;
     }
@@ -88,7 +111,7 @@ public class Game extends Canvas implements Runnable, GameObject {
         renderer.terrain = gameState.getTerrain();
         renderer.cam = cam;
         renderer.ball = gameState.getBall();
-        renderer.unitSizePixels = 20;
+        renderer.unitSizePixels = 40;
         renderer.createTerrainImage();
     }
 
@@ -145,6 +168,28 @@ public class Game extends Canvas implements Runnable, GameObject {
     // region Update
     private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
 
+    public void setBot(Bot bot) {
+        this.bot = bot;
+    }
+
+    /**
+     * Checks if a key was pressed.
+     * @param key The key to check. see {@code Input}
+     * @return {@code true} if it was pressed and {@code false} otherwise
+     */
+    public boolean checkKeyPressed(int key) {
+        return input.isPressed(key);
+    }
+
+    /**
+     * Checks if a key is being held down.
+     * @param key The key to check. see {@code Input}
+     * @return {@code true} if it is being helf down and {@code false} otherwise
+     */
+    public boolean checkKeyDown(int key) {
+        return input.isDown(key);
+    }
+
     /**
      * Updates the state of the game each step
      */
@@ -156,11 +201,41 @@ public class Game extends Canvas implements Runnable, GameObject {
         // Update the ball position if it has been calculated
         moveBall();
         moveCamera();
+        // Reset the game
+        if (checkKeyPressed(Input.R)) {
+            resetGame();
+        }
+        if (checkKeyPressed(Input.H)) {
+            setBot(new HillClimbingBot(
+                    new FinalEuclidianDistanceHeuristic(),
+                    0.01,
+                    12,
+                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)
+            ));
+        }
+        if (checkKeyPressed(Input.P)) {
+            setBot(new ParticleSwarmBot(
+                    new FinalEuclidianDistanceHeuristic(),
+                    0.5,
+                    0.5,
+                    0.5,
+                    100,
+                    10)
+            );
+        }
+        if (checkKeyPressed(Input.G)) {
+            setBot(new GradientDescentBot(
+                    new FinalEuclidianDistanceHeuristic(),
+                    0.01,
+                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)
+            ));
+        }
+        input.removeFromPressed();
     }
 
     private void handleBallInWater() {
         if (isSimulationFinished()) {
-            boolean isBallInWater = gameState.getTerrain().terrainFunction.valueAt(gameState.getBall().state.position.x, gameState.getBall().state.position.y) <= 0;
+            boolean isBallInWater = gameState.getTerrain().terrainFunction.valueAt(gameState.getBall().state.position.x, gameState.getBall().state.position.y) < 0;
             if (isBallInWater) {
                 resetGame();
             }
@@ -170,17 +245,29 @@ public class Game extends Canvas implements Runnable, GameObject {
     private void resetGame() {
         gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
         numShots = 0;
+        if (bot != null && botThread.isAlive()) {
+            // End the bot thread if it is still running
+            try {
+                botThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        shotVector = null;
+        ballPositions = new ArrayList<Vector2>();
     }
 
     private void handleOpenWindow() {
-        if (isSimulationFinished()) {
+        if (isSimulationFinished() && !hasReachedTarget()) {
             if (bot == null) {
                 shotInputWindow.openWindow();
             } else {
                 botThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        System.out.println("Calculating shot...");
                         shotVector = bot.findBestShot(gameState);
+                        System.out.println("Velocity: "+shotVector);
                     }
                 });
                 botThread.start();
@@ -238,29 +325,33 @@ public class Game extends Canvas implements Runnable, GameObject {
      * Renders the game
      */
     public void render() {
-        if (isBufferStrategyNull()) {
-            return;
-        }
+        //if (isBufferStrategyNull()) {
+        //    return;
+        //}
         updateGraphics();
     }
 
-    private boolean isBufferStrategyNull() {
+    /*private boolean isBufferStrategyNull() {
         bufferStrategy = getBufferStrategy();
         if (bufferStrategy == null) {
             createBufferStrategy(3);
             return true;
         }
         return false;
-    }
+    }*/
 
     private void updateGraphics() {
-        Graphics2D g2 = (Graphics2D) bufferStrategy.getDrawGraphics();
-        g2.drawImage(terrainImage, 0, 0, terrainImage.getWidth(), terrainImage.getHeight(), null);
-
+        Graphics2D g2 = (Graphics2D) terrainImage.getGraphics();//(Graphics2D) bufferStrategy.getDrawGraphics();
+        g2.setColor(Color.WHITE);
+        g2.fillRect(0 ,0, terrainImage.getWidth(), terrainImage.getHeight());
+        //g2.drawImage(terrainImage, 0, 0, terrainImage.getWidth(), terrainImage.getHeight(), null);
         renderer.render(g2);
-
         g2.dispose();
-        bufferStrategy.show();
+
+        g2 = (Graphics2D) getGraphics();
+        g2.drawImage(terrainImage, null, 0, 0);
+        g2.dispose();
+        //bufferStrategy.show();
     }
     // endregion
 

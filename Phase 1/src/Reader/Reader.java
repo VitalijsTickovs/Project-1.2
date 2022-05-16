@@ -105,7 +105,7 @@ public class Reader {
               saveDataIntoObject(),
               new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector()),
               //new RungeKutta()
-              new PhysicsEngine(9.81, new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem())
+              new PhysicsEngine(9.81, new RungeKutta2Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem())
       );
    }
 
