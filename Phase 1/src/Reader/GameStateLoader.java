@@ -30,6 +30,7 @@ public class GameStateLoader {
 
    private static double ballStartPointX;
    private static double ballStartPointY;
+   private static double ballRadius;
 
    private static double targetRadius;
    private static double targetX;
@@ -159,8 +160,8 @@ public class GameStateLoader {
    }
 
    private static GameState createGameStateUsingGeneratedData() {
-      Terrain generatedTerrain = saveDataIntoTerrain();
-      Ball startingBall = new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector());
+      Terrain generatedTerrain = createTerrain();
+      Ball startingBall = createBall();
       PhysicsEngine engine = createEngine();
 
       GameState gameState = new GameState(generatedTerrain, startingBall, engine);
@@ -241,12 +242,15 @@ public class GameStateLoader {
       if (lineContainsKeywordAndEqualSign(line, "terrainFunction")) {
          terrainFunction = readString(line);
       }
-      // Ball start point
+      // Ball
       if (lineContainsKeywordAndEqualSign(line, "ballStartPointX")) {
          ballStartPointX = readDouble(line);
       }
       if (lineContainsKeywordAndEqualSign(line, "ballStartPointY")) {
          ballStartPointY = readDouble(line);
+      }
+      if (lineContainsKeywordAndEqualSign(line, "ballRadius")) {
+         ballRadius = readDouble(line);
       }
       // Target
       if (lineContainsKeywordAndEqualSign(line, "targetRadius")) {
@@ -427,7 +431,7 @@ public class GameStateLoader {
    // endregion
 
    // region Create Terrain
-   private static Terrain saveDataIntoTerrain() {
+   private static Terrain createTerrain() {
       terrain = new Terrain();
       // Singular values
       defineGreen();
@@ -696,6 +700,12 @@ public class GameStateLoader {
       }
 
       return new PhysicsEngine(savedSolver, savedCondition, savedCollisionSystem);
+   }
+
+   private static Ball createBall(){
+      Ball newBall = new Ball(terrain.ballStartingPosition, Vector2.zeroVector());
+      newBall.radius = ballRadius;
+      return newBall;
    }
    // endregion
 }

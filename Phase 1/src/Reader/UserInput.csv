@@ -20,9 +20,10 @@ greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
 terrainFunction = 0.4*(0.9 - e**(-(x**2+y**2)/8));
 
-//To create ball "ballStartPointX", "ballStartPointY";
+//To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
 ballStartPointX = -3;
 ballStartPointY = 0;
+ballRadius = 1;
 
 //To create target "targetRadius", "targetX", "targetX";
 targetRadius = 0.15;
