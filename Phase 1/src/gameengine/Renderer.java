@@ -96,8 +96,8 @@ public class Renderer {
         // Calculate ball render position
         int ballRenderX = (int) ((ball.state.position.x - camTLx) * unitSizePixels);
         int ballRenderY = (int) ((ball.state.position.y - ballZ - camTLy) * unitSizePixels);
-        int ballWidth = unitSizePixels;
-        int ballHeight = unitSizePixels;
+        int ballWidth = unitSizePixels/2;
+        int ballHeight = unitSizePixels/2;
         // Ball shadow
         g2.setColor(new Color(50, 50, 50, 50));
         g2.fillArc(ballRenderX-3*ballWidth/4, ballRenderY-3*ballHeight/4, 3*ballWidth/2, 3*ballHeight/2, 0, 360);
@@ -108,9 +108,9 @@ public class Renderer {
         g2.setFont(new Font("TimesRoman", Font.BOLD, 15));
         g2.setColor(Color.WHITE);
         BigDecimal xx = new BigDecimal(ball.state.position.x);
-        xx = xx.setScale(2, RoundingMode.HALF_UP);
+        xx = xx.setScale(5, RoundingMode.HALF_UP);
         BigDecimal yy = new BigDecimal(ball.state.position.y);
-        yy = yy.setScale(2, RoundingMode.HALF_UP);
+        yy = yy.setScale(5, RoundingMode.HALF_UP);
         g2.drawString("x = "+xx+" y = "+yy, unitSizePixels, 2*unitSizePixels);
 
         // Draw number of shots
