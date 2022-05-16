@@ -16,7 +16,7 @@ public class GameStateLoader {
    // Singular values
    private static double solverStep;
 
-   private static IODESolver solver;
+   private static IODESolver ODEsolver;
    private static IStoppingCondition stoppingCondition;
    private static ICollisionSystem collisionSystem;
 
@@ -61,7 +61,7 @@ public class GameStateLoader {
    // region default variable values
    private final static double defsolverStep = 0.01;
 
-   private final static IODESolver defsolver = new RungeKutta4Solver(defsolverStep);
+   private final static IODESolver defODEsolver = new RungeKutta4Solver(defsolverStep);
    private final static IStoppingCondition defstoppingCondition = new SmallVelocityStoppingCondition();
    private final static ICollisionSystem defcollisionSystem = new BounceCollisionSystem();
 
@@ -120,7 +120,7 @@ public class GameStateLoader {
 
    private static void resetVariables() {
       solverStep = 0;
-      solver = null;
+      ODEsolver = null;
       stoppingCondition = null;
       collisionSystem = null;
 
@@ -210,8 +210,8 @@ public class GameStateLoader {
       if (lineContainsKeywordAndEqualSign(line, "solverStep")) {
          solverStep = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line, "solver")) {
-         solver = readSolver(line);
+      if (lineContainsKeywordAndEqualSign(line, "ODEsolver")) {
+         ODEsolver = readSolver(line);
       }
       if (lineContainsKeywordAndEqualSign(line, "stoppingCondition")) {
          stoppingCondition = readStoppingCondition(line);
@@ -318,7 +318,7 @@ public class GameStateLoader {
          return getSolverFromName(name);
       } catch (IndexOutOfBoundsException e) {
          System.out.println("There was nothing after the = sign");
-         return defsolver;
+         return defODEsolver;
       }
    }
 
@@ -327,16 +327,16 @@ public class GameStateLoader {
          solverStep = defsolverStep;
       }
 
-      if (name.compareTo("Euler") == 0) {
+      if (name.contains("Euler")) {
          return new EulerSolver(solverStep);
       }
-      if (name.compareTo("RK2") == 0) {
+      if (name.contains("RK2")) {
          return new RungeKutta2Solver(solverStep);
       }
-      if (name.compareTo("RK4") == 0) {
+      if (name.contains("RK4")) {
          return new RungeKutta4Solver(solverStep);
       } else {
-         return defsolver;
+         return defODEsolver;
       }
    }
 
@@ -351,7 +351,7 @@ public class GameStateLoader {
    }
 
    private static IStoppingCondition getStoppingConditionFromName(String name) {
-      if (name.compareTo("smallV") == 0) {
+      if (name.contains("smallV")) {
          return new SmallVelocityStoppingCondition();
       } else {
          return defstoppingCondition;
@@ -369,10 +369,10 @@ public class GameStateLoader {
    }
 
    private static ICollisionSystem getCollisionSystemFromName(String name) {
-      if (name.compareTo("bounce") == 0) {
+      if (name.contains("bounce")) {
          return new BounceCollisionSystem();
       }
-      if (name.compareTo("stop") == 0) {
+      if (name.contains("stop")) {
          return new StopCollisionSystem();
       } else {
          return defcollisionSystem;
@@ -682,10 +682,10 @@ public class GameStateLoader {
       IStoppingCondition savedCondition;
       ICollisionSystem savedCollisionSystem;
 
-      if (solver == null) {
-         savedSolver = defsolver;
+      if (ODEsolver == null) {
+         savedSolver = defODEsolver;
       } else {
-         savedSolver = solver;
+         savedSolver = ODEsolver;
       }
       if (stoppingCondition == null) {
          savedCondition = defstoppingCondition;

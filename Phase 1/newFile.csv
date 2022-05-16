@@ -1,5 +1,5 @@
 solverStep = 0.01;
-solver = RK4;
+solver = RK2;
 stoppingCondition = smallV;
 collisionSystem = bounce;
 
