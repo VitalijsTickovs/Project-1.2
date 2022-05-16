@@ -4,7 +4,7 @@ import Data_storage.BallState;
 import Data_storage.Terrain;
 import Data_storage.Vector2;
 
-public class RungeKutta2Solver implements ODESolver {
+public class RungeKutta2Solver implements IODESolver {
     private double h;
 
     public RungeKutta2Solver(double h) {
@@ -49,5 +49,11 @@ public class RungeKutta2Solver implements ODESolver {
     @Override
     public void setStepSize(double h) {
         this.h = h;
+    }
+    
+    @Override
+    public String getSolverName() {
+        // TODO Auto-generated method stub
+        return "RK2";
     }
 }

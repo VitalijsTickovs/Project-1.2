@@ -1,8 +1,6 @@
 package bot;
 
 import Data_storage.*;
-import Physics.PhysicsEngine;
-import Physics.RungeKutta;
 
 import java.io.File;
 import java.io.FileWriter;

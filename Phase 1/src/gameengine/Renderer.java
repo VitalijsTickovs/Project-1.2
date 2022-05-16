@@ -79,7 +79,9 @@ public class Renderer {
             if (yDraw < 0) {
                 yDraw = 0;
             }
-            g2.drawImage(terrainImage.getSubimage(xTL, yTL, xBR - xTL, yBR - yTL), null, xDraw, yDraw);
+            BufferedImage bufferedImage = terrainImage.getSubimage(xTL, yTL, xBR - xTL, yBR - yTL);
+            g2.drawImage(bufferedImage, null, xDraw, yDraw);
+            bufferedImage.flush();
         }
 
         // Render the ball

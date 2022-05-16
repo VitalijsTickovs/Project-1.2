@@ -1,8 +1,9 @@
 package Physics;
 
 import Data_storage.BallState;
-import Data_storage.Terrain;
 
-public interface StoppingCondition {
+public interface IStoppingCondition {
     public boolean shouldStop(BallState newState, BallState previousState, double h);
+
+    public String getConditionName();
 }

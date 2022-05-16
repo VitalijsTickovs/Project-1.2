@@ -4,16 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
-
-import Data_storage.Ball;
 import Data_storage.GameState;
-import Data_storage.Terrain;
 import Data_storage.Vector2;
 import GUI.InterfaceFactory;
 import GUI.ShotInputWindow;
-import Physics.PhysicsEngine;
-import Physics.RungeKutta;
 import Reader.*;
 import bot.*;
 
@@ -51,12 +45,12 @@ public class Game extends JPanel implements Runnable, GameObject {
         //bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16, null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));
         //bot = new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10);
         //bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16, null);
-        bot = new HillClimbingBot(
+        setBot(new HillClimbingBot(
                 new FinalEuclidianDistanceHeuristic(),
                 0.01,
                 16,
                 new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)
-        );
+        ));
         botThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -64,9 +58,10 @@ public class Game extends JPanel implements Runnable, GameObject {
             }
         });
         FPS = fps;
+        createGameState();
+        resetBotThread();
         resetStartingVariables();
         createInputWindow();
-        createGameState();
         //createTerrain();
         createCamera();
         createRenderer();
@@ -81,10 +76,20 @@ public class Game extends JPanel implements Runnable, GameObject {
         requestFocus();
         addKeyListener(input);
     }
+    
+    private void resetBotThread(){
+        botThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Calculating shot...");
+                shotVector = bot.findBestShot(gameState);
+                System.out.println("Velocity: "+shotVector);
+            }
+        });
+    }
 
     private void createGameState() {
-        gameState = Reader.readFile();
-        gameState.getTerrain().calculateHeightMap(1024, 1.0);
+        gameState = GameStateLoader.readFile();
     }
 
     private void resetStartingVariables() {
@@ -262,14 +267,7 @@ public class Game extends JPanel implements Runnable, GameObject {
             if (bot == null) {
                 shotInputWindow.openWindow();
             } else {
-                botThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("Calculating shot...");
-                        shotVector = bot.findBestShot(gameState);
-                        System.out.println("Velocity: "+shotVector);
-                    }
-                });
+                resetBotThread();
                 botThread.start();
             }
         }

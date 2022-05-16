@@ -5,7 +5,7 @@ import Data_storage.BallState;
 import Data_storage.Terrain;
 import Data_storage.Vector2;
 
-public class EulerSolver implements ODESolver {
+public class EulerSolver implements IODESolver {
 
     private double h; // The step size to use
 
@@ -36,6 +36,12 @@ public class EulerSolver implements ODESolver {
     @Override
     public void setStepSize(double h) {
         this.h = h;
+    }
+
+    @Override
+    public String getSolverName() {
+        // TODO Auto-generated method stub
+        return "Euler";
     }
 
 }

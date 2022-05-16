@@ -69,7 +69,7 @@ public class EngineTester {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         PhysicsEngine engine = new PhysicsEngine(9.81, new RungeKutta2Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem());
         Terrain terrain = new Terrain("0", 0.2, 0.1, new Vector2(-50, -50), new Vector2(50, 50));
         EngineTester et = new EngineTester();
@@ -85,5 +85,5 @@ public class EngineTester {
                 terrain,
                 0.6
         );
-    }
+    }*/
 }
