@@ -417,6 +417,10 @@ public class Function {
         return root.toString();
     }
 
+    public String getString(){
+        return root.toString();
+    }
+
     public static void main(String[] args) {
         Function f = new Function("ln(2*x+1)");
         System.out.println(f);

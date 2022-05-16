@@ -82,10 +82,10 @@ public class GameStateLoader {
    private final static double deftargetY = 4;
 
    // ArrayList values
-   private final static double defsandPitX0 = 0;
-   private final static double defsandPitY0 = 0;
-   private final static double defsandPitX1 = 100;
-   private final static double defsandPitY1 = 100;
+   private final static double defsandZoneX0 = 0;
+   private final static double defsandZoneY0 = 0;
+   private final static double defsandZoneX1 = 100;
+   private final static double defsandZoneY1 = 100;
    private final static double defsandKineticFriction = 0.25;
    private final static double defsandStaticFriction = 0.4;
 
@@ -101,11 +101,11 @@ public class GameStateLoader {
    private final static double defBoxBounciness = 1;
 
    public static double[] getSandX() {
-      return new double[] { defsandPitX0, defsandPitX1 };
+      return new double[] { defsandZoneX0, defsandZoneX1 };
    }
 
    public static double[] getSandY() {
-      return new double[] { defsandPitY0, defsandPitY1 };
+      return new double[] { defsandZoneY0, defsandZoneY1 };
    }
 
    public static GameState readFile() {
@@ -175,14 +175,13 @@ public class GameStateLoader {
     */
    private static void createScanner() {
       try {
-         scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase1/src/Reader/userInput.csv"));
+         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase1/src/Reader/userInput.csv"));
          // The top line does not work on my computer, so I put the one at the bottom -
          // comment it out and switch.
          // I was not able to come up with a line of code that would work on everyone's
          // computer
-         // scanner = new Scanner(
-         // new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase
-         // 1/src/Reader/userInput.csv"));
+         scanner = new Scanner(
+         new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv"));
 
       } catch (FileNotFoundException e) {
          throw new NullPointerException("File not found - the path to the save file is wrong, see comment above");
@@ -417,7 +416,7 @@ public class GameStateLoader {
          String[] split = temp.split("<");
          double[] range = new double[2];
          range[0] = readDouble(split[0]);
-         range[1] = readDouble(split[2]);
+         range[1] = readDouble(split[1]);
          return range;
 
       } catch (IndexOutOfBoundsException e) {
@@ -637,25 +636,25 @@ public class GameStateLoader {
          position0.x = sandZoneX0.get(0);
          sandZoneX0.remove(0);
       } else {
-         position0.x = defsandPitX0;
+         position0.x = defsandZoneX0;
       }
       if (sandZoneY0.size() > 0) {
          position0.y = sandZoneY0.get(0);
          sandZoneY0.remove(0);
       } else {
-         position0.y = defsandPitY0;
+         position0.y = defsandZoneY0;
       }
       if (sandZoneX1.size() > 0) {
          position1.x = sandZoneX1.get(0);
          sandZoneX1.remove(0);
       } else {
-         position1.x = defsandPitX1;
+         position1.x = defsandZoneX1;
       }
       if (sandZoneY1.size() > 0) {
          position1.y = sandZoneY1.get(0);
          sandZoneY1.remove(0);
       } else {
-         position1.y = defsandPitY1;
+         position1.y = defsandZoneY1;
       }
       // Friction
       if (sandKineticFriction.size() > 0) {

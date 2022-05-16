@@ -2,13 +2,13 @@
 solverStep = 0.01;
 
 //Solvers "Euler", "RK2", "RK4"
-solver = RK4;
+solver = Euler;
 
 // Stopping conditions "smallV" only for now
 stoppingCondition = smallV;
 
 //Collision systems "bounce", "stop"
-collisionSystem = bounce;
+collisionSystem = stop;
 
 // To create terrain "terrainX0", "terrainY0", "terrainX1", "terrainY1", 
 // "greenKineticFriction", "greenStaticFriction", "terrainFunction";
@@ -18,7 +18,7 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
-terrainFunction = 0.4*(0.9 - e**(-(x**2+y**2)/8));
+terrainFunction = sin(x+y);
 
 //To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
 ballStartPointX = -3;
@@ -32,7 +32,7 @@ targetY = 1;
 
 //To create sand zone "sandZoneX", "sandZoneY", "sandKineticFriction", "sandStaticFriction";
 //Make this a range Eg. variableX = -2<5;
-
+sandZoneX = 5<10;
 //To create tree "treeX", "treeY", "treeRadius", "treeBounciness";
 
 //To create box "boxX", "boxY", "boxBounciness";
