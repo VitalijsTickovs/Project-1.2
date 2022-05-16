@@ -118,7 +118,44 @@ public class GameStateLoader {
    }
 
    private static void resetVariables() {
+      solverStep = 0;
+      solver = null;
+      stoppingCondition = null;
+      collisionSystem = null;
 
+      terrainX0 = 0;
+      terrainY0 = 0;
+      terrainX1 = 0;
+      terrainY1 = 0;
+
+      greenKineticFriction = 0;
+      greenStaticFriction = 0;
+      terrainFunction = null;
+
+      ballStartPointX = 0;
+      ballStartPointY = 0;
+
+      targetRadius = 0;
+      targetX = 0;
+      targetY = 0;
+
+      sandZoneX0 = new ArrayList<>();
+      sandZoneY0 = new ArrayList<>();
+      sandZoneX1 = new ArrayList<>();
+      sandZoneY1 = new ArrayList<>();
+      sandKineticFriction = new ArrayList<>();
+      sandStaticFriction = new ArrayList<>();
+
+      treeX = new ArrayList<>();
+      treeY = new ArrayList<>();
+      treeBounciness = new ArrayList<>();
+      treeRadius = new ArrayList<>();
+
+      boxX0 = new ArrayList<>();
+      boxY0 = new ArrayList<>();
+      boxX1 = new ArrayList<>();
+      boxY1 = new ArrayList<>();
+      boxBounciness = new ArrayList<>();
    }
 
    private static GameState createGameStateUsingGeneratedData() {
