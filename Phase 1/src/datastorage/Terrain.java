@@ -10,8 +10,7 @@ public class Terrain {
     // This is generated after Terrain is created
     public double[][] meshGrid2;
     public float[] meshGrid;
-    public float minScaledVal = Integer.MAX_VALUE;
-    public float maxScaledVal = Integer.MIN_VALUE;
+
     public float[] heightmap;
 
     // All of the data below should be included, when Terrain is created
@@ -28,23 +27,18 @@ public class Terrain {
     public double kineticFriction;
 
     public TerrainFunction1 terrainFunction;
+    public double scaleFactor = 1;
 
     public int xRes = 500;
     public int yRes = 500;
-
-    public final int SQUARES_PER_GAME_UNIT = 4; // How many squares will the map used by AStar pathfinding generate per
-                                                // game unit.
-    // A game unit is a distance between two vectors (0,0) and (0,1);
-    // The map's size is calculated the "topLeftCorner" and "bottomRightCorner"
-    // vectors
 
     public Terrain() {
     }
 
     // This value seems to be the right number, so no need to provide it as input
     // everytime.
-    private final int VERTECES_PER_SIDE = 1025;
-    public final double NORMAL_FACTOR = 50;
+    private final int VERTECES_PER_SIDE = 1024;
+    private final double NORMAL_FACTOR = 50;
 
     public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner,
             Vector2 limitingCorner) {
