@@ -1,8 +1,12 @@
-package Reader;
+package reader;
 
 import java.io.*;
-import Data_storage.*;
-import Physics.*;
+
+import datastorage.*;
+import datastorage.obstacles.IObstacle;
+import datastorage.obstacles.ObstacleBox;
+import datastorage.obstacles.ObstacleTree;
+import physics.*;
 
 public class GameStateSaver {
 

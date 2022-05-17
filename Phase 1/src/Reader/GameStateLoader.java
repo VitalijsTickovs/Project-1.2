@@ -1,11 +1,18 @@
-package Reader;
+package reader;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import Data_storage.*;
-import Physics.*;
+import datastorage.*;
+import datastorage.obstacles.IObstacle;
+import datastorage.obstacles.ObstacleBox;
+import datastorage.obstacles.ObstacleTree;
+import physics.collisionsystems.*;
+import physics.*;
+import physics.solvers.*;
+import physics.stoppingconditions.*;
+import utility.math.Vector2;
 
 public class GameStateLoader {
 

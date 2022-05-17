@@ -2,9 +2,8 @@ package bot;
 
 import java.util.LinkedList;
 
-import Data_storage.Ball;
-import Data_storage.Terrain;
-import Data_storage.Vector2;
+import datastorage.Terrain;
+import utility.math.Vector2;
 
 public class AStar {
     /**

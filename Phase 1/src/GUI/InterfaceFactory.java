@@ -1,11 +1,11 @@
-package GUI;
+package gui;
 
 import javax.swing.*;
+
+import utility.math.Vector2;
+
 import java.awt.*;
 import java.awt.event.*;
-
-import Data_storage.InputPanel;
-import Data_storage.Vector2;
 
 /**
  * We shall be using this class to make interfaces. It can create parts of the

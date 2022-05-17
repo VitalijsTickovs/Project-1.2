@@ -1,4 +1,4 @@
-package JMonkeyRender;
+package jmonkeyrender;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;

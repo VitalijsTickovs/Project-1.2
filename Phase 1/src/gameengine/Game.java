@@ -4,12 +4,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
-import Data_storage.GameState;
-import Data_storage.Vector2;
-import GUI.InterfaceFactory;
-import GUI.ShotInputWindow;
-import Reader.*;
+
 import bot.*;
+import bot.botimplementations.Bot;
+import bot.botimplementations.GradientDescentBot;
+import bot.botimplementations.HillClimbingBot;
+import bot.botimplementations.ParticleSwarmBot;
+import bot.heuristics.FinalEuclidianDistanceHeuristic;
+import datastorage.GameState;
+import gui.InterfaceFactory;
+import gui.ShotInputWindow;
+import reader.*;
+import utility.math.Vector2;
 
 public class Game extends JPanel implements Runnable, GameObject {
     public JFrame frame;

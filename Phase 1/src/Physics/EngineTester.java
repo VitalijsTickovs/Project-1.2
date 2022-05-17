@@ -1,13 +1,14 @@
-package Physics;
+package physics;
 
-import Data_storage.Ball;
-import Data_storage.Terrain;
-import Data_storage.Vector2;
 import function.Function;
+import utility.math.Vector2;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+
+import datastorage.Ball;
+import datastorage.Terrain;
 
 public class EngineTester {
     public void testStepSizeAccuracy(PhysicsEngine engine, Vector2 stepSizeRange, Vector2 p0,

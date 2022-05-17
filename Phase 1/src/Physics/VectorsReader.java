@@ -1,10 +1,10 @@
-package Physics;
+package physics;
 
-
-import Data_storage.Vector2;
 
 import java.io.*;
 import java.util.*;
+
+import utility.math.Vector2;
 
 public class VectorsReader {
 

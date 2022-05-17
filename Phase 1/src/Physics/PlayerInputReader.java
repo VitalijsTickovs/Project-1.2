@@ -1,6 +1,6 @@
-package Physics;
+package physics;
 
-import Data_storage.Vector2;
+import utility.math.Vector2;
 
 public class PlayerInputReader extends InputModule {
 
