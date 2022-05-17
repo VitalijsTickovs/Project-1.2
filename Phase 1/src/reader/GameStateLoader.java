@@ -189,11 +189,24 @@ public class GameStateLoader {
          // computer
          scanner = new Scanner(
          new FileReader(System.getProperty("user.dir") +"/Phase 1/src/reader/UserInput.csv"));
-
       } catch (FileNotFoundException e) {
          throw new NullPointerException("File not found - the path to the save file is wrong, see comment above");
       } catch (NullPointerException e) {
          throw new NullPointerException("The path to the save file itself was null");
+      }
+   }
+
+   private static String getPath() {
+      // The top line does not work on my computer, so I put the one at the bottom -
+      // comment it out and switch.
+      // I was not able to come up with a line of code that would work on everyone's
+      // computer
+      String dir = System.getProperty("user.dir");
+      boolean stansLaptop = dir.contains("src");
+      if (stansLaptop) {
+         return System.getProperty("user.dir") + "\\reader\\UserInput.csv";
+      } else {
+         return System.getProperty("user.dir") + "Phase 1/src/reader/UserInput.csv";
       }
    }
 
@@ -713,5 +726,18 @@ public class GameStateLoader {
       newBall.radius = ballRadius;
       return newBall;
    }
+
+   public static double getTargetRadius() {
+      return targetRadius;
+   }
+
+   public static double getTargetX() {
+      return targetX;
+   }
+
+   public static double getTargetY() {
+      return targetY;
+   }
+
    // endregion
 }

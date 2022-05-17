@@ -9,8 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ShotInputWindow {
-    public Game game;
+public class ShotInputWindow extends BallVelocityInput {
     public boolean isOpen;
 
     private JFrame frame;
@@ -21,6 +20,7 @@ public class ShotInputWindow {
      * Constructor. Creates a new ShotInput
      */
     public ShotInputWindow(Game game) {
+        super(game);
         isOpen = false;
         this.game = game;
     }
@@ -29,7 +29,7 @@ public class ShotInputWindow {
     /**
      * Creates a JFrame window with a velocity input option
      */
-    public void openWindow() {
+    public void readyForNextInput() {
         if (!wasCreated) {
             createWindow();
             wasCreated = true;
@@ -89,7 +89,7 @@ public class ShotInputWindow {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    game.shotVector = readShotVector(xInputPanel, yInputPanel);
+                    game.setShotForce(readShotVector(xInputPanel, yInputPanel));
                     frame.setVisible(false);
                     isOpen = false;
                 } catch (Exception e) {

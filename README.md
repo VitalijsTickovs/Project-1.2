@@ -6,7 +6,7 @@
 PROJECT TITLE: Crazy Putting
 PURPOSE OF PROJECT: Calculating the approximation of how the ball would move based on friction and terrain.
 DATE: 17.03.2022
-HOW TO START THIS PROJECT: Open src/GUI/MenuGUI.java file. Compile and run the specified file.
+HOW TO START THIS PROJECT: Open src/gui/MenuGUI.java file. Compile and run the specified file.
 AUTHORS: Alex, Niko, Tomas, Vitaly, Wei, Stan, Léa
 
 USER INSTRUCTIONS:
@@ -20,14 +20,14 @@ Build the project.
 
 To run the 2D renderer:
 1. Open src folder, which is located in phase1 folder in VS Code/Eclipse/Intellij Idea.
-2. Open MenuGUI.java in GUI folder.
+2. Open MenuGUI.java in gui folder.
 3. Compile it using java compiler.
 4. Run it.
 5. Click on Single player.
 
 To run the 3D renderer:
 1. Open src folder, which is located in phase1 folder in VS Code/Eclipse/Intellij Idea.
-2. Open MenuGUI.java in GUI folder.
+2. Open MenuGUI.java in gui folder.
 3. Compile it using java compiler.
 4. Run it.
 5. Click on Multiplayer.

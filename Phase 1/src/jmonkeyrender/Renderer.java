@@ -1,5 +1,6 @@
 package jmonkeyrender;
 
+import gameengine.Game;
 import physics.*;
 import physics.collisionsystems.StopCollisionSystem;
 import physics.solvers.RungeKutta4Solver;
@@ -30,13 +31,15 @@ import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 
+import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Queue;
 
 public class Renderer extends Cam {
     private TerrainQuad terrainQuad;
-    private Terrain terrain;
+    private GameState gameState;
     private Geometry ballRender;
 
     private ArrayList<Vector2> points = new ArrayList<>();
@@ -61,8 +64,9 @@ public class Renderer extends Cam {
     float x = 0;
     float y = 0;
     float val = 0;
-    int normalFactor = 50;
-    float terScale = (float) normalFactor/10;
+    float normalFactor;
+    float terScale = 10;
+    private Terrain terrain;
 
     /**
      * Initializes area terrain based on the function given in input file
@@ -77,7 +81,7 @@ public class Renderer extends Cam {
         AlphaMapGenerator.generateAlphaMap(terrain);
 
         //Setting terrain using heightmap
-        this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), terrain.heightmap);
+        this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), this.terrain.heightmap);
 
         //Setting up the Texture of the ground
         Material matTerrain = new Material(assetManager,"Common/MatDefs/Terrain/Terrain.j3md");
@@ -99,7 +103,7 @@ public class Renderer extends Cam {
         rootNode.addLight(amb);
 
         terrainQuad.setMaterial(matTerrain);
-        terrainQuad.setLocalScale(1,terScale,1);
+        terrainQuad.scale(1,terScale,1);
         rootNode.attachChild(terrainQuad);
     }
 
@@ -154,7 +158,7 @@ public class Renderer extends Cam {
         val *= normalFactor;
         this.val = val;
 
-        //Moving the cylinder to the calculated position
+        //Moving the cylinder to the calculatd position
         target.setLocalTranslation((float) this.targetPos.x, val*terScale, (float) this.targetPos.y);
 
         //Adding it to the scene
@@ -261,8 +265,10 @@ public class Renderer extends Cam {
 
         //Setting location to be around the terrain
         water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
-        water.setLocalTranslation(xoff-100, 0, -yoff+100);
-        water.move(0, (float) terrain.minVal*terScale,0);
+        water.setLocalTranslation(xoff-100, this.terrain.minScaledVal*terScale, -yoff+100);
+        float heightLength = this.terrain.maxScaledVal-this.terrain.minScaledVal;
+
+        if(heightLength>normalFactor/2) water.move(0,(heightLength-normalFactor/2)*terScale,0);
 
         //Attaching water object to the scene
         rootNode.attachChild(water);
@@ -273,11 +279,13 @@ public class Renderer extends Cam {
      */
     public void initPhysics(){
         //Attaches the input values to Terrain object
-        this.terrain = GameStateLoader.readFile().getTerrain();
+        this.gameState = GameStateLoader.readFile();
+        this.terrain = gameState.getTerrain();
+        this.normalFactor = (float) terrain.NORMAL_FACTOR;
 
-        this.ballStartPos = this.terrain.ballStartingPosition;
-        this.targetRadius = this.terrain.target.radius;
-        this.targetPos = this.terrain.target.position;
+        this.ballStartPos = this.gameState.getBall().state.position;
+        this.targetRadius = GameStateLoader.getTargetRadius();
+        this.targetPos = new Vector2(GameStateLoader.getTargetX(), GameStateLoader.getTargetY());
 
         //Initializing terrain
         initTerrain(MenuGUI.texPath);
@@ -301,6 +309,8 @@ public class Renderer extends Cam {
         guiNode.attachChild(hudText);
 
     }
+
+
 
     Ball ball;
     Queue<Vector2> q;

@@ -6,11 +6,16 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Scanner;
 
-import datastorage.*;
+import gameengine.Game;
+import gui.BallVelocityInput;
 import utility.math.Vector2;
 
-public class InputFileReader extends InputModule {
+public class InputFileReader extends BallVelocityInput {
 
+    public InputFileReader(Game game){
+        super(game);
+    }
+    
     static String fileName = "Data";
     static Scanner fileScanner;
     static Queue<Vector2> commandQueue;
@@ -23,7 +28,11 @@ public class InputFileReader extends InputModule {
     }
 
     @Override
-    public Vector2 getForce() {
+    public void readyForNextInput(){
+        game.setShotForce(getForce());
+    }
+
+    private Vector2 getForce() {
         commandQueue = getShotQueue();
         if (hasUpdatedQueue) {
             return commandQueue.poll();

@@ -26,6 +26,12 @@ public class AStar {
 
     private boolean doDebugMessages = true;
     private Terrain terrain;
+
+    public final int SQUARES_PER_GAME_UNIT = 4; // How many squares will the map used by AStar pathfinding generate per
+                                                // game unit.
+    // A game unit is a distance between two vectors (0,0) and (0,1);
+    // The map's size is calculated the "topLeftCorner" and "bottomRightCorner"
+    // vectors
     
     private void setMap(double[][] newMap){
         map = newMap;
@@ -90,7 +96,7 @@ public class AStar {
      * @return a game unit position translated into a grid position used by the pathfinding algorithm
      */
     private int translateToGridPosition(double axisPosition){
-        return (int) (terrain.target.position.x * terrain.SQUARES_PER_GAME_UNIT);
+        return (int) (terrain.target.position.x * SQUARES_PER_GAME_UNIT);
     }
 
     /**
@@ -321,7 +327,7 @@ public class AStar {
     public double[][] getMap() {
         double[][] map = createEmptyMap();
         // We add half a tile, to get a height value at the center of each square
-        double halfTileOffset = (1d / (double) terrain.SQUARES_PER_GAME_UNIT) / 2d;
+        double halfTileOffset = (1d / (double) SQUARES_PER_GAME_UNIT) / 2d;
 
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
@@ -339,15 +345,15 @@ public class AStar {
     }
 
     private double[][] createEmptyMap() {
-        int xSquares = (int) getTerrainWidth() * terrain.SQUARES_PER_GAME_UNIT;
-        int ySquares = (int) getTerrainHeight() * terrain.SQUARES_PER_GAME_UNIT;
+        int xSquares = (int) getTerrainWidth() * SQUARES_PER_GAME_UNIT;
+        int ySquares = (int) getTerrainHeight() * SQUARES_PER_GAME_UNIT;
         double[][] map = new double[ySquares][xSquares];
         return map;
     }
 
     private Vector2 translateGridPositionIntoGameUnits(int xPos, int yPos) {
-        double newX = (double) xPos / (double) terrain.SQUARES_PER_GAME_UNIT;
-        double newY = (double) yPos / (double) terrain.SQUARES_PER_GAME_UNIT;
+        double newX = (double) xPos / (double) SQUARES_PER_GAME_UNIT;
+        double newY = (double) yPos / (double) SQUARES_PER_GAME_UNIT;
         return new Vector2(newX, newY);
     }
 
