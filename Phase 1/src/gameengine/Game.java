@@ -48,8 +48,8 @@ public class Game extends JPanel implements Runnable, GameObject {
      */
     public Game(int fps) {
         game = this;
-        
-        // setupInitialBot();
+
+        setupInitialBot();
         FPS = fps;
         createGameState();
         resetBotThread();
@@ -75,12 +75,7 @@ public class Game extends JPanel implements Runnable, GameObject {
                 0.01,
                 16,
                 new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
-        botThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                shotForce = bot.findBestShot(gameState);
-            }
-        });
+        resetBotThread();
     }
 
     private void createInput() {

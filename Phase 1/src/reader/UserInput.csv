@@ -18,11 +18,7 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
-<<<<<<< HEAD:Phase 1/src/Reader/UserInput.csv
 terrainFunction = sin(x+y)/2 + 1;
-=======
-terrainFunction = sin(x+y)+5;
->>>>>>> 153078b9e303596b265c2d1ddece19276978b50b:Phase 1/src/reader/UserInput.csv
 
 //To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
 ballStartPointX = -5;
