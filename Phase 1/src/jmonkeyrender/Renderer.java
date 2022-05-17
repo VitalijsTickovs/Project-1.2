@@ -247,32 +247,31 @@ import java.util.Queue;
          * Spawns water simulation around the terrain
          */
         public void InitWater(){
-            //Creates new water object reflection
-            SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
-            waterProcessor.setLightPosition(new Vector3f(0.55f, -0.82f, 0.15f));
-            waterProcessor.setReflectionScene(mainScene);
+            if(this.terrain.minScaledVal<normalFactor/2) {
+                //Creates new water object reflection
+                SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
+                waterProcessor.setLightPosition(new Vector3f(0.55f, -0.82f, 0.15f));
+                waterProcessor.setReflectionScene(mainScene);
 
-            //Setting the wave size
-            Vector3f waterLocation=new Vector3f(0,0,0);
-            waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
-            viewPort.addProcessor(waterProcessor);
+                //Setting the wave size
+                Vector3f waterLocation = new Vector3f(0, 0, 0);
+                waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
+                viewPort.addProcessor(waterProcessor);
 
-            //Creating the box of water
-            Quad waveSize = new Quad(this.totalSize + 200,this.totalSize + 200);
-            Geometry water=new Geometry("water", waveSize);
-            water.setShadowMode(RenderQueue.ShadowMode.Receive);
-            water.setMaterial(waterProcessor.getMaterial());
+                //Creating the box of water
+                Quad waveSize = new Quad(this.totalSize + 200, this.totalSize + 200);
+                Geometry water = new Geometry("water", waveSize);
+                water.setShadowMode(RenderQueue.ShadowMode.Receive);
+                water.setMaterial(waterProcessor.getMaterial());
 
-            //Setting location to be around the terrain
-            water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
-            System.out.println(this.terrain.minScaledVal);
-            water.setLocalTranslation(xoff-100, this.terrain.minScaledVal*terScale, -yoff+100);
-            float heightLength = this.terrain.maxScaledVal-this.terrain.minScaledVal;
+                //Setting location to be around the terrain
+                water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
+                water.setLocalTranslation(xoff - 100, this.terrain.minScaledVal * terScale, -yoff + 100);
+                water.move(0, (normalFactor/2-this.terrain.minScaledVal) * terScale, 0);
 
-            if(heightLength>normalFactor/2) water.move(0,(heightLength-normalFactor/2)*terScale,0);
-
-            //Attaching water object to the scene
-            rootNode.attachChild(water);
+                //Attaching water object to the scene
+                rootNode.attachChild(water);
+            }
         }
 
         /**
