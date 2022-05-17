@@ -40,6 +40,7 @@ public class ShotInputWindow {
         }
     }
 
+    //region Private methods
     private void createWindow() {
         frame = createFrame();
         JPanel mainPanel = new JPanel();
@@ -105,4 +106,5 @@ public class ShotInputWindow {
         shotVector.y = Double.parseDouble(yInputPanel.textField.getText());
         return shotVector;
     }
+    //endregion
 }

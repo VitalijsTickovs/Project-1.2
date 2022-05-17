@@ -213,35 +213,7 @@ public class Game extends JPanel implements Runnable, GameObject {
         moveBall();
         moveCamera();
         // Reset the game
-        if (checkKeyPressed(Input.R)) {
-            resetGame();
-        }
-        if (checkKeyPressed(Input.H)) {
-            setBot(new HillClimbingBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.01,
-                    12,
-                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)
-            ));
-        }
-        if (checkKeyPressed(Input.P)) {
-            setBot(new ParticleSwarmBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.5,
-                    0.5,
-                    0.5,
-                    100,
-                    10)
-            );
-        }
-        if (checkKeyPressed(Input.G)) {
-            setBot(new GradientDescentBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.01,
-                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)
-            ));
-        }
-        input.removeFromPressed();
+        handleKeyInputs();
     }
 
     private void handleBallInWater() {
@@ -319,6 +291,43 @@ public class Game extends JPanel implements Runnable, GameObject {
     private void moveCamera() {
         cam.x += (gameState.getBall().state.position.x - cam.x) / 10;
         cam.y += (gameState.getBall().state.position.y - cam.y) / 10;
+    }
+
+    private void handleKeyInputs(){
+        checkResetGame();
+        changeBotImplementation();
+        input.removeFromPressed();
+    }
+
+    private void checkResetGame(){
+        if (checkKeyPressed(Input.R)) {
+            resetGame();
+        }
+    }
+
+    private void changeBotImplementation(){
+        if (checkKeyPressed(Input.H)) {
+            setBot(new HillClimbingBot(
+                    new FinalEuclidianDistanceHeuristic(),
+                    0.01,
+                    12,
+                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+        }
+        if (checkKeyPressed(Input.P)) {
+            setBot(new ParticleSwarmBot(
+                    new FinalEuclidianDistanceHeuristic(),
+                    0.5,
+                    0.5,
+                    0.5,
+                    100,
+                    10));
+        }
+        if (checkKeyPressed(Input.G)) {
+            setBot(new GradientDescentBot(
+                    new FinalEuclidianDistanceHeuristic(),
+                    0.01,
+                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+        }
     }
     // endregion
 
