@@ -3,10 +3,6 @@ package datastorage;
 import physics.PhysicsEngine;
 import utility.math.Vector2;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 
 public class GameState {

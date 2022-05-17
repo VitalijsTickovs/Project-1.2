@@ -18,7 +18,7 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
-terrainFunction = sin(x+y)/2 + 1;
+terrainFunction = x**2+y**2;
 
 //To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
 ballStartPointX = -5;

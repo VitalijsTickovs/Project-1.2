@@ -206,7 +206,7 @@ public class GameStateLoader {
       if (stansLaptop) {
          return System.getProperty("user.dir") + "\\reader\\UserInput.csv";
       } else {
-         return System.getProperty("user.dir") + "Phase 1/src/reader/UserInput.csv";
+         return System.getProperty("user.dir") + "/Phase 1/src/reader/UserInput.csv";
       }
    }
 

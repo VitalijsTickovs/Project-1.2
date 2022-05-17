@@ -1,6 +1,18 @@
 package jmonkeyrender;
 
-import gameengine.Game;
+import bot.botimplementations.Bot;
+import bot.botimplementations.HillClimbingBot;
+import bot.botimplementations.ParticleSwarmBot;
+import bot.heuristics.FinalEuclidianDistanceHeuristic;
+import com.jme3.input.ChaseCamera;
+import com.jme3.texture.Image;
+import com.jme3.texture.Texture2D;
+import com.jme3.texture.plugins.AWTLoader;
+import com.jme3.ui.Picture;
+import gui.BallVelocityInput;
+import gui.GameStateRenderer;
+import gui.MenuGUI;
+import org.lwjgl.Sys;
 import physics.*;
 import physics.collisionsystems.StopCollisionSystem;
 import physics.solvers.RungeKutta4Solver;
@@ -8,13 +20,9 @@ import physics.stoppingconditions.SmallVelocityStoppingCondition;
 import reader.GameStateLoader;
 import utility.math.Vector2;
 import datastorage.*;
-import gui.MenuGUI;
 
 import com.jme3.font.BitmapText;
-import com.jme3.input.ChaseCamera;
 import com.jme3.light.AmbientLight;
-import com.jme3.light.DirectionalLight;
-import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.math.*;
@@ -34,13 +42,15 @@ import com.jme3.water.SimpleWaterProcessor;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Queue;
 
     public class Renderer extends Cam {
         private TerrainQuad terrainQuad;
         private GameState gameState;
         private Geometry ballRender;
+
+        private GameStateRenderer minimapGenerator;
+        private BufferedImage minimapImg;
 
         private ArrayList<Vector2> points = new ArrayList<>();
         private Boolean inTarget = false;
@@ -51,7 +61,7 @@ import java.util.Queue;
         float xoff = 0;
         float yoff = 0;
 
-        Vector2 ballStartPos;
+        Ball ball;
         double targetRadius;
         Vector2 targetPos;
         private PhysicsEngine engine;
@@ -65,7 +75,7 @@ import java.util.Queue;
         float y = 0;
         float val = 0;
         float normalFactor;
-        float terScale = 10;
+        float terScale = 5;
         private Terrain terrain;
 
         /**
@@ -74,8 +84,8 @@ import java.util.Queue;
         public void initTerrain(String texPath){
 
             //Calculating offset to spawn the terrain arround the ball
-            this.xoff = (float) (this.ballStartPos.x - this.totalSize/2);
-            this.yoff = (float) (this.ballStartPos.y - this.totalSize/2);
+            this.xoff = (float) (this.ball.state.position.x - this.totalSize/2);
+            this.yoff = (float) (this.ball.state.position.y - this.totalSize/2);
 
             //Creating heightmap representation of the terrain
             AlphaMapGenerator.generateAlphaMap(terrain);
@@ -125,7 +135,7 @@ import java.util.Queue;
             //add the geometry object to the scene
             rootNode.attachChild(this.ballRender);
             //Moving the ball according to the start position
-            moveBall(ballStartPos);
+            moveBall(this.ball.state.position);
         }
 
         /**
@@ -207,10 +217,14 @@ import java.util.Queue;
         /**
          * Moves ball according to x & y coordinates
          */
-        public void moveBall(Vector2 balPos){
-            if(balPos.x<(this.totalSize)/2 && balPos.y < (this.totalSize)/2) {
-                this.x = (float) balPos.x;
-                this.y = (float) balPos.y;
+        AWTLoader loader = new AWTLoader();
+        Picture pic = new Picture("HUD Picture");
+        Image img;
+        Texture2D texture2D = new Texture2D();
+        public void moveBall(Vector2 ballState){
+            if(ballState.x<(this.totalSize)/2 && ballState.y < (this.totalSize)/2) {
+                this.x = (float) ballState.x;
+                this.y = (float) ballState.y;
                 //Getting height value corresponding to x and y values
                 float val;
                 val = (float) terrain.terrainFunction.valueAt( this.x* terrain.xOff, this.y * terrain.yOff);
@@ -231,6 +245,17 @@ import java.util.Queue;
                 findTangent();
                 //Outputting the position of the ball
                 text.setText("x: " + df.format(getBallX()) + "  y: " + df.format(getBallY()) + "  z: "+ df.format(getBallZ()/terScale));
+
+                minimapImg = minimapGenerator.getSubimage(this.x, this.y, 50, 50);
+                img = loader.load(minimapImg, false);
+                texture2D.setImage(img);
+                pic.setTexture(assetManager, texture2D, true);
+                pic.setHeight(300);
+                pic.setWidth(300);
+                pic.setPosition(1280-300, 720-300);
+                guiNode.attachChild(pic);
+                img.dispose();
+                minimapImg.flush();
             }
         }
 
@@ -283,16 +308,17 @@ import java.util.Queue;
             this.terrain = gameState.getTerrain();
             this.normalFactor = (float) terrain.NORMAL_FACTOR;
 
-            this.ballStartPos = this.gameState.getBall().state.position;
+            this.ball = this.gameState.getBall();
             this.targetRadius = GameStateLoader.getTargetRadius();
             this.targetPos = new Vector2(GameStateLoader.getTargetX(), GameStateLoader.getTargetY());
+
+            minimapGenerator = new GameStateRenderer(this.gameState, 20);
 
             //Initializing terrain
             initTerrain(MenuGUI.texPath);
 
             //setting the physics engine
-            ball = new Ball(this.ballStartPos, new Vector2(3, -5));
-            engine = new PhysicsEngine(new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem());
+            //gameState.set() = new PhysicsEngine(new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem());
         }
 
         /**
@@ -309,10 +335,37 @@ import java.util.Queue;
             guiNode.attachChild(hudText);
 
         }
+        Bot bot;
+        private void setupInitialBot(){
+            // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
+            // null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));
+            // bot = new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5,
+            // 0.5, 100, 10);
+            // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
+            // null);
+            bot = new HillClimbingBot(
+                    new FinalEuclidianDistanceHeuristic(),
+                    0.01,
+                    16,
+                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10));
+            resetBotThread();
+        }
+
+        Thread botThread;
+        private Vector2 shotForce;
+        private void resetBotThread(){
+            botThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("Calculating shot...");
+                    shotForce = bot.findBestShot(gameState);
+                    System.out.println("Velocity: "+shotForce);
+                }
+            });
+        }
 
 
 
-        Ball ball;
         Queue<Vector2> q;
         @Override
         public void simpleInitApp() {
@@ -328,31 +381,85 @@ import java.util.Queue;
             InitText();
             InitBall();
             InitTarget();
+            setupInitialBot();
+
+
 
             //creating and attaching camera to ball
-            //ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
-            //InitCam(chaseCam);
-            flyCam.setMoveSpeed(100);
+            ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
+            InitCam(chaseCam);
+            //flyCam.setMoveSpeed(100);
         }
 
-        float ballx =.1f;
+        private void handleBallInWater() {
+            if (isSimulationFinished()) {
+                boolean isBallInWater = gameState.getTerrain().terrainFunction.valueAt(gameState.getBall().state.position.x, gameState.getBall().state.position.y) < 0;
+                if (isBallInWater) {
+                    resetGame();
+                }
+            }
+        }
+        private boolean isSimulationFinished() {
+            boolean ballStopped = points.size() == 0;
+            boolean noBot = (bot != null && !botThread.isAlive()) || (bot == null);
+            boolean ballHasBeenPushed = shotForce == null;
+            return ballHasBeenPushed && noBot && ballStopped;
+        }
+        private void resetGame() {
+            gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
+            int numShots = 0;
+            if (bot != null && botThread.isAlive()) {
+                // End the bot thread if it is still running
+                try {
+                    botThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            shotForce = null;
+            points = new ArrayList<Vector2>();
+        }
+
+        private BallVelocityInput ballVelocityInput;
+        private void handleInput() {
+            if (isSimulationFinished() && !isInTarget(ball)) {
+                if (bot == null) {
+                    ballVelocityInput.readyForNextInput();
+                } else {
+                    resetBotThread();
+                    botThread.start();
+                }
+            }
+        }
+
         @Override
         public void simpleUpdate(float tpf) {
-            if (!inTarget) {
                 //simulates from Vectors.csv file
                 //moves the ball with calculated position
                 //if (points.size() != 0) {
                 //ball.state.position = points.get(0);
-                moveBall(new Vector2(ballx,ballx));
+//            handleBallInWater();
+//            handleInput();
+//            if (points.size() == 0 && shotForce != null && !isInTarget(ball)) {
+//                points = gameState.simulateShot(shotForce);
+//                //numShots++;
+//                shotForce = null;
+//            }
+//            if(points.size() != 0) {
+//                moveBall(points.get(0));
+//                points.remove(0);
+//            }
+            ball.state.position.x+=1;
+            ball.state.position.y+=1;
+            moveBall(ball.state.position);
+
+
                 //points.remove(0);
-                ballx++;
                 //}
                 //checks if the ball is in the hole
-                isInTarget(ball);
-            }else{
-                //exit if ball reached the target
-                System.exit(1);
-            }
+                if(isInTarget(ball)){
+                    System.exit(0);
+                }
         }
 
         public void start3d(){
