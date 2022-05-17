@@ -1,10 +1,12 @@
 package bot;
 
-import Data_storage.*;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+
+import bot.heuristics.Heuristic;
+import datastorage.*;
+import utility.math.Vector2;
 
 public class HeuristicPlotter {
     private Heuristic heuristic;

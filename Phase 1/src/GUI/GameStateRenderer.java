@@ -1,6 +1,8 @@
-package GUI;
+package gui;
 
-import Data_storage.*;
+import datastorage.*;
+import datastorage.obstacles.*;
+import utility.math.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

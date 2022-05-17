@@ -1,11 +1,18 @@
-package Reader;
+package reader;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import Data_storage.*;
-import Physics.*;
+import datastorage.*;
+import datastorage.obstacles.IObstacle;
+import datastorage.obstacles.ObstacleBox;
+import datastorage.obstacles.ObstacleTree;
+import physics.collisionsystems.*;
+import physics.*;
+import physics.solvers.*;
+import physics.stoppingconditions.*;
+import utility.math.Vector2;
 
 public class GameStateLoader {
 
@@ -16,7 +23,7 @@ public class GameStateLoader {
    // Singular values
    private static double solverStep;
 
-   private static IODESolver solver;
+   private static IODESolver ODEsolver;
    private static IStoppingCondition stoppingCondition;
    private static ICollisionSystem collisionSystem;
 
@@ -30,6 +37,7 @@ public class GameStateLoader {
 
    private static double ballStartPointX;
    private static double ballStartPointY;
+   private static double ballRadius;
 
    private static double targetRadius;
    private static double targetX;
@@ -60,7 +68,7 @@ public class GameStateLoader {
    // region default variable values
    private final static double defsolverStep = 0.01;
 
-   private final static IODESolver defsolver = new RungeKutta4Solver(defsolverStep);
+   private final static IODESolver defODEsolver = new RungeKutta4Solver(defsolverStep);
    private final static IStoppingCondition defstoppingCondition = new SmallVelocityStoppingCondition();
    private final static ICollisionSystem defcollisionSystem = new BounceCollisionSystem();
 
@@ -81,10 +89,10 @@ public class GameStateLoader {
    private final static double deftargetY = 4;
 
    // ArrayList values
-   private final static double defsandPitX0 = 0;
-   private final static double defsandPitY0 = 0;
-   private final static double defsandPitX1 = 100;
-   private final static double defsandPitY1 = 100;
+   private final static double defsandZoneX0 = 0;
+   private final static double defsandZoneY0 = 0;
+   private final static double defsandZoneX1 = 100;
+   private final static double defsandZoneY1 = 100;
    private final static double defsandKineticFriction = 0.25;
    private final static double defsandStaticFriction = 0.4;
 
@@ -100,11 +108,11 @@ public class GameStateLoader {
    private final static double defBoxBounciness = 1;
 
    public static double[] getSandX() {
-      return new double[] { defsandPitX0, defsandPitX1 };
+      return new double[] { defsandZoneX0, defsandZoneX1 };
    }
 
    public static double[] getSandY() {
-      return new double[] { defsandPitY0, defsandPitY1 };
+      return new double[] { defsandZoneY0, defsandZoneY1 };
    }
 
    public static GameState readFile() {
@@ -119,7 +127,7 @@ public class GameStateLoader {
 
    private static void resetVariables() {
       solverStep = 0;
-      solver = null;
+      ODEsolver = null;
       stoppingCondition = null;
       collisionSystem = null;
 
@@ -159,8 +167,8 @@ public class GameStateLoader {
    }
 
    private static GameState createGameStateUsingGeneratedData() {
-      Terrain generatedTerrain = saveDataIntoTerrain();
-      Ball startingBall = new Ball(terrain.ballStartingPosition.copy(), Vector2.zeroVector());
+      Terrain generatedTerrain = createTerrain();
+      Ball startingBall = createBall();
       PhysicsEngine engine = createEngine();
 
       GameState gameState = new GameState(generatedTerrain, startingBall, engine);
@@ -174,14 +182,13 @@ public class GameStateLoader {
     */
    private static void createScanner() {
       try {
-         scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/UserInput.csv"));
+         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/UserInput.csv"));
          // The top line does not work on my computer, so I put the one at the bottom -
          // comment it out and switch.
          // I was not able to come up with a line of code that would work on everyone's
          // computer
-         // scanner = new Scanner(
-         // new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase
-         // 1/src/Reader/userInput.csv"));
+         scanner = new Scanner(
+         new FileReader(System.getProperty("user.dir") +"/Phase 1/src/reader/UserInput.csv"));
 
       } catch (FileNotFoundException e) {
          throw new NullPointerException("File not found - the path to the save file is wrong, see comment above");
@@ -210,8 +217,8 @@ public class GameStateLoader {
       if (lineContainsKeywordAndEqualSign(line, "solverStep")) {
          solverStep = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line, "solver")) {
-         solver = readSolver(line);
+      if (lineContainsKeywordAndEqualSign(line, "ODEsolver")) {
+         ODEsolver = readSolver(line);
       }
       if (lineContainsKeywordAndEqualSign(line, "stoppingCondition")) {
          stoppingCondition = readStoppingCondition(line);
@@ -241,12 +248,15 @@ public class GameStateLoader {
       if (lineContainsKeywordAndEqualSign(line, "terrainFunction")) {
          terrainFunction = readString(line);
       }
-      // Ball start point
+      // Ball
       if (lineContainsKeywordAndEqualSign(line, "ballStartPointX")) {
          ballStartPointX = readDouble(line);
       }
       if (lineContainsKeywordAndEqualSign(line, "ballStartPointY")) {
          ballStartPointY = readDouble(line);
+      }
+      if (lineContainsKeywordAndEqualSign(line, "ballRadius")) {
+         ballRadius = readDouble(line);
       }
       // Target
       if (lineContainsKeywordAndEqualSign(line, "targetRadius")) {
@@ -315,7 +325,7 @@ public class GameStateLoader {
          return getSolverFromName(name);
       } catch (IndexOutOfBoundsException e) {
          System.out.println("There was nothing after the = sign");
-         return defsolver;
+         return defODEsolver;
       }
    }
 
@@ -324,16 +334,16 @@ public class GameStateLoader {
          solverStep = defsolverStep;
       }
 
-      if (name.compareTo("Euler") == 0) {
+      if (name.contains("Euler")) {
          return new EulerSolver(solverStep);
       }
-      if (name.compareTo("RK2") == 0) {
+      if (name.contains("RK2")) {
          return new RungeKutta2Solver(solverStep);
       }
-      if (name.compareTo("RK4") == 0) {
+      if (name.contains("RK4")) {
          return new RungeKutta4Solver(solverStep);
       } else {
-         return defsolver;
+         return defODEsolver;
       }
    }
 
@@ -348,7 +358,7 @@ public class GameStateLoader {
    }
 
    private static IStoppingCondition getStoppingConditionFromName(String name) {
-      if (name.compareTo("smallV") == 0) {
+      if (name.contains("smallV")) {
          return new SmallVelocityStoppingCondition();
       } else {
          return defstoppingCondition;
@@ -366,10 +376,10 @@ public class GameStateLoader {
    }
 
    private static ICollisionSystem getCollisionSystemFromName(String name) {
-      if (name.compareTo("bounce") == 0) {
+      if (name.contains("bounce")) {
          return new BounceCollisionSystem();
       }
-      if (name.compareTo("stop") == 0) {
+      if (name.contains("stop")) {
          return new StopCollisionSystem();
       } else {
          return defcollisionSystem;
@@ -413,7 +423,7 @@ public class GameStateLoader {
          String[] split = temp.split("<");
          double[] range = new double[2];
          range[0] = readDouble(split[0]);
-         range[1] = readDouble(split[2]);
+         range[1] = readDouble(split[1]);
          return range;
 
       } catch (IndexOutOfBoundsException e) {
@@ -427,7 +437,7 @@ public class GameStateLoader {
    // endregion
 
    // region Create Terrain
-   private static Terrain saveDataIntoTerrain() {
+   private static Terrain createTerrain() {
       terrain = new Terrain();
       // Singular values
       defineGreen();
@@ -633,25 +643,25 @@ public class GameStateLoader {
          position0.x = sandZoneX0.get(0);
          sandZoneX0.remove(0);
       } else {
-         position0.x = defsandPitX0;
+         position0.x = defsandZoneX0;
       }
       if (sandZoneY0.size() > 0) {
          position0.y = sandZoneY0.get(0);
          sandZoneY0.remove(0);
       } else {
-         position0.y = defsandPitY0;
+         position0.y = defsandZoneY0;
       }
       if (sandZoneX1.size() > 0) {
          position1.x = sandZoneX1.get(0);
          sandZoneX1.remove(0);
       } else {
-         position1.x = defsandPitX1;
+         position1.x = defsandZoneX1;
       }
       if (sandZoneY1.size() > 0) {
          position1.y = sandZoneY1.get(0);
          sandZoneY1.remove(0);
       } else {
-         position1.y = defsandPitY1;
+         position1.y = defsandZoneY1;
       }
       // Friction
       if (sandKineticFriction.size() > 0) {
@@ -679,10 +689,10 @@ public class GameStateLoader {
       IStoppingCondition savedCondition;
       ICollisionSystem savedCollisionSystem;
 
-      if (solver == null) {
-         savedSolver = defsolver;
+      if (ODEsolver == null) {
+         savedSolver = defODEsolver;
       } else {
-         savedSolver = solver;
+         savedSolver = ODEsolver;
       }
       if (stoppingCondition == null) {
          savedCondition = defstoppingCondition;
@@ -696,6 +706,12 @@ public class GameStateLoader {
       }
 
       return new PhysicsEngine(savedSolver, savedCondition, savedCollisionSystem);
+   }
+
+   private static Ball createBall(){
+      Ball newBall = new Ball(terrain.ballStartingPosition, Vector2.zeroVector());
+      newBall.radius = ballRadius;
+      return newBall;
    }
    // endregion
 }

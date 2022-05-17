@@ -1,10 +1,8 @@
-package JMonkeyRender;
+package jmonkeyrender;
 
-import Reader.GameStateLoader;
+import datastorage.Terrain;
 
 import javax.imageio.ImageIO;
-
-import Data_storage.Terrain;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

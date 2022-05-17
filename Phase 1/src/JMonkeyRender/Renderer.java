@@ -1,9 +1,14 @@
-package JMonkeyRender;
+package jmonkeyrender;
 
-import Data_storage.*;
-import GUI.MenuGUI;
-import Physics.*;
-import Reader.GameStateLoader;
+import physics.*;
+import physics.collisionsystems.StopCollisionSystem;
+import physics.solvers.RungeKutta4Solver;
+import physics.stoppingconditions.SmallVelocityStoppingCondition;
+import reader.GameStateLoader;
+import utility.math.Vector2;
+import datastorage.*;
+import gui.MenuGUI;
+
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
 import com.jme3.light.AmbientLight;

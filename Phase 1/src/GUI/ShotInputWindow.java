@@ -1,10 +1,10 @@
-package GUI;
+package gui;
 
-import Data_storage.InputPanel;
-import Data_storage.Vector2;
 import gameengine.Game;
+import utility.math.Vector2;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

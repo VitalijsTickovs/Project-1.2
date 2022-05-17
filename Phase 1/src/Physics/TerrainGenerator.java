@@ -1,6 +1,6 @@
-package Physics;
+package physics;
 
-import Data_storage.*;
+import datastorage.*;
 
 public class TerrainGenerator {
 

@@ -1,7 +1,12 @@
-package Physics;
+package physics;
 
 import java.util.ArrayList;
-import Data_storage.*;
+
+import datastorage.*;
+import physics.collisionsystems.ICollisionSystem;
+import physics.solvers.IODESolver;
+import physics.stoppingconditions.IStoppingCondition;
+import utility.math.Vector2;
 
 public class PhysicsEngine {
 
@@ -79,7 +84,7 @@ public class PhysicsEngine {
      * @param terrain The terrain to calculate the acceleration on
      * @return The x-acceleration value
      */
-    protected double xAcceleration(BallState state, Terrain terrain) {
+    public double xAcceleration(BallState state, Terrain terrain) {
         double friction = terrain.getKineticFriction(state.position);
         Vector2 slope = new Vector2(
                 terrain.xDerivativeAt(state.position),
@@ -96,7 +101,7 @@ public class PhysicsEngine {
      * @param terrain The terrain to calculate the acceleration on
      * @return The x-acceleration value
      */
-    protected double yAcceleration(BallState state, Terrain terrain) {
+    public double yAcceleration(BallState state, Terrain terrain) {
         double friction = terrain.getKineticFriction(state.position);
         Vector2 slope = new Vector2(
                 terrain.xDerivativeAt(state.position),

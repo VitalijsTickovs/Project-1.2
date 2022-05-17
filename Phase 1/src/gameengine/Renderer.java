@@ -1,13 +1,18 @@
 package gameengine;
 
-import Data_storage.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import javax.imageio.ImageIO;
+
+import datastorage.*;
+import datastorage.obstacles.IObstacle;
+import datastorage.obstacles.ObstacleBox;
+import datastorage.obstacles.ObstacleTree;
+import utility.math.Vector2;
+import utility.math.Vector3;
 
 import java.io.*;
 

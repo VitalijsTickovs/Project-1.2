@@ -1,0 +1,27 @@
+solverStep = 0.01;
+solver = RK2;
+stoppingCondition = smallV;
+collisionSystem = bounce;
+
+ballRadius = 1.0;
+ballStartPointX = -3.0;
+ballStartPointY = 0.0;
+
+terrainX0 = -50.0;
+terrainY0 = -50.0;
+terrainX1 = 50.0;
+terrainY1 = 50.0;
+
+greenStaticFriction = 0.2;
+greenKineticFriction = 0.08;
+terrainFunction = sin(x+y);
+
+targetRadius = 0.15;
+targetX = 4.0;
+targetY = 1.0;
+
+sandZoneX = 5.0<10.0;
+sandZoneY = 0.0<100.0;
+sandKineticFriction = 0.25;
+sandStaticFriction = 0.4;
+

@@ -1,4 +1,4 @@
-package GUI;//package crazyPutting;
+package gui;//package crazyPutting;
 
 import java.io.*;
 import java.util.*;

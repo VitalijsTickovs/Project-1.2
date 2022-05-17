@@ -1,11 +1,13 @@
-package Physics;
+package physics;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Scanner;
-import Data_storage.*;
+
+import datastorage.*;
+import utility.math.Vector2;
 
 public class InputFileReader extends InputModule {
 

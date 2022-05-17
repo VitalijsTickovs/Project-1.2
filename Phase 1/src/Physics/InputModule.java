@@ -1,6 +1,7 @@
-package Physics;
+package physics;
 
-import Data_storage.*;
+import datastorage.*;
+import utility.math.Vector2;
 
 public abstract class InputModule {
     public abstract Vector2 getForce();

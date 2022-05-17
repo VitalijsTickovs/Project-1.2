@@ -4,13 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
-import Data_storage.GameState;
-import Data_storage.Vector2;
-import GUI.GameStateRenderer;
-import GUI.InterfaceFactory;
-import GUI.ShotInputWindow;
-import Reader.*;
-import bot.*;
+import datastorage.GameState;
+import utility.math.Vector2;
+import gui.GameStateRenderer;
+import gui.InterfaceFactory;
+import gui.ShotInputWindow;
+import bot.botimplementations.Bot;
+import bot.botimplementations.GradientDescentBot;
+import bot.botimplementations.HillClimbingBot;
+import bot.botimplementations.ParticleSwarmBot;
+import bot.heuristics.FinalEuclidianDistanceHeuristic;
 
 public class Game extends JPanel implements Runnable, GameObject {
     public JFrame frame;
@@ -90,7 +93,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private void createGameState() {
-        gameState = GameStateLoader.readFile();
+        gameState = reader.GameStateLoader.readFile();
     }
 
     private void resetStartingVariables() {
