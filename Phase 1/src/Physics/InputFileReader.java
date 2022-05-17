@@ -29,7 +29,7 @@ public class InputFileReader extends BallVelocityInput {
 
     @Override
     public void readyForNextInput(){
-        game.setShotVector(getForce());
+        game.setShotForce(getForce());
     }
 
     private Vector2 getForce() {

@@ -89,7 +89,7 @@ public class ShotInputWindow extends BallVelocityInput {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    game.setShotVector(readShotVector(xInputPanel, yInputPanel));
+                    game.setShotForce(readShotVector(xInputPanel, yInputPanel));
                     frame.setVisible(false);
                     isOpen = false;
                 } catch (Exception e) {

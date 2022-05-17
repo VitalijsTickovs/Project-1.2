@@ -28,7 +28,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     private Thread thread;
     private BufferedImage terrainImage;
     private Renderer renderer;
-    private Vector2 shotVector;
+    private Vector2 shotForce;
     private Camera cam;
     private BallVelocityInput ballVelocityInput;
     private Bot bot;
@@ -79,7 +79,7 @@ public class Game extends JPanel implements Runnable, GameObject {
         botThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                shotVector = bot.findBestShot(gameState);
+                shotForce = bot.findBestShot(gameState);
             }
         });
     }
@@ -96,8 +96,8 @@ public class Game extends JPanel implements Runnable, GameObject {
             @Override
             public void run() {
                 System.out.println("Calculating shot...");
-                shotVector = bot.findBestShot(gameState);
-                System.out.println("Velocity: "+shotVector);
+                shotForce = bot.findBestShot(gameState);
+                System.out.println("Velocity: "+shotForce);
             }
         });
     }
@@ -109,7 +109,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     private void resetStartingVariables() {
         numShots = 0;
         running = false;
-        shotVector = null;
+        shotForce = null;
     }
 
     private void setManualInputType() {
@@ -244,7 +244,7 @@ public class Game extends JPanel implements Runnable, GameObject {
                 e.printStackTrace();
             }
         }
-        shotVector = null;
+        shotForce = null;
         ballPositions = new ArrayList<Vector2>();
     }
 
@@ -270,21 +270,21 @@ public class Game extends JPanel implements Runnable, GameObject {
     private boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
         boolean noBot = (bot != null && !botThread.isAlive()) || (bot == null);
-        boolean ballHasBeenPushed = shotVector == null;
+        boolean ballHasBeenPushed = shotForce == null;
         return ballHasBeenPushed && noBot && ballStopped;
     }
 
     private void simulateShot() {
         if (shouldPushBall()) {
-            ballPositions = gameState.simulateShot(shotVector);
+            ballPositions = gameState.simulateShot(shotForce);
             numShots++;
-            shotVector = null;
+            shotForce = null;
         }
     }
 
     private boolean shouldPushBall() {
         boolean ballStopped = ballPositions.size() == 0;
-        boolean ballHasNotBeenPushed = shotVector != null;
+        boolean ballHasNotBeenPushed = shotForce != null;
         return ballStopped && ballHasNotBeenPushed && !hasReachedTarget();
     }
 
@@ -376,8 +376,8 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
     // endregion
 
-    public void setShotVector(Vector2 newShotVector){
-        shotVector = newShotVector;
+    public void setShotForce(Vector2 newShotVector){
+        shotForce = newShotVector;
     }
 
     /**
