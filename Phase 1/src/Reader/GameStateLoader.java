@@ -182,13 +182,13 @@ public class GameStateLoader {
     */
    private static void createScanner() {
       try {
-         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/UserInput.csv"));
+         String path = System.getProperty("user.dir") + "\\reader\\UserInput.csv";
+         System.out.println(path);
+         scanner = new Scanner(new FileReader(path));
          // The top line does not work on my computer, so I put the one at the bottom -
          // comment it out and switch.
          // I was not able to come up with a line of code that would work on everyone's
          // computer
-         scanner = new Scanner(
-         new FileReader("C:/Users/staso/Documents/GitHub/Project-1.2/Phase 1/src/Reader/UserInput.csv"));
 
       } catch (FileNotFoundException e) {
          throw new NullPointerException("File not found - the path to the save file is wrong, see comment above");
