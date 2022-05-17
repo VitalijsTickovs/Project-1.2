@@ -1,17 +1,18 @@
 package gameengine;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
 
-import bot.*;
 import bot.botimplementations.Bot;
 import bot.botimplementations.GradientDescentBot;
 import bot.botimplementations.HillClimbingBot;
 import bot.botimplementations.ParticleSwarmBot;
 import bot.heuristics.FinalEuclidianDistanceHeuristic;
 import datastorage.GameState;
+import gui.BallVelocityInput;
 import gui.InterfaceFactory;
 import gui.ShotInputWindow;
 import reader.*;
@@ -19,17 +20,17 @@ import utility.math.Vector2;
 
 public class Game extends JPanel implements Runnable, GameObject {
     public JFrame frame;
-    public Vector2 shotVector;
+    public GameState gameState;
     public int numShots;
-
+    
     private final int FPS;
     private boolean running;
     private Thread thread;
     private BufferedImage terrainImage;
     private Renderer renderer;
+    private Vector2 shotVector;
     private Camera cam;
-    private ShotInputWindow shotInputWindow;
-    private GameState gameState;
+    private BallVelocityInput ballVelocityInput;
     private Bot bot;
     private Thread botThread;
     private Input input;
@@ -48,32 +49,39 @@ public class Game extends JPanel implements Runnable, GameObject {
      */
     public Game(int fps) {
         game = this;
-        //bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16, null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));
-        //bot = new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10);
-        //bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16, null);
-        setBot(new HillClimbingBot(
-                new FinalEuclidianDistanceHeuristic(),
-                0.01,
-                16,
-                new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)
-        ));
-        botThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                shotVector = bot.findBestShot(gameState);
-            }
-        });
+        
+        // setupInitialBot();
         FPS = fps;
         createGameState();
         resetBotThread();
         resetStartingVariables();
-        createInputWindow();
+        setManualInputType();
         //createTerrain();
         createCamera();
         createRenderer();
         createTerrainImage();
         createFrame();
         createInput();
+    }
+
+    private void setupInitialBot(){
+        // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
+        // null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));
+        // bot = new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5,
+        // 0.5, 100, 10);
+        // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
+        // null);
+        setBot(new HillClimbingBot(
+                new FinalEuclidianDistanceHeuristic(),
+                0.01,
+                16,
+                new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+        botThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                shotVector = bot.findBestShot(gameState);
+            }
+        });
     }
 
     private void createInput() {
@@ -104,8 +112,8 @@ public class Game extends JPanel implements Runnable, GameObject {
         shotVector = null;
     }
 
-    private void createInputWindow() {
-        shotInputWindow = new ShotInputWindow(this);
+    private void setManualInputType() {
+        ballVelocityInput = new ShotInputWindow(this);
     }
 
     private void createCamera() {
@@ -206,7 +214,7 @@ public class Game extends JPanel implements Runnable, GameObject {
      */
     public void update() {
         handleBallInWater();
-        handleOpenWindow();
+        handleInput();
         // Find the positions after a shot
         simulateShot();
         // Update the ball position if it has been calculated
@@ -240,10 +248,10 @@ public class Game extends JPanel implements Runnable, GameObject {
         ballPositions = new ArrayList<Vector2>();
     }
 
-    private void handleOpenWindow() {
+    private void handleInput() {
         if (isSimulationFinished() && !hasReachedTarget()) {
             if (bot == null) {
-                shotInputWindow.openWindow();
+                ballVelocityInput.readyForNextInput();
             } else {
                 resetBotThread();
                 botThread.start();
@@ -261,9 +269,9 @@ public class Game extends JPanel implements Runnable, GameObject {
      */
     private boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
-        boolean inputWindowClosed = (bot != null && !botThread.isAlive()) || (bot == null && !shotInputWindow.isOpen);
+        boolean noBot = (bot != null && !botThread.isAlive()) || (bot == null);
         boolean ballHasBeenPushed = shotVector == null;
-        return ballHasBeenPushed && inputWindowClosed && ballStopped;
+        return ballHasBeenPushed && noBot && ballStopped;
     }
 
     private void simulateShot() {
@@ -367,6 +375,10 @@ public class Game extends JPanel implements Runnable, GameObject {
         //bufferStrategy.show();
     }
     // endregion
+
+    public void setShotVector(Vector2 newShotVector){
+        shotVector = newShotVector;
+    }
 
     /**
      * Starts the game.
