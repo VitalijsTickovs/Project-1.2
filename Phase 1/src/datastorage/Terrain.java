@@ -19,8 +19,8 @@ public class Terrain {
     public Target target;
     public Vector2 ballStartingPosition;
 
-    public float minScaledVal;
-    public float maxScaledVal;
+    public float minScaledVal = Integer.MAX_VALUE;
+    public float maxScaledVal = Integer.MIN_VALUE;
 
     // The corners of the whole map. The function is evaluated in this rectangle
     public Vector2 topLeftCorner;
@@ -40,7 +40,7 @@ public class Terrain {
 
     // This value seems to be the right number, so no need to provide it as input
     // everytime.
-    private final int VERTECES_PER_SIDE = 1024;
+    private final int VERTECES_PER_SIDE = 1025;
     public final double NORMAL_FACTOR = 50;
 
     public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner,
