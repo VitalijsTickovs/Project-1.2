@@ -10,7 +10,8 @@ public class Terrain {
     // This is generated after Terrain is created
     public double[][] meshGrid2;
     public float[] meshGrid;
-
+    public float minScaledVal = Integer.MAX_VALUE;
+    public float maxScaledVal = Integer.MIN_VALUE;
     public float[] heightmap;
 
     // All of the data below should be included, when Terrain is created
@@ -27,7 +28,6 @@ public class Terrain {
     public double kineticFriction;
 
     public TerrainFunction1 terrainFunction;
-    public double scaleFactor = 1;
 
     public int xRes = 500;
     public int yRes = 500;
@@ -43,8 +43,8 @@ public class Terrain {
 
     // This value seems to be the right number, so no need to provide it as input
     // everytime.
-    private final int VERTECES_PER_SIDE = 1024;
-    private final double NORMAL_FACTOR = 1;
+    private final int VERTECES_PER_SIDE = 1025;
+    public final double NORMAL_FACTOR = 50;
 
     public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner,
             Vector2 limitingCorner) {
@@ -53,7 +53,7 @@ public class Terrain {
         this.kineticFriction = kineticFriction;
         this.topLeftCorner = startingCorner;
         this.bottomRightCorner = limitingCorner;
-        calculateHeightMap(VERTECES_PER_SIDE, NORMAL_FACTOR);
+        calculateHeightMap(VERTECES_PER_SIDE);
     }
 
     public boolean isPointInZone(double x, double y) {
@@ -179,9 +179,8 @@ public class Terrain {
      * Recalculates the heightmap that is used for
      * 
      * @param numVerteces
-     * @param normalFactor
      */
-    private void calculateHeightMap(int numVerteces, double normalFactor) {
+    private void calculateHeightMap(int numVerteces) {
         heightmap = new float[numVerteces * numVerteces];
         int pos = 0;
         this.xOff = (bottomRightCorner.x - topLeftCorner.x) / numVerteces;
@@ -212,7 +211,13 @@ public class Terrain {
             if (val > 1) {
                 val = 1;
             }
-            val *= normalFactor;
+            val *= NORMAL_FACTOR;
+            if (val > maxScaledVal) {
+                maxScaledVal = val;
+            }
+            if (val < minScaledVal) {
+                minScaledVal = val;
+            }
             heightmap[i] = val;
         }
     }
@@ -241,7 +246,7 @@ public class Terrain {
     }
     public void setTerrainFunction(TerrainFunction1 terrainFunction){
         this.terrainFunction = terrainFunction;
-        calculateHeightMap(VERTECES_PER_SIDE, NORMAL_FACTOR);
+        calculateHeightMap(VERTECES_PER_SIDE);
     }
 
 }
