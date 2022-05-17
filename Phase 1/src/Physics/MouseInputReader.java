@@ -2,6 +2,8 @@ package physics;
 
 import javax.swing.event.MouseInputListener;
 
+import datastorage.Ball;
+
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import gameengine.Game;
@@ -31,7 +33,7 @@ public class MouseInputReader extends BallVelocityInput implements MouseInputLis
         boolean clickedLeftMouseButton = e.getButton() == 1;
         if (clickedLeftMouseButton) {
             Vector2 mousePosition = getMousePosition(e);
-            game.setShotVector(calculateShotForce(mousePosition));
+            game.setShotForce(calculateShotForce(mousePosition));
         }
         isListening = false;
     }
@@ -40,19 +42,17 @@ public class MouseInputReader extends BallVelocityInput implements MouseInputLis
         Vector2 ballPosition = game.gameState.getBall().state.position;
         Vector2 deltaPosition = ballPosition.deltaPositionTo(mousePosition);
 
-        clampVector(deltaPosition);
-
-        
+        return getForce(deltaPosition);
     }
 
-    private void clampVector(Vector2 deltaPosition) {
+    private Vector2 getForce(Vector2 deltaPosition) {
         double maxVectorLength = 5;
         double vectorLength = deltaPosition.length();
         if (vectorLength <= maxVectorLength) {
-            return;
+            vectorLength = maxVectorLength;
         }
-        double maxVelocity = game.gameState.getBall().maxSpeed;
-        deltaPosition.normalize().scale(vectorLength / maxVelocity);
+        double maxVelocity = Ball.maxSpeed;
+        return deltaPosition.normalized().scale(vectorLength / maxVelocity);
     }
 
     /**
