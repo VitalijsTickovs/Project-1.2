@@ -6,6 +6,7 @@ import java.awt.image.*;
 import java.util.ArrayList;
 import Data_storage.GameState;
 import Data_storage.Vector2;
+import GUI.GameStateRenderer;
 import GUI.InterfaceFactory;
 import GUI.ShotInputWindow;
 import Reader.*;
@@ -118,6 +119,7 @@ public class Game extends JPanel implements Runnable, GameObject {
         renderer.ball = gameState.getBall();
         renderer.unitSizePixels = 40;
         renderer.createTerrainImage();
+        gameStateRenderer = new GameStateRenderer(gameState, 40);
     }
 
     private void createTerrainImage() {
@@ -317,39 +319,22 @@ public class Game extends JPanel implements Runnable, GameObject {
     // endregion
 
     // region Render
-    private BufferStrategy bufferStrategy;
+    private GameStateRenderer gameStateRenderer;
 
     /**
      * Renders the game
      */
     public void render() {
-        //if (isBufferStrategyNull()) {
-        //    return;
-        //}
-        updateGraphics();
-    }
-
-    /*private boolean isBufferStrategyNull() {
-        bufferStrategy = getBufferStrategy();
-        if (bufferStrategy == null) {
-            createBufferStrategy(3);
-            return true;
-        }
-        return false;
-    }*/
-
-    private void updateGraphics() {
-        Graphics2D g2 = (Graphics2D) terrainImage.getGraphics();//(Graphics2D) bufferStrategy.getDrawGraphics();
+        Graphics2D g2 = (Graphics2D) terrainImage.getGraphics();
         g2.setColor(Color.WHITE);
         g2.fillRect(0 ,0, terrainImage.getWidth(), terrainImage.getHeight());
-        //g2.drawImage(terrainImage, 0, 0, terrainImage.getWidth(), terrainImage.getHeight(), null);
-        renderer.render(g2);
+        //renderer.render(g2);
+        gameStateRenderer.render(g2, cam.x, cam.y, cam.width, cam.height, 0, 0);
         g2.dispose();
 
         g2 = (Graphics2D) getGraphics();
         g2.drawImage(terrainImage, null, 0, 0);
         g2.dispose();
-        //bufferStrategy.show();
     }
     // endregion
 

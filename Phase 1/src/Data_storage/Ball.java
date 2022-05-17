@@ -11,6 +11,7 @@ public class Ball {
     public Ball(Vector2 startPosition, Vector2 startVelocity) {
         state = new BallState(startPosition, startVelocity);
         mass = 1;
+        radius = 0.25;
     }
 
     public void addForce(Vector2 force) {
