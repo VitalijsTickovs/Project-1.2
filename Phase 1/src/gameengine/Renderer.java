@@ -32,12 +32,12 @@ public class Renderer {
      */
     public void render(Graphics2D g2) {
         g2.setColor(new Color(75, 47, 26));
-        g2.fillRect(0, 0, (int) (cam.width*unitSizePixels), (int) (cam.height*unitSizePixels));
+        g2.fillRect(0, 0, (int) (cam.WIDTH*unitSizePixels), (int) (cam.HEIGHT*unitSizePixels));
         // Render the terrain
-        double camTLx = cam.x - cam.width/2;
-        double camTLy = cam.y - cam.height/2;
-        double camBRx = cam.x + cam.width/2;
-        double camBRy = cam.y + cam.height/2;
+        double camTLx = cam.xPos - cam.WIDTH/2;
+        double camTLy = cam.yPos - cam.HEIGHT/2;
+        double camBRx = cam.xPos + cam.WIDTH/2;
+        double camBRy = cam.yPos + cam.HEIGHT/2;
 
         int xTL=-1, yTL=-1, xBR=-1, yBR=-1;
 

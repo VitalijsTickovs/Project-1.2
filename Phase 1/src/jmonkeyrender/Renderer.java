@@ -20,6 +20,7 @@ import physics.stoppingconditions.SmallVelocityStoppingCondition;
 import reader.GameStateLoader;
 import utility.math.Vector2;
 import datastorage.*;
+import gameengine.Camera;
 
 import com.jme3.font.BitmapText;
 import com.jme3.light.AmbientLight;
@@ -246,7 +247,11 @@ import java.util.Queue;
                 //Outputting the position of the ball
                 text.setText("x: " + df.format(getBallX()) + "  y: " + df.format(getBallY()) + "  z: "+ df.format(getBallZ()/terScale));
 
-                minimapImg = minimapGenerator.getSubimage(this.x, this.y, 50, 50);
+                Camera camera = new Camera(15,15);
+                camera.xPos = this.x;
+                camera.yPos = this.y;
+
+                minimapImg = minimapGenerator.getSubimage(camera);
                 img = loader.load(minimapImg, false);
                 texture2D.setImage(img);
                 pic.setTexture(assetManager, texture2D, true);
@@ -257,6 +262,7 @@ import java.util.Queue;
                 img.dispose();
                 minimapImg.flush();
             }
+            
         }
 
         /**
@@ -312,7 +318,7 @@ import java.util.Queue;
             this.targetRadius = GameStateLoader.getTargetRadius();
             this.targetPos = new Vector2(GameStateLoader.getTargetX(), GameStateLoader.getTargetY());
 
-            minimapGenerator = new GameStateRenderer(this.gameState, 20);
+            minimapGenerator = new GameStateRenderer(this.gameState);
 
             //Initializing terrain
             initTerrain(MenuGUI.texPath);
