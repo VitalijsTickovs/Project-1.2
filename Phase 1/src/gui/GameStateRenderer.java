@@ -290,18 +290,6 @@ public class GameStateRenderer {
         g2.dispose();
     }
 
-    private void renderBall(Graphics2D g2, Camera camera) {
-        Ball ball = gameState.getBall();
-        double z = ball.getZCoordinate(gameState.getTerrain());
-        int x = (int) ((ball.state.position.x - camera.xPos + camera.WIDTH / 2 - ball.radius) * PIXELS_PER_GAME_UNIT);
-        int y = (int) ((ball.state.position.y - z - camera.yPos + camera.HEIGHT / 2 - ball.radius)
-                * PIXELS_PER_GAME_UNIT);
-        g2.setColor(Color.WHITE);
-        g2.fillArc(x, y, (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2), (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2),
-                0,
-                360);
-    }
-
     private Canvas calculateVisibleTerrainArea(Camera camera) {
         // Render the terrain
         double camTLx = camera.xPos - camera.WIDTH / 2;
@@ -348,20 +336,9 @@ public class GameStateRenderer {
             }
         }
 
-        if (xTL != -1) {
-            int xDraw = (int) ((terrain.topLeftCorner.x - camTLx) * PIXELS_PER_GAME_UNIT);
-            int yDraw = (int) ((terrain.topLeftCorner.y - heightRange / 2 - camTLy) * PIXELS_PER_GAME_UNIT);
-            if (xDraw < 0) {
-                xDraw = 0;
-            }
-            if (yDraw < 0) {
-                yDraw = 0;
-            }
-        }
-
         Canvas visibleTerrainArea = new Canvas();
         visibleTerrainArea.topLeftX = xTL;
-        visibleTerrainArea.topLeftX = yTL;
+        visibleTerrainArea.topLeftY = yTL;
         visibleTerrainArea.width = xBR - xTL;
         visibleTerrainArea.height = yBR - yTL;
 
@@ -371,7 +348,9 @@ public class GameStateRenderer {
     private void renderBallAndFlag(Graphics2D g2, Camera camera) {
         Terrain terrain = gameState.getTerrain();
 
-        if (terrain.target.position.y > gameState.getBall().state.position.y) {
+        boolean ballIsBelowFlag = terrain.target.position.y > gameState.getBall().state.position.y;
+        // boolean ballIsBelowFlag = true;
+        if (ballIsBelowFlag) {
             renderBall(g2, camera);
             renderFlag(g2, camera);
         } else {
@@ -391,9 +370,22 @@ public class GameStateRenderer {
         g2.fillPolygon(new int[] { x, x + PIXELS_PER_GAME_UNIT / 2, x },
                 new int[] { y, y + PIXELS_PER_GAME_UNIT / 4, y + PIXELS_PER_GAME_UNIT / 2 }, 3);
     }
+
+    private void renderBall(Graphics2D g2, Camera camera) {
+        Ball ball = gameState.getBall();
+        double z = ball.getZCoordinate(gameState.getTerrain());
+        int x = (int) ((ball.state.position.x - camera.xPos + camera.WIDTH / 2 - ball.radius) * PIXELS_PER_GAME_UNIT);
+        int y = (int) ((ball.state.position.y - z - camera.yPos + camera.HEIGHT / 2 - ball.radius)
+                * PIXELS_PER_GAME_UNIT);
+        g2.setColor(Color.WHITE);
+        g2.fillArc(x, y, (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2), (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2),
+                0,
+                360);
+    }
+
     // endregion
 
-    //region Draw shapes
+    // region Draw shapes
     /**
      * Draws a circle onto the function terrain
      * 
@@ -487,9 +479,9 @@ public class GameStateRenderer {
         int renderY = (int) ((yy - h - terrain.topLeftCorner.y + heightRange / 2) * PIXELS_PER_GAME_UNIT);
         return new Vector2(renderX, renderY);
     }
-    //endregion
+    // endregion
 
-    //region Translation from game units to pixels
+    // region Translation from game units to pixels
     private int getTerrainWidthInPixels() {
         Terrain terrain = gameState.getTerrain();
         return (int) (terrain.bottomRightCorner.x - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT;
@@ -508,8 +500,9 @@ public class GameStateRenderer {
         return terrain.maxVal - terrain.minVal;
 
     }
-    //endregion
+    // endregion
 
+    // region Helper classes
     public class Square {
         /**
          * Game units
@@ -540,4 +533,5 @@ public class GameStateRenderer {
         public int width;
         public int height;
     }
+    // endregion
 }
