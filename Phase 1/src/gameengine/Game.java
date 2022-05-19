@@ -5,12 +5,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
+
+import datastorage.Ball;
 import datastorage.GameState;
 import utility.math.Vector2;
 import gui.GameStateRenderer;
 import gui.InterfaceFactory;
 import gui.ShotInputWindow;
 import bot.botimplementations.Bot;
+import bot.botimplementations.BotFactory;
 import bot.botimplementations.GradientDescentBot;
 import bot.botimplementations.HillClimbingBot;
 import bot.botimplementations.ParticleSwarmBot;
@@ -50,7 +53,6 @@ public class Game extends JPanel implements Runnable, GameObject {
         setupInitialBot();
         FPS = fps;
         createGameState();
-        resetBotThread();
         resetStartingVariables();
         setManualInputType();
         // createTerrain();
@@ -61,17 +63,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private void setupInitialBot() {
-        // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
-        // null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));
-        // bot = new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5,
-        // 0.5, 100, 10);
-        // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
-        // null);
-        setBot(new HillClimbingBot(
-                new FinalEuclidianDistanceHeuristic(),
-                0.01,
-                16,
-                new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+        setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
         resetBotThread();
     }
 
@@ -95,6 +87,7 @@ public class Game extends JPanel implements Runnable, GameObject {
 
     private void createGameState() {
         gameState = reader.GameStateLoader.readFile();
+        BotFactory.setTerrain(gameState.getTerrain());
     }
 
     private void resetStartingVariables() {
@@ -195,12 +188,9 @@ public class Game extends JPanel implements Runnable, GameObject {
     public void update() {
         handleBallInWater();
         handleInput();
-        // Find the positions after a shot
         simulateShot();
-        // Update the ball position if it has been calculated
         moveBall();
         moveCamera();
-        // Reset the game
         handleKeyInputs();
     }
 
@@ -251,9 +241,9 @@ public class Game extends JPanel implements Runnable, GameObject {
      */
     private boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
-        boolean noBot = (bot != null && !botThread.isAlive()) || (bot == null);
+        boolean notWaitingForBot = (bot != null && !botThread.isAlive()) || (bot == null);
         boolean ballHasBeenPushed = shotForce == null;
-        return ballHasBeenPushed && noBot && ballStopped;
+        return ballHasBeenPushed && notWaitingForBot && ballStopped;
     }
 
     private void simulateShot() {
@@ -279,10 +269,12 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private void moveCamera() {
-        camera.xPos += (gameState.getBall().state.position.x - camera.xPos) / 10;
-        camera.yPos += (gameState.getBall().state.position.y - camera.yPos) / 10;
+        Ball ball = gameState.getBall();
+        camera.xPos += (ball.state.position.x - camera.xPos) / 10;
+        camera.yPos += (ball.state.position.y - ball.getZCoordinate(gameState.getTerrain()) - camera.yPos) / 10;
     }
 
+    // region keyInputs
     private void handleKeyInputs() {
         checkResetGame();
         changeBotImplementation();
@@ -297,28 +289,16 @@ public class Game extends JPanel implements Runnable, GameObject {
 
     private void changeBotImplementation() {
         if (checkKeyPressed(Input.H)) {
-            setBot(new HillClimbingBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.01,
-                    12,
-                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+            setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
         }
         if (checkKeyPressed(Input.P)) {
-            setBot(new ParticleSwarmBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.5,
-                    0.5,
-                    0.5,
-                    100,
-                    10));
+            setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
         }
         if (checkKeyPressed(Input.G)) {
-            setBot(new GradientDescentBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.01,
-                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+            setBot(BotFactory.getBot(BotFactory.BotImplementations.GRADIENT_DESCENT));
         }
     }
+    // endregion
     // endregion
 
     // region Render

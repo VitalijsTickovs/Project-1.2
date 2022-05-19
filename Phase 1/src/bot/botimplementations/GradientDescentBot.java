@@ -16,7 +16,6 @@ public class GradientDescentBot implements Bot {
         this.heuristic = heuristic;
         this.learningRate = learningRate;
         this.initialShotTaker = initialShotTaker;
-
     }
 
     @Override
