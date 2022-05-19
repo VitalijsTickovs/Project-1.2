@@ -1,6 +1,6 @@
 package jmonkeyrender;
 
-import bot.botimplementations.Bot;
+import bot.botimplementations.IBot;
 import bot.botimplementations.HillClimbingBot;
 import bot.botimplementations.ParticleSwarmBot;
 import bot.heuristics.FinalEuclidianDistanceHeuristic;
@@ -341,7 +341,7 @@ import java.util.Queue;
             guiNode.attachChild(hudText);
 
         }
-        Bot bot;
+        IBot bot;
         private void setupInitialBot(){
             // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
             // null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));

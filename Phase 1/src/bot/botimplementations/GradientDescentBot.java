@@ -7,12 +7,12 @@ import datastorage.Ball;
 import datastorage.GameState;
 import utility.math.Vector2;
 
-public class GradientDescentBot implements Bot {
+public class GradientDescentBot implements IBot {
     private final Heuristic heuristic;
     private final double learningRate;
-    private final Bot initialShotTaker;
+    private final IBot initialShotTaker;
 
-    public GradientDescentBot(Heuristic heuristic, double learningRate, Bot initialShotTaker) {
+    public GradientDescentBot(Heuristic heuristic, double learningRate, IBot initialShotTaker) {
         this.heuristic = heuristic;
         this.learningRate = learningRate;
         this.initialShotTaker = initialShotTaker;

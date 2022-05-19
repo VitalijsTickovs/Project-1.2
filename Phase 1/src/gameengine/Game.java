@@ -12,7 +12,7 @@ import utility.math.Vector2;
 import gui.GameStateRenderer;
 import gui.InterfaceFactory;
 import gui.ShotInputWindow;
-import bot.botimplementations.Bot;
+import bot.botimplementations.IBot;
 import bot.botimplementations.BotFactory;
 import bot.botimplementations.GradientDescentBot;
 import bot.botimplementations.HillClimbingBot;
@@ -31,7 +31,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     private Vector2 shotForce;
     private Camera camera;
     private BallVelocityInput ballVelocityInput;
-    private Bot bot;
+    private IBot bot = null;
     private Thread botThread;
     private Input input;
     private static Game game;
@@ -63,7 +63,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private void setupInitialBot() {
-        setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
+        setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
         resetBotThread();
     }
 
@@ -158,7 +158,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     // region Update
     private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
 
-    public void setBot(Bot bot) {
+    public void setBot(IBot bot) {
         this.bot = bot;
     }
 

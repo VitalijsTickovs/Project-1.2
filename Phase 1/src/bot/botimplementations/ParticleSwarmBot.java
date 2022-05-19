@@ -8,7 +8,7 @@ import datastorage.Ball;
 import datastorage.GameState;
 import utility.math.Vector2;
 
-public class ParticleSwarmBot implements Bot {
+public class ParticleSwarmBot implements IBot {
 
     private final Heuristic heuristic;
     private final double w, c1, c2;
@@ -34,6 +34,8 @@ public class ParticleSwarmBot implements Bot {
         Particle[] particles = new Particle[numParticles];
         for (int i=0; i<particles.length; i++) {
             particles[i] = new Particle(gameState);
+            System.out.print(".");
+
         }
         // Find the best shot
         for (Particle particle : particles) {

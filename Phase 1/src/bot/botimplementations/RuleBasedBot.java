@@ -4,7 +4,7 @@ import bot.heuristics.Heuristic;
 import datastorage.GameState;
 import utility.math.Vector2;
 
-public class RuleBasedBot implements Bot {
+public class RuleBasedBot implements IBot {
 
     private final Heuristic heuristic;
 

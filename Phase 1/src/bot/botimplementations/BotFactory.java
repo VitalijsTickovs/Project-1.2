@@ -18,7 +18,7 @@ public class BotFactory {
         terrain = setTerrain;
     }
 
-    public static Bot getBot(BotImplementations implementation) {
+    public static IBot getBot(BotImplementations implementation) {
         if (implementation == BotImplementations.PARTICLE_SWARM) {
             return new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10);
         }

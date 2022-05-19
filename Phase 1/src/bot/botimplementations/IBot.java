@@ -3,6 +3,6 @@ package bot.botimplementations;
 import datastorage.GameState;
 import utility.math.Vector2;
 
-public interface Bot {
+public interface IBot {
     public Vector2 findBestShot(GameState gameState);
 }

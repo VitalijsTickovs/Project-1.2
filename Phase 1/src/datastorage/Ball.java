@@ -27,7 +27,7 @@ public class Ball {
     }
 
     public Ball copy() {
-        Ball newBall = new Ball(state.position, state.velocity);
+        Ball newBall = new Ball(state.position.copy(), state.velocity.copy());
         newBall.mass = mass;
         newBall.radius = radius;
         return newBall;
