@@ -140,11 +140,10 @@ public class GameStateRenderer {
     private void createTerrainImage() {
         Terrain terrain = gameState.getTerrain();
         double heightRange = terrain.maxVal - terrain.minVal;
-        terrainImage = new BufferedImage(
-                (int) ((terrain.bottomRightCorner.x-terrain.topLeftCorner.x)*unitSizePixels),
-                (int) ((terrain.bottomRightCorner.y-terrain.topLeftCorner.y)*unitSizePixels + heightRange*unitSizePixels),
-                BufferedImage.TYPE_4BYTE_ABGR
-        );
+
+        int width = (int) ((terrain.bottomRightCorner.x-terrain.topLeftCorner.x)*unitSizePixels);
+        int height = (int) ((terrain.bottomRightCorner.y-terrain.topLeftCorner.y)*unitSizePixels + heightRange*unitSizePixels);
+        terrainImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
         Graphics2D g2 = (Graphics2D) terrainImage.getGraphics();
         // Number of units in colored space
         double sizeColored = 4;

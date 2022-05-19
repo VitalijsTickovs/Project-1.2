@@ -35,6 +35,11 @@ public class Terrain {
     public int xRes = 500;
     public int yRes = 500;
 
+    public float minVal = -10;
+    public float maxVal = 10;
+    public double xOff;
+    public double yOff;
+
     public Terrain() {
     }
 
@@ -82,11 +87,6 @@ public class Terrain {
         temp[temp.length - 1] = z;
         zones = temp;
     }
-
-    public float minVal = -10;
-    public float maxVal = 10;
-    public double xOff;
-    public double yOff;
 
     public boolean isValid(int accuracy) {
         double xStep = (bottomRightCorner.x - topLeftCorner.x) / accuracy;
