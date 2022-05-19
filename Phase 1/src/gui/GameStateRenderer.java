@@ -31,17 +31,15 @@ public class GameStateRenderer {
 
     // region Startup
     private BufferedImage getGreenWithObstacles() {
-        Terrain terrain = gameState.getTerrain();
-        double heightRange = terrain.maxVal - terrain.minVal;
-
         BufferedImage imageOfGreenWithObstacles = getImageOfGreen();
         Graphics2D g2 = (Graphics2D) imageOfGreenWithObstacles.getGraphics();
 
-        drawTarget(g2, heightRange);
+        drawTarget(g2, getTerrainHeightRange());
         drawObstacles(g2);
         return imageOfGreenWithObstacles;
     }
 
+    // region getGreenWithObstacles helper methods
     private void drawTarget(Graphics2D g2, double heightRange) {
         Terrain terrain = gameState.getTerrain();
         double radius = terrain.target.radius;
@@ -64,6 +62,7 @@ public class GameStateRenderer {
             }
         }
     }
+    // endregion
 
     public BufferedImage getImageOfGreen() {
         Terrain terrain = gameState.getTerrain();
@@ -149,7 +148,7 @@ public class GameStateRenderer {
         return imageOfGreen;
     }
 
-    // region GetImageOfGreen helper methods
+    // region getImageOfGreen helper methods
     private void drawSquare(Graphics2D g2, Square square) {
         g2.setColor(getSquareColor(square));
         g2.fillPolygon(new int[] { square.pixel1X, square.pixel2X, square.pixel4X, square.pixel3X },
@@ -244,12 +243,66 @@ public class GameStateRenderer {
 
     public BufferedImage getSubimage(Camera camera) {
         BufferedImage image = getEmptyTerrainImage(camera);
+        fillImageWithBrown(image, camera);
+        Graphics2D g2 = (Graphics2D) image.getGraphics();
+
+        // Render a part of the image
+        BufferedImage subImage = cropImage(STATIC_TERRAIN_IMAGE, calculateVisibleTerrainArea(camera));
+        g2.drawImage(subImage, null, 0, 0);
+        subImage.flush();
+
+        renderBallAndFlag(g2, camera);
+        drawText(g2);
+
+        return image;
+    }
+
+    // region getSubimage helper methods
+    public BufferedImage getEmptyTerrainImage(Camera camera) {
+        return new BufferedImage((int) (camera.WIDTH * PIXELS_PER_GAME_UNIT),
+                (int) (camera.HEIGHT * PIXELS_PER_GAME_UNIT),
+                BufferedImage.TYPE_4BYTE_ABGR);
+    }
+
+    private void fillImageWithBrown(BufferedImage image, Camera camera) {
         Graphics2D imageG2 = (Graphics2D) image.getGraphics();
         // Fill the given part of the Graphics2D object in brown
         imageG2.setColor(new Color(75, 47, 26));
         imageG2.fillRect(0, 0, (int) (camera.WIDTH * PIXELS_PER_GAME_UNIT),
                 (int) (camera.HEIGHT * PIXELS_PER_GAME_UNIT));
-        // Render a part of the image
+    }
+
+    private BufferedImage cropImage(BufferedImage image, Canvas visibleTerrainArea) {
+        return image.getSubimage(visibleTerrainArea.topLeftX,
+                visibleTerrainArea.topLeftY, visibleTerrainArea.width, visibleTerrainArea.height);
+    }
+
+    private void drawText(Graphics2D g2) {
+        g2.setFont(new Font("TimesRoman", Font.BOLD, PIXELS_PER_GAME_UNIT / 2));
+        g2.setColor(Color.WHITE);
+        BigDecimal xx = new BigDecimal(gameState.getBall().state.position.x);
+        xx = xx.setScale(5, RoundingMode.HALF_UP);
+        BigDecimal yy = new BigDecimal(gameState.getBall().state.position.y);
+        yy = yy.setScale(5, RoundingMode.HALF_UP);
+        g2.drawString("x = " + xx, PIXELS_PER_GAME_UNIT, PIXELS_PER_GAME_UNIT);
+        g2.drawString("y = " + yy, PIXELS_PER_GAME_UNIT, 2 * PIXELS_PER_GAME_UNIT);
+        // Dispose of the graphics
+        g2.dispose();
+    }
+
+    private void renderBall(Graphics2D g2, Camera camera) {
+        Ball ball = gameState.getBall();
+        double z = ball.getZCoordinate(gameState.getTerrain());
+        int x = (int) ((ball.state.position.x - camera.xPos + camera.WIDTH / 2 - ball.radius) * PIXELS_PER_GAME_UNIT);
+        int y = (int) ((ball.state.position.y - z - camera.yPos + camera.HEIGHT / 2 - ball.radius)
+                * PIXELS_PER_GAME_UNIT);
+        g2.setColor(Color.WHITE);
+        g2.fillArc(x, y, (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2), (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2),
+                0,
+                360);
+    }
+
+    private Canvas calculateVisibleTerrainArea(Camera camera) {
         // Render the terrain
         double camTLx = camera.xPos - camera.WIDTH / 2;
         double camTLy = camera.yPos - camera.HEIGHT / 2;
@@ -304,53 +357,27 @@ public class GameStateRenderer {
             if (yDraw < 0) {
                 yDraw = 0;
             }
-            BufferedImage subImage = STATIC_TERRAIN_IMAGE.getSubimage(xTL, yTL, xBR - xTL, yBR - yTL);
-            imageG2.drawImage(subImage, null, 0, 0);
-            subImage.flush();
         }
-        // Render the flag and ball, order depending on position
+
+        Canvas visibleTerrainArea = new Canvas();
+        visibleTerrainArea.topLeftX = xTL;
+        visibleTerrainArea.topLeftX = yTL;
+        visibleTerrainArea.width = xBR - xTL;
+        visibleTerrainArea.height = yBR - yTL;
+
+        return visibleTerrainArea;
+    }
+
+    private void renderBallAndFlag(Graphics2D g2, Camera camera) {
+        Terrain terrain = gameState.getTerrain();
+
         if (terrain.target.position.y > gameState.getBall().state.position.y) {
-            renderBall(imageG2, camera);
-            renderFlag(imageG2, camera);
+            renderBall(g2, camera);
+            renderFlag(g2, camera);
         } else {
-            renderFlag(imageG2, camera);
-            renderBall(imageG2, camera);
+            renderFlag(g2, camera);
+            renderBall(g2, camera);
         }
-        // Draw ball position
-        drawText(imageG2);
-
-        return image;
-    }
-
-    private void drawText(Graphics2D imageG2) {
-        imageG2.setFont(new Font("TimesRoman", Font.BOLD, PIXELS_PER_GAME_UNIT / 2));
-        imageG2.setColor(Color.WHITE);
-        BigDecimal xx = new BigDecimal(gameState.getBall().state.position.x);
-        xx = xx.setScale(5, RoundingMode.HALF_UP);
-        BigDecimal yy = new BigDecimal(gameState.getBall().state.position.y);
-        yy = yy.setScale(5, RoundingMode.HALF_UP);
-        imageG2.drawString("x = " + xx, PIXELS_PER_GAME_UNIT, PIXELS_PER_GAME_UNIT);
-        imageG2.drawString("y = " + yy, PIXELS_PER_GAME_UNIT, 2 * PIXELS_PER_GAME_UNIT);
-        // Dispose of the graphics
-        imageG2.dispose();
-    }
-
-    public BufferedImage getEmptyTerrainImage(Camera camera) {
-        return new BufferedImage((int) (camera.WIDTH * PIXELS_PER_GAME_UNIT),
-                (int) (camera.HEIGHT * PIXELS_PER_GAME_UNIT),
-                BufferedImage.TYPE_4BYTE_ABGR);
-    }
-
-    private void renderBall(Graphics2D g2, Camera camera) {
-        Ball ball = gameState.getBall();
-        double z = ball.getZCoordinate(gameState.getTerrain());
-        int x = (int) ((ball.state.position.x - camera.xPos + camera.WIDTH / 2 - ball.radius) * PIXELS_PER_GAME_UNIT);
-        int y = (int) ((ball.state.position.y - z - camera.yPos + camera.HEIGHT / 2 - ball.radius)
-                * PIXELS_PER_GAME_UNIT);
-        g2.setColor(Color.WHITE);
-        g2.fillArc(x, y, (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2), (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2),
-                0,
-                360);
     }
 
     private void renderFlag(Graphics2D g2, Camera camera) {
@@ -364,7 +391,9 @@ public class GameStateRenderer {
         g2.fillPolygon(new int[] { x, x + PIXELS_PER_GAME_UNIT / 2, x },
                 new int[] { y, y + PIXELS_PER_GAME_UNIT / 4, y + PIXELS_PER_GAME_UNIT / 2 }, 3);
     }
+    // endregion
 
+    //region Draw shapes
     /**
      * Draws a circle onto the function terrain
      * 
@@ -458,7 +487,9 @@ public class GameStateRenderer {
         int renderY = (int) ((yy - h - terrain.topLeftCorner.y + heightRange / 2) * PIXELS_PER_GAME_UNIT);
         return new Vector2(renderX, renderY);
     }
+    //endregion
 
+    //region Translation from game units to pixels
     private int getTerrainWidthInPixels() {
         Terrain terrain = gameState.getTerrain();
         return (int) (terrain.bottomRightCorner.x - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT;
@@ -477,6 +508,7 @@ public class GameStateRenderer {
         return terrain.maxVal - terrain.minVal;
 
     }
+    //endregion
 
     public class Square {
         /**
@@ -500,5 +532,12 @@ public class GameStateRenderer {
         public double maxHeight;
 
         public double lightLevel;
+    }
+
+    public class Canvas {
+        public int topLeftX;
+        public int topLeftY;
+        public int width;
+        public int height;
     }
 }
