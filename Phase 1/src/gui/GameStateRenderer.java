@@ -16,6 +16,7 @@ public class GameStateRenderer {
      * Only contains the green. Displays the entire map.
      */
     private final GameState gameState;
+    private final Terrain terrain;
     public final int PIXELS_PER_GAME_UNIT = 40;
     /**
      * Contains the green with all obstacles, zones and the target added. Displays
@@ -25,6 +26,7 @@ public class GameStateRenderer {
 
     public GameStateRenderer(GameState gameState) {
         this.gameState = gameState;
+        this.terrain = gameState.getTerrain();
 
         STATIC_TERRAIN_IMAGE = getGreenWithObstacles();
     }
@@ -41,14 +43,12 @@ public class GameStateRenderer {
 
     // region getGreenWithObstacles helper methods
     private void drawTarget(Graphics2D g2, double heightRange) {
-        Terrain terrain = gameState.getTerrain();
         double radius = terrain.target.radius;
         drawCircle(g2, terrain.target.position.x, terrain.target.position.y, radius, Color.BLACK, false);
 
     }
 
     private void drawObstacles(Graphics2D g2) {
-        Terrain terrain = gameState.getTerrain();
         Color obstacleColor = new Color(96, 69, 38);
 
         for (IObstacle o : terrain.obstacles) {
@@ -65,8 +65,6 @@ public class GameStateRenderer {
     // endregion
 
     public BufferedImage getImageOfGreen() {
-        Terrain terrain = gameState.getTerrain();
-
         BufferedImage imageOfGreen = new BufferedImage(getTerrainWidthInPixels(), getTerrainHeightInPixels(),
                 BufferedImage.TYPE_4BYTE_ABGR);
         Graphics2D g2 = (Graphics2D) imageOfGreen.getGraphics();
@@ -157,7 +155,6 @@ public class GameStateRenderer {
 
     private Color getSquareColor(Square square) {
         Vector2 squarePosition = square.squarePosition;
-        Terrain terrain = gameState.getTerrain();
 
         if (square.maxHeight < 0) {
             return calculateWaterColor(square.lightLevel);
@@ -195,7 +192,6 @@ public class GameStateRenderer {
     }
 
     private boolean isPixelTinted(double xPos, double yPos) {
-        Terrain terrain = gameState.getTerrain();
         // The lenfth of one of the sides of a tinted square in game units
         int TINTED_SQUARE_SIZE = 4;
 
@@ -205,7 +201,6 @@ public class GameStateRenderer {
     }
 
     private double[] getMaxAndMinTerrainHeight() {
-        Terrain terrain = gameState.getTerrain();
         // First value is min height, second is max height
         double[] minMax = new double[2];
 
@@ -299,7 +294,6 @@ public class GameStateRenderer {
 
         int xTL = -1, yTL = -1, xBR = -1, yBR = -1;
 
-        Terrain terrain = gameState.getTerrain();
         double heightRange = terrain.maxVal - terrain.minVal;
 
         // Check if the terrain is on-screen and find the range of the drawing part
@@ -346,8 +340,6 @@ public class GameStateRenderer {
     }
 
     private void renderBallAndFlag(Graphics2D g2, Camera camera) {
-        Terrain terrain = gameState.getTerrain();
-
         boolean ballIsBelowFlag = terrain.target.position.y > gameState.getBall().state.position.y;
         // boolean ballIsBelowFlag = true;
         if (ballIsBelowFlag) {
@@ -373,7 +365,7 @@ public class GameStateRenderer {
 
     private void renderBall(Graphics2D g2, Camera camera) {
         Ball ball = gameState.getBall();
-        double z = ball.getZCoordinate(gameState.getTerrain());
+        double z = ball.getZCoordinate(terrain);
         int x = (int) ((ball.state.position.x - camera.xPos + camera.WIDTH / 2 - ball.radius) * PIXELS_PER_GAME_UNIT);
         int y = (int) ((ball.state.position.y  - camera.yPos + camera.HEIGHT / 2 - ball.radius)
                 * PIXELS_PER_GAME_UNIT);
@@ -397,7 +389,6 @@ public class GameStateRenderer {
      * @param filled Whether it's a filled circle or just an outline
      */
     private void drawCircle(Graphics2D g2, double x, double y, double radius, Color color, boolean filled) {
-        Terrain terrain = gameState.getTerrain();
         double heightRange = terrain.maxVal - terrain.minVal;
         int[] xPoints = new int[361];
         int[] yPoints = new int[361];
@@ -470,7 +461,6 @@ public class GameStateRenderer {
     }
 
     private Vector2 getPointValue(Vector2 point) {
-        Terrain terrain = gameState.getTerrain();
         double heightRange = terrain.maxVal - terrain.minVal;
         double xx = point.x;
         double yy = point.y;
@@ -483,20 +473,14 @@ public class GameStateRenderer {
 
     // region Translation from game units to pixels
     private int getTerrainWidthInPixels() {
-        Terrain terrain = gameState.getTerrain();
         return (int) (terrain.bottomRightCorner.x - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT;
-
     }
 
     private int getTerrainHeightInPixels() {
-        Terrain terrain = gameState.getTerrain();
         return (int) (terrain.bottomRightCorner.y - terrain.topLeftCorner.y) * PIXELS_PER_GAME_UNIT;
-
     }
 
     private double getTerrainHeightRange() {
-        Terrain terrain = gameState.getTerrain();
-
         return terrain.maxVal - terrain.minVal;
 
     }

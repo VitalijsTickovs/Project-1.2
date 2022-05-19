@@ -271,7 +271,8 @@ public class Game extends JPanel implements Runnable, GameObject {
     private void moveCamera() {
         Ball ball = gameState.getBall();
         camera.xPos += (ball.state.position.x - camera.xPos) / 10;
-        camera.yPos += (ball.state.position.y - camera.yPos) / 10;
+        double zOffset = ball.getZCoordinate(gameState.getTerrain());
+        camera.yPos += (ball.state.position.y - zOffset - camera.yPos) / 10;
     }
 
     // region keyInputs
