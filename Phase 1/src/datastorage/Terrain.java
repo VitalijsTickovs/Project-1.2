@@ -136,24 +136,6 @@ public class Terrain {
         }
     }
 
-    public double xDerivativeAt(double x, double y) {
-        double functionVal = terrainFunction.valueAt(x, y);
-        if (functionVal > maxVal || functionVal < minVal) {
-            return 0;
-        } else {
-            return terrainFunction.xDerivativeAt(x, y);
-        }
-    }
-
-    public double yDerivativeAt(double x, double y) {
-        double functionVal = terrainFunction.valueAt(x, y);
-        if (functionVal > maxVal || functionVal < minVal) {
-            return 0;
-        } else {
-            return terrainFunction.yDerivativeAt(x, y);
-        }
-    }
-
     public double getStaticFriction(Vector2 position) {
         for (Zone zone : zones) {
             if (zone.isPositionInside(position)) {

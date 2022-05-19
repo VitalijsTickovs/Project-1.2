@@ -34,7 +34,6 @@ public class ParticleSwarmBot implements IBot {
         Particle[] particles = new Particle[numParticles];
         for (int i=0; i<particles.length; i++) {
             particles[i] = new Particle(gameState);
-            System.out.print(".");
 
         }
         // Find the best shot

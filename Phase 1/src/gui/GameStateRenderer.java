@@ -363,7 +363,7 @@ public class GameStateRenderer {
         Target target = gameState.getTerrain().target;
         double z = gameState.getTerrain().terrainFunction.valueAt(target.position.x, target.position.y);
         int x = (int) ((target.position.x - camera.xPos + camera.WIDTH / 2) * PIXELS_PER_GAME_UNIT);
-        int y = (int) ((target.position.y - z - camera.yPos + camera.HEIGHT / 2 - 2) * PIXELS_PER_GAME_UNIT);
+        int y = (int) ((target.position.y  - camera.yPos + camera.HEIGHT / 2 - 2) * PIXELS_PER_GAME_UNIT);
         g2.setColor(Color.WHITE);
         g2.drawLine(x, y, x, y + 2 * PIXELS_PER_GAME_UNIT);
         g2.setColor(Color.RED);
@@ -375,7 +375,7 @@ public class GameStateRenderer {
         Ball ball = gameState.getBall();
         double z = ball.getZCoordinate(gameState.getTerrain());
         int x = (int) ((ball.state.position.x - camera.xPos + camera.WIDTH / 2 - ball.radius) * PIXELS_PER_GAME_UNIT);
-        int y = (int) ((ball.state.position.y - z - camera.yPos + camera.HEIGHT / 2 - ball.radius)
+        int y = (int) ((ball.state.position.y  - camera.yPos + camera.HEIGHT / 2 - ball.radius)
                 * PIXELS_PER_GAME_UNIT);
         g2.setColor(Color.WHITE);
         g2.fillArc(x, y, (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2), (int) (ball.radius * PIXELS_PER_GAME_UNIT * 2),
