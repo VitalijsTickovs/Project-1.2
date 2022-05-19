@@ -21,7 +21,7 @@ public class Function {
      * @param varValues The array of corresponding variable values
      * @return The result of the computation
      */
-    public double evaluate(String[] varNames, double[] varValues) {
+    public synchronized double evaluate(String[] varNames, double[] varValues) {
         if (varNames.length != varValues.length) {
             throw new RuntimeException("Variable names and values must have the same number of elements");
         }

@@ -23,7 +23,8 @@ public class TerrainHeightFunction extends TerrainHeight {
 
     @Override
     public double valueAt(double x, double y) {
-        return f.evaluate(new String[] { "x", "y" }, new double[] { x, y });
+        double value = f.evaluate(new String[] { "x", "y" }, new double[] { x, y });
+        return value;
     }
 
 
