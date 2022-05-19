@@ -29,7 +29,7 @@ public class Terrain {
     public double staticFriction;
     public double kineticFriction;
 
-    public TerrainFunction1 terrainFunction;
+    public TerrainHeightFunction terrainFunction;
     public double scaleFactor = 1;
 
     public int xRes = 500;
@@ -50,7 +50,7 @@ public class Terrain {
 
     public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner,
             Vector2 limitingCorner) {
-        this.terrainFunction = new TerrainFunction1(function);
+        this.terrainFunction = new TerrainHeightFunction(function);
         this.staticFriction = staticFriction;
         this.kineticFriction = kineticFriction;
         this.topLeftCorner = startingCorner;
@@ -241,7 +241,7 @@ public class Terrain {
         }
         target.print();
     }
-    public void setTerrainFunction(TerrainFunction1 terrainFunction){
+    public void setTerrainFunction(TerrainHeightFunction terrainFunction){
         this.terrainFunction = terrainFunction;
         calculateHeightMap(VERTECES_PER_SIDE);
     }

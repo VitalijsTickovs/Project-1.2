@@ -2,8 +2,9 @@ package datastorage;
 
 import function.Function;
 // import org.mariuszgromada.math.mxparser.*;
+import utility.math.Vector2;
 
-public class TerrainFunction1 extends TerrainFunction {
+public class TerrainHeightFunction extends TerrainHeight {
     /*
      * private Function f;
      * private Function dfx;
@@ -14,7 +15,7 @@ public class TerrainFunction1 extends TerrainFunction {
     public function.Function dfx;
     public function.Function dfy;
 
-    public TerrainFunction1(String function) {
+    public TerrainHeightFunction(String function) {
         f = new Function(function);
         dfx = f.getDerivative("x");
         dfy = f.getDerivative("y");
@@ -41,5 +42,20 @@ public class TerrainFunction1 extends TerrainFunction {
         return "h(x,y) = " + f.toString() + "\n" +
                 "dh/dx = " + dfx.toString() + "\n" +
                 "dh/dy = " + dfy.toString();
+    }
+
+    @Override
+    public double valueAt(Vector2 position) {
+        return valueAt(position.x, position.y);
+    }
+
+    @Override
+    public double xDerivativeAt(Vector2 position) {
+        return xDerivativeAt(position.x, position.y);
+    }
+
+    @Override
+    public double yDerivativeAt(Vector2 position) {
+        return yDerivativeAt(position.x, position.y);
     }
 }

@@ -100,7 +100,7 @@ public class MeshGenerator extends SimpleApplication {
         return vertices;
     }
 
-    public static Mesh createTerrainMesh(TerrainFunction1 t) {
+    public static Mesh createTerrainMesh(TerrainHeightFunction t) {
         Terrain terrain = new Terrain();
         terrain.terrainFunction = t;
         terrain.topLeftCorner = new Vector2(0, 0);

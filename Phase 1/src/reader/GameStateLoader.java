@@ -486,11 +486,11 @@ public class GameStateLoader {
       } else {
          terrain.staticFriction = greenStaticFriction;
       }
-      TerrainFunction1 decodedFunction;
+      TerrainHeightFunction decodedFunction;
       if (terrainFunction == null) {
-         decodedFunction = new TerrainFunction1(defterrainFunction);
+         decodedFunction = new TerrainHeightFunction(defterrainFunction);
       } else {
-         decodedFunction = new TerrainFunction1(terrainFunction);
+         decodedFunction = new TerrainHeightFunction(terrainFunction);
       }
       terrain.setTerrainFunction(decodedFunction);
 

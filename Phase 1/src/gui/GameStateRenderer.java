@@ -29,6 +29,219 @@ public class GameStateRenderer {
         STATIC_TERRAIN_IMAGE = getGreenWithObstacles();
     }
 
+    // region Startup
+    private BufferedImage getGreenWithObstacles() {
+        Terrain terrain = gameState.getTerrain();
+        double heightRange = terrain.maxVal - terrain.minVal;
+
+        BufferedImage imageOfGreenWithObstacles = getImageOfGreen();
+        Graphics2D g2 = (Graphics2D) imageOfGreenWithObstacles.getGraphics();
+
+        drawTarget(g2, heightRange);
+        drawObstacles(g2);
+        return imageOfGreenWithObstacles;
+    }
+
+    private void drawTarget(Graphics2D g2, double heightRange) {
+        Terrain terrain = gameState.getTerrain();
+        double radius = terrain.target.radius;
+        drawCircle(g2, terrain.target.position.x, terrain.target.position.y, radius, Color.BLACK, false);
+
+    }
+
+    private void drawObstacles(Graphics2D g2) {
+        Terrain terrain = gameState.getTerrain();
+        Color obstacleColor = new Color(96, 69, 38);
+
+        for (IObstacle o : terrain.obstacles) {
+            // Trees
+            if (o instanceof ObstacleTree) {
+                ObstacleTree t = (ObstacleTree) o;
+                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, obstacleColor, true);
+            } else if (o instanceof ObstacleBox) {
+                ObstacleBox b = (ObstacleBox) o;
+                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, obstacleColor, true);
+            }
+        }
+    }
+
+    public BufferedImage getImageOfGreen() {
+        Terrain terrain = gameState.getTerrain();
+
+        BufferedImage imageOfGreen = new BufferedImage(getTerrainWidthInPixels(), getTerrainHeightInPixels(),
+                BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics2D g2 = (Graphics2D) imageOfGreen.getGraphics();
+        // Number of units in colored space
+        // Clear screen
+        Color brownBackground = new Color(75, 47, 26);
+        g2.setColor(brownBackground);
+        g2.fillRect(0, 0, imageOfGreen.getWidth(), imageOfGreen.getHeight());
+        // Render the terrain
+        int numVertices = (int) Math.sqrt(terrain.heightmap.length);
+        double xStep = (terrain.bottomRightCorner.x - terrain.topLeftCorner.x) / numVertices;
+        double yStep = (terrain.bottomRightCorner.y - terrain.topLeftCorner.y) / numVertices;
+        // Find the max and min height in the terrain
+        double[] minMax = getMaxAndMinTerrainHeight();
+        double totalMinHeight = minMax[0];
+        double totalMaxHeight = minMax[1];
+
+        // Make sure that the deepest part isn't pitch black
+        totalMinHeight -= 1.5;
+        // Find the rendering coordinates
+        for (int yy = 0; yy < numVertices - 1; yy++) {
+            for (int xx = 0; xx < numVertices - 1; xx++) {
+                // First point
+                double x1 = terrain.topLeftCorner.x + xx * xStep;
+                double y1 = terrain.topLeftCorner.y + yy * yStep;
+                double h1 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x1, y1), -10, 10);
+                // Second point
+                double x2 = terrain.topLeftCorner.x + (xx + 1) * xStep;
+                double y2 = terrain.topLeftCorner.y + yy * yStep;
+                double h2 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x2, y2), -10, 10);
+                // Third point
+                double x3 = terrain.topLeftCorner.x + xx * xStep;
+                double y3 = terrain.topLeftCorner.y + (yy + 1) * yStep;
+                double h3 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x3, y3), -10, 10);
+
+                // Fourth point
+                double x4 = terrain.topLeftCorner.x + (xx + 1) * xStep;
+                double y4 = terrain.topLeftCorner.y + (yy + 1) * yStep;
+                double h4 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x4, y4), -10, 10);
+
+                double heightRange = getTerrainHeightRange();
+                double maxHeight = UtilityClass.getMaxValue(new double[] { h1, h2, h3, h4 });
+
+                int renderPixelX1 = (int) ((x1 - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
+                int renderPixelY1 = (int) ((y1 - h1 - terrain.topLeftCorner.y + heightRange / 2)
+                        * PIXELS_PER_GAME_UNIT);
+
+                int renderPixelX2 = (int) ((x2 - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
+                int renderPixelY2 = (int) ((y2 - h2 - terrain.topLeftCorner.y + heightRange / 2)
+                        * PIXELS_PER_GAME_UNIT);
+
+                int renderPixelX3 = (int) ((x3 - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
+                int renderPixelY3 = (int) ((y3 - h3 - terrain.topLeftCorner.y + heightRange / 2)
+                        * PIXELS_PER_GAME_UNIT);
+
+                int renderPixelX4 = (int) ((x4 - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
+                int renderPixelY4 = (int) ((y4 - h4 - terrain.topLeftCorner.y + heightRange / 2)
+                        * PIXELS_PER_GAME_UNIT);
+
+                double lightLevel = (maxHeight - totalMinHeight) / (totalMaxHeight - totalMinHeight);
+
+                Square square = new Square();
+                square.lightLevel = lightLevel;
+                square.maxHeight = maxHeight;
+                square.squarePosition = new Vector2(x1, y1);
+
+                square.pixel1X = renderPixelX1;
+                square.pixel1Y = renderPixelY1;
+                square.pixel2X = renderPixelX2;
+                square.pixel2Y = renderPixelY2;
+                square.pixel3X = renderPixelX3;
+                square.pixel3Y = renderPixelY3;
+                square.pixel4X = renderPixelX4;
+                square.pixel4Y = renderPixelY4;
+
+                drawSquare(g2, square);
+            }
+        }
+        return imageOfGreen;
+    }
+
+    // region GetImageOfGreen helper methods
+    private void drawSquare(Graphics2D g2, Square square) {
+        g2.setColor(getSquareColor(square));
+        g2.fillPolygon(new int[] { square.pixel1X, square.pixel2X, square.pixel4X, square.pixel3X },
+                new int[] { square.pixel1Y, square.pixel2Y, square.pixel4Y, square.pixel3Y }, 4);
+    }
+
+    private Color getSquareColor(Square square) {
+        Vector2 squarePosition = square.squarePosition;
+        Terrain terrain = gameState.getTerrain();
+
+        if (square.maxHeight < 0) {
+            return calculateWaterColor(square.lightLevel);
+        }
+        if (terrain.isPointInZone(squarePosition.x, squarePosition.y)) {
+            return calculateSandColor(square);
+        }
+        return calculateGrassColor(square);
+    }
+
+    private Color calculateSandColor(Square square) {
+        Vector2 squarePosition = square.squarePosition;
+        double lightLevel = square.lightLevel;
+
+        if (isPixelTinted(squarePosition.x, squarePosition.y)) {
+            return new Color((int) (150 * lightLevel), (int) (150 * lightLevel), 0);
+        } else {
+            return new Color((int) (100 * lightLevel), (int) (100 * lightLevel), 0);
+        }
+    }
+
+    private Color calculateGrassColor(Square square) {
+        Vector2 squarePosition = square.squarePosition;
+        double lightLevel = square.lightLevel;
+
+        if (isPixelTinted(squarePosition.x, squarePosition.y)) {
+            return new Color(0, (int) (200 * lightLevel), 0);
+        } else {
+            return new Color(0, (int) (180 * lightLevel), 0);
+        }
+    }
+
+    private Color calculateWaterColor(double lightLevel) {
+        return new Color((int) (34 * lightLevel), (int) (124 * lightLevel), (int) (176 * lightLevel));
+    }
+
+    private boolean isPixelTinted(double xPos, double yPos) {
+        Terrain terrain = gameState.getTerrain();
+        // The lenfth of one of the sides of a tinted square in game units
+        int TINTED_SQUARE_SIZE = 4;
+
+        int numBlockX = (int) ((xPos - terrain.topLeftCorner.x) / TINTED_SQUARE_SIZE);
+        int numBlockY = (int) ((yPos - terrain.topLeftCorner.y) / TINTED_SQUARE_SIZE);
+        return (numBlockX + numBlockY) % 2 == 0;
+    }
+
+    private double[] getMaxAndMinTerrainHeight() {
+        Terrain terrain = gameState.getTerrain();
+        // First value is min height, second is max height
+        double[] minMax = new double[2];
+
+        int numVertices = (int) Math.sqrt(terrain.heightmap.length);
+        double xStep = (terrain.bottomRightCorner.x - terrain.topLeftCorner.x) / numVertices;
+        double yStep = (terrain.bottomRightCorner.y - terrain.topLeftCorner.y) / numVertices;
+        // Find the max and min height in the terrain
+        double totalMaxHeight = -10;
+        double totalMinHeight = 10;
+        for (int yy = 0; yy < numVertices; yy++) {
+            for (int xx = 0; xx < numVertices; xx++) {
+                double x = terrain.topLeftCorner.x + xx * xStep;
+                double y = terrain.topLeftCorner.y + yy * yStep;
+                double h = terrain.terrainFunction.valueAt(x, y);
+                if (h > 10) {
+                    h = 10;
+                }
+                if (h < -10) {
+                    h = -10;
+                }
+                if (h > totalMaxHeight) {
+                    totalMaxHeight = h;
+                }
+                if (h < totalMinHeight) {
+                    totalMinHeight = h;
+                }
+            }
+        }
+        minMax[0] = totalMinHeight;
+        minMax[1] = totalMaxHeight;
+        return minMax;
+    }
+    // endregion
+    // endregion
+
     public BufferedImage getSubimage(Camera camera) {
         BufferedImage image = getEmptyTerrainImage(camera);
         Graphics2D imageG2 = (Graphics2D) image.getGraphics();
@@ -107,185 +320,6 @@ public class GameStateRenderer {
         drawText(imageG2);
 
         return image;
-    }
-
-    private BufferedImage getGreenWithObstacles() {
-        Terrain terrain = gameState.getTerrain();
-        double heightRange = terrain.maxVal - terrain.minVal;
-
-        BufferedImage imageOfGreenWithObstacles = getImageOfGreen();
-        Graphics2D g2 = (Graphics2D) imageOfGreenWithObstacles.getGraphics();
-
-        drawTarget(g2, heightRange);
-        drawObstacles(g2);
-        return imageOfGreenWithObstacles;
-    }
-
-    public BufferedImage getImageOfGreen() {
-        Terrain terrain = gameState.getTerrain();
-
-        BufferedImage imageOfGreen = new BufferedImage(getTerrainWidthInPixels(), getTerrainHeightInPixels(),
-                BufferedImage.TYPE_4BYTE_ABGR);
-        Graphics2D g2 = (Graphics2D) imageOfGreen.getGraphics();
-        // Number of units in colored space
-        // Clear screen
-        Color brownBackground = new Color(75, 47, 26);
-        g2.setColor(brownBackground);
-        g2.fillRect(0, 0, imageOfGreen.getWidth(), imageOfGreen.getHeight());
-        // Render the terrain
-        int numVertices = (int) Math.sqrt(terrain.heightmap.length);
-        double xStep = (terrain.bottomRightCorner.x - terrain.topLeftCorner.x) / numVertices;
-        double yStep = (terrain.bottomRightCorner.y - terrain.topLeftCorner.y) / numVertices;
-        // Find the max and min height in the terrain
-        double[] minMax = getMaxAndMinTerrainHeight();
-        double totalMinHeight = minMax[0];
-        double totalMaxHeight = minMax[1];
-
-        // Make sure that the deepest part isn't pitch black
-        totalMinHeight -= 1.5;
-        // Find the rendering coordinates
-        for (int yy = 0; yy < numVertices - 1; yy++) {
-            for (int xx = 0; xx < numVertices - 1; xx++) {
-                // First point
-                double x1 = terrain.topLeftCorner.x + xx * xStep;
-                double y1 = terrain.topLeftCorner.y + yy * yStep;
-                double h1 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x1, y1), -10, 10);
-                // Second point
-                double x2 = terrain.topLeftCorner.x + (xx + 1) * xStep;
-                double y2 = terrain.topLeftCorner.y + yy * yStep;
-                double h2 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x2, y2), -10, 10);
-                // Third point
-                double x3 = terrain.topLeftCorner.x + xx * xStep;
-                double y3 = terrain.topLeftCorner.y + (yy + 1) * yStep;
-                double h3 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x3, y3), -10, 10);
-
-                // Fourth point
-                double x4 = terrain.topLeftCorner.x + (xx + 1) * xStep;
-                double y4 = terrain.topLeftCorner.y + (yy + 1) * yStep;
-                double h4 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x4, y4), -10, 10);
-
-                double heightRange = getTerrainHeightRange();
-                double maxHeight = UtilityClass.getMaxValue(new double[] { h1, h2, h3, h4 });
-
-                int renderPixelX1 = (int) ((x1 - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
-                int renderPixelY1 = (int) ((y1 - h1 - terrain.topLeftCorner.y + heightRange / 2)
-                        * PIXELS_PER_GAME_UNIT);
-
-                int renderPixelX2 = (int) ((x2 - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
-                int renderPixelY2 = (int) ((y2 - h2 - terrain.topLeftCorner.y + heightRange / 2)
-                        * PIXELS_PER_GAME_UNIT);
-
-                int renderPixelX3 = (int) ((x3 - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
-                int renderPixelY3 = (int) ((y3 - h3 - terrain.topLeftCorner.y + heightRange / 2)
-                        * PIXELS_PER_GAME_UNIT);
-
-                int renderPixelX4 = (int) ((x4 - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
-                int renderPixelY4 = (int) ((y4 - h4 - terrain.topLeftCorner.y + heightRange / 2)
-                        * PIXELS_PER_GAME_UNIT);
-
-                double lightLevel = (maxHeight - totalMinHeight) / (totalMaxHeight - totalMinHeight);
-
-                // Land
-                if (maxHeight >= 0) {
-                    // Sand
-                    if (terrain.isPointInZone(x1, y1)) {
-                        if (isPixelTinted(x1,y1)) {
-                            g2.setColor(new Color((int) (150 * lightLevel), (int) (150 * lightLevel), 0));
-                        } else {
-                            g2.setColor(new Color((int) (100 * lightLevel), (int) (100 * lightLevel), 0));
-                        }
-                        // Grass
-                    } else {
-                        if (isPixelTinted(x1,y1)) {
-                            g2.setColor(new Color(0, (int) (200 * lightLevel), 0));
-                        } else {
-                            g2.setColor(new Color(0, (int) (180 * lightLevel), 0));
-                        }
-                    }
-                } else {
-                    // Water
-                    g2.setColor(calculateWaterColor(lightLevel));
-                }
-
-                g2.fillPolygon(
-                        new int[] { renderPixelX1, renderPixelX2, renderPixelX4, renderPixelX3 },
-                        new int[] { renderPixelY1, renderPixelY2, renderPixelY4, renderPixelY3 },
-                        4);
-            }
-        }
-        return imageOfGreen;
-    }
-
-    private Color calculateWaterColor(double lightLevel) {
-        return new Color((int) (34 * lightLevel), (int) (124 * lightLevel), (int) (176 * lightLevel));
-    }
-
-    private boolean isPixelTinted(double xPos, double yPos){
-        Terrain terrain = gameState.getTerrain();
-        //The lenfth of one of the sides of a tinted square in game units
-        int TINTED_SQUARE_SIZE = 4;
-
-        int numBlockX = (int) ((xPos - terrain.topLeftCorner.x) / TINTED_SQUARE_SIZE);
-        int numBlockY = (int) ((yPos - terrain.topLeftCorner.y) / TINTED_SQUARE_SIZE);
-        return (numBlockX + numBlockY) % 2 == 0;
-    }
-
-    private double[] getMaxAndMinTerrainHeight() {
-        Terrain terrain = gameState.getTerrain();
-        // First value is min height, second is max height
-        double[] minMax = new double[2];
-
-        int numVertices = (int) Math.sqrt(terrain.heightmap.length);
-        double xStep = (terrain.bottomRightCorner.x - terrain.topLeftCorner.x) / numVertices;
-        double yStep = (terrain.bottomRightCorner.y - terrain.topLeftCorner.y) / numVertices;
-        // Find the max and min height in the terrain
-        double totalMaxHeight = -10;
-        double totalMinHeight = 10;
-        for (int yy = 0; yy < numVertices; yy++) {
-            for (int xx = 0; xx < numVertices; xx++) {
-                double x = terrain.topLeftCorner.x + xx * xStep;
-                double y = terrain.topLeftCorner.y + yy * yStep;
-                double h = terrain.terrainFunction.valueAt(x, y);
-                if (h > 10) {
-                    h = 10;
-                }
-                if (h < -10) {
-                    h = -10;
-                }
-                if (h > totalMaxHeight) {
-                    totalMaxHeight = h;
-                }
-                if (h < totalMinHeight) {
-                    totalMinHeight = h;
-                }
-            }
-        }
-        minMax[0] = totalMinHeight;
-        minMax[1] = totalMaxHeight;
-        return minMax;
-    }
-
-    private void drawTarget(Graphics2D g2, double heightRange) {
-        Terrain terrain = gameState.getTerrain();
-        double radius = terrain.target.radius;
-        drawCircle(g2, terrain.target.position.x, terrain.target.position.y, radius, Color.BLACK, false);
-
-    }
-
-    private void drawObstacles(Graphics2D g2) {
-        Terrain terrain = gameState.getTerrain();
-        Color obstacleColor = new Color(96, 69, 38);
-
-        for (IObstacle o : terrain.obstacles) {
-            // Trees
-            if (o instanceof ObstacleTree) {
-                ObstacleTree t = (ObstacleTree) o;
-                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, obstacleColor, true);
-            } else if (o instanceof ObstacleBox) {
-                ObstacleBox b = (ObstacleBox) o;
-                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, obstacleColor, true);
-            }
-        }
     }
 
     private void drawText(Graphics2D imageG2) {
@@ -444,4 +478,27 @@ public class GameStateRenderer {
 
     }
 
+    public class Square {
+        /**
+         * Game units
+         */
+        public Vector2 squarePosition;
+
+        // Pixel position in pixel units
+        public int pixel1X;
+        public int pixel1Y;
+        public int pixel2X;
+        public int pixel2Y;
+        public int pixel3X;
+        public int pixel3Y;
+        public int pixel4X;
+        public int pixel4Y;
+
+        /**
+         * The highest value of one of the corners
+         */
+        public double maxHeight;
+
+        public double lightLevel;
+    }
 }
