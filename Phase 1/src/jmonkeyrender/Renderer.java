@@ -9,9 +9,11 @@ import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import com.jme3.texture.plugins.AWTLoader;
 import com.jme3.ui.Picture;
-import gui.BallVelocityInput;
+
 import gui.GameStateRenderer;
 import gui.MenuGUI;
+import gui.shotinput.BallVelocityInput;
+
 import org.lwjgl.Sys;
 import physics.*;
 import physics.collisionsystems.StopCollisionSystem;

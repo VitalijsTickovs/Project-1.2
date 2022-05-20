@@ -246,6 +246,9 @@ public class GameStateRenderer {
         g2.drawImage(subImage, null, 0, 0);
         subImage.flush();
 
+        renderArrow(g2, camera, new Vector2(-1, 0), new Vector2(0, 1));
+        renderArrow(g2, camera, new Vector2(-2, 1), new Vector2(-3, 3));
+        renderArrow(g2, camera, new Vector2(-3, 2), new Vector2(-4, 0));
         renderBallAndFlag(g2, camera);
         drawText(g2);
 
@@ -375,6 +378,141 @@ public class GameStateRenderer {
                 360);
     }
 
+    // region Render Arrow
+    /**
+     * Documentation
+     * https://drive.google.com/file/d/16GReA5Fd6xL5yreBKhzWaXLGMchfEYjl/view?usp=sharing
+     * @param g2
+     * @param camera
+     * @param startingPos the position given in game units where the arrow starts
+     * @param targetPos   the position given in game units where the arrow ends
+     */
+    private void renderArrow(Graphics2D g2, Camera camera, Vector2 startingPos, Vector2 targetPos) {
+        // The maximum length of the arrow in game units. This is the maximum distance
+        // to the mouse cursor that will affect the arrow
+        double MAX_LENGTH = 5;
+        double arrowLength = startingPos.distanceTo(targetPos);
+        double arrowBaseWidth = arrowLength * 0.05d; // In game units
+        double triangleSideSize = arrowLength * 0.35d; // In game units
+
+        Polygon arrowBase = getArrowBase(camera, startingPos.copy(), targetPos.copy(), arrowBaseWidth,
+                triangleSideSize);
+        Polygon arrowTriangle = getArrowTriangle(camera, startingPos.copy(), targetPos.copy(), triangleSideSize);
+        // Draw the colored shape
+        g2.setColor(getArrowColor(startingPos, targetPos, MAX_LENGTH));
+        g2.fillPolygon(arrowBase);
+        g2.fillPolygon(arrowTriangle);
+        // Make a black outline
+        g2.setColor(Color.BLACK);
+        g2.drawPolygon(arrowBase);
+        g2.drawPolygon(arrowTriangle);
+    }
+
+    private Polygon getArrowBase(Camera camera, Vector2 startPos, Vector2 targetPos, double arrowBaseWidth,
+            double triangleSideSize) {
+        translatePositionsByCamera(camera, startPos);
+        translatePositionsByCamera(camera, targetPos);
+
+        Line2D arrowLine = new Line2D(startPos, targetPos);
+        Line2D startingPosLine = arrowLine.getPerpendicularLineAtPoint(startPos);
+        Vector2 arrowBaseEndPos = calculateArrowBaseEndPosition(startPos, targetPos, triangleSideSize);
+        Line2D targetPosLine = arrowLine.getPerpendicularLineAtPoint(arrowBaseEndPos);
+
+        Vector2 startingPosLineDirection = startingPosLine.getDirectionVector().normalize().scale(arrowBaseWidth);
+        Vector2 targetPosLineDirection = targetPosLine.getDirectionVector().normalize().scale(arrowBaseWidth);
+
+        // Make the direction line always point to the right from the arrow line
+        if (startPos.y > targetPos.y) {
+            startingPosLineDirection.reverse();
+            targetPosLineDirection.reverse();
+        }
+
+        ArrowBase arrowBase = new ArrowBase();
+        arrowBase.startRightPosition = gameUnitToPixels(startPos.translated(startingPosLineDirection));
+        arrowBase.startLeftPosition = gameUnitToPixels(startPos.translated(startingPosLineDirection.reversed()));
+        arrowBase.targetRightPosition = gameUnitToPixels(arrowBaseEndPos.translated(targetPosLineDirection));
+        arrowBase.targetLeftPosition = gameUnitToPixels(arrowBaseEndPos.translated(targetPosLineDirection.reversed()));
+        return new Polygon(arrowBase.getXPoints(), arrowBase.getYPoints(), 4);
+    }
+
+    private Polygon getArrowTriangle(Camera camera, Vector2 startPos, Vector2 targetPos, double triangleSideSize) {
+        translatePositionsByCamera(camera, startPos);
+        translatePositionsByCamera(camera, targetPos);
+
+        Line2D arrowLine = new Line2D(startPos, targetPos);
+        Line2D startPosLine = arrowLine.getPerpendicularLineAtPoint(startPos);
+        Vector2 arrowBaseEndPos = calculateArrowBaseEndPosition(startPos, targetPos, triangleSideSize);
+
+        Vector2 startPosLineDirection = startPosLine.getDirectionVector().normalize().scale(triangleSideSize / 2);
+
+        // Make the direction line always point to the right from the arrow line
+        if (startPos.y >= targetPos.y) {
+            startPosLineDirection.reverse();
+        }
+
+        ArrowTriangle arrowTriangle = new ArrowTriangle();
+        arrowTriangle.rightPosition = gameUnitToPixels(arrowBaseEndPos.translated(startPosLineDirection));
+        arrowTriangle.leftPosition = gameUnitToPixels(arrowBaseEndPos.translated(startPosLineDirection.reversed()));
+        arrowTriangle.topPosition = gameUnitToPixels(targetPos);
+        return new Polygon(arrowTriangle.getXPoints(), arrowTriangle.getYPoints(), 3);
+    }
+
+    private void translatePositionsByCamera(Camera camera, Vector2 position) {
+        double xOffset = -camera.xPos + camera.WIDTH / 2;
+        double yOffset = -camera.yPos + camera.HEIGHT / 2;
+        position.translate(xOffset, yOffset);
+    }
+
+    private Color getArrowColor(Vector2 startingPos, Vector2 targetPos, double MAX_LENGTH) {
+        double arrowLength = startingPos.distanceTo(targetPos);
+        Color greenColor = new Color(71, 214, 0);
+        Color redColor = new Color(255, 87, 41);
+
+        double maxLengthPercentage = arrowLength / MAX_LENGTH;
+        return UtilityClass.lerp(greenColor, redColor, maxLengthPercentage);
+    }
+
+    private Vector2 calculateArrowBaseEndPosition(Vector2 startPos, Vector2 targetPos, double triangleSideSize) {
+        Vector2 deltaPosition = startPos.deltaPositionTo(targetPos);
+        Vector2 triangleHeightVector = deltaPosition.modifyLength(-getTriangleHeight(triangleSideSize));
+        return startPos.translated(triangleHeightVector);
+    }
+
+    private double getTriangleHeight(double triangleSideSize) {
+        return triangleSideSize / 2 * Math.sqrt(3);
+    }
+
+    private class ArrowBase {
+        // The vectors are translated from game units into pixels
+        public int[] startRightPosition;
+        public int[] startLeftPosition;
+        public int[] targetRightPosition;
+        public int[] targetLeftPosition;
+
+        public int[] getXPoints() {
+
+            return new int[] { targetLeftPosition[0], targetRightPosition[0], startRightPosition[0],startLeftPosition[0] };
+        }
+
+        public int[] getYPoints() {
+            return new int[] { targetLeftPosition[1], targetRightPosition[1], startRightPosition[1],startLeftPosition[1] };
+        }
+    }
+
+    private class ArrowTriangle {
+        public int[] leftPosition;
+        public int[] rightPosition;
+        public int[] topPosition;
+
+        public int[] getXPoints() {
+            return new int[] { leftPosition[0], rightPosition[0], topPosition[0] };
+        }
+
+        public int[] getYPoints() {
+            return new int[] { leftPosition[1], rightPosition[1], topPosition[1] };
+        }
+    }
+    // endregion
     // endregion
 
     // region Draw shapes
@@ -484,6 +622,17 @@ public class GameStateRenderer {
         return terrain.maxVal - terrain.minVal;
 
     }
+
+    /**
+     * @param gameUnitPosition
+     * @return array with [xPos, yPos]
+     */
+    private int[] gameUnitToPixels(Vector2 gameUnitPosition) {
+        // Vector2 translatedVector = terrain.topLeftCorner.deltaPositionTo(gameUnitPosition).scale(PIXELS_PER_GAME_UNIT);
+        Vector2 translatedVector = gameUnitPosition.scaled(PIXELS_PER_GAME_UNIT);
+        int[] pixelsVector = new int[] { (int) translatedVector.x, (int) translatedVector.y };
+        return pixelsVector;
+    }
     // endregion
 
     // region Helper classes
@@ -518,4 +667,5 @@ public class GameStateRenderer {
         public int height;
     }
     // endregion
+
 }
