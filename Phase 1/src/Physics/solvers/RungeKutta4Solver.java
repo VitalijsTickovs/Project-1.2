@@ -46,7 +46,7 @@ public class RungeKutta4Solver implements IODESolver {
 
         k4State = state.copy();
         k4State.position.translate(k3Velocity.scaled(h));
-        k4State.velocity.translate(k1Acceleration.scaled(h));
+        k4State.velocity.translate(k3Acceleration.scaled(h));
         k4Velocity = k4State.velocity;
         k4Acceleration = new Vector2(
                 engine.xAcceleration(k4State, terrain),

@@ -5,15 +5,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
+
+import bot.botimplementations.*;
 import datastorage.GameState;
 import utility.math.Vector2;
 import gui.GameStateRenderer;
 import gui.InterfaceFactory;
 import gui.ShotInputWindow;
-import bot.botimplementations.Bot;
-import bot.botimplementations.GradientDescentBot;
-import bot.botimplementations.HillClimbingBot;
-import bot.botimplementations.ParticleSwarmBot;
 import bot.heuristics.FinalEuclidianDistanceHeuristic;
 import gui.BallVelocityInput;
 
@@ -52,10 +50,8 @@ public class Game extends JPanel implements Runnable, GameObject {
         setupInitialBot();
         FPS = fps;
         createGameState();
-        resetBotThread();
         resetStartingVariables();
         setManualInputType();
-        //createTerrain();
         createCamera();
         createRenderer();
         createTerrainImage();
@@ -73,8 +69,9 @@ public class Game extends JPanel implements Runnable, GameObject {
         setBot(new HillClimbingBot(
                 new FinalEuclidianDistanceHeuristic(),
                 0.01,
-                16,
+                8,
                 new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+        //setBot(new RuleBasedBot());
         resetBotThread();
     }
 
@@ -264,7 +261,7 @@ public class Game extends JPanel implements Runnable, GameObject {
      */
     private boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
-        boolean noBot = (bot != null && !botThread.isAlive()) || (bot == null);
+        boolean noBot = bot == null || !botThread.isAlive();
         boolean ballHasBeenPushed = shotForce == null;
         return ballHasBeenPushed && noBot && ballStopped;
     }
@@ -312,8 +309,8 @@ public class Game extends JPanel implements Runnable, GameObject {
         if (checkKeyPressed(Input.H)) {
             setBot(new HillClimbingBot(
                     new FinalEuclidianDistanceHeuristic(),
-                    0.01,
-                    12,
+                    0.001,
+                    16,
                     new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
         }
         if (checkKeyPressed(Input.P)) {

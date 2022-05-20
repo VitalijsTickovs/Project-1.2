@@ -18,11 +18,11 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
-terrainFunction = sin(x+y)/2 + 1;
+terrainFunction = 0.4*(0.9-e**(-(x*x + y*y)/8));
 
 //To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
-ballStartPointX = -5;
-ballStartPointY = -10;
+ballStartPointX = -3;
+ballStartPointY = 0;
 ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";

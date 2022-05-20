@@ -31,7 +31,7 @@ public class GradientDescentBot implements Bot {
             currentShot = initialShotTaker.findBestShot(gameState);
         }
         double currentHeuristic = heuristic.getShotValue(gameState.simulateShot(currentShot), gameState);
-        final double derivativeStep = learningRate;
+        final double derivativeStep = learningRate/10;
         Vector2 gradient;
         int numIterations = 0;
         do {
@@ -48,7 +48,7 @@ public class GradientDescentBot implements Bot {
             );
             // Move in the direction of the gradient (either down or up depending on the heuristic
             // Check whether to move up or down
-            int sign = 0;
+            int sign;
             if (heuristic.firstBetterThanSecond(xHeuristic, currentHeuristic)) {
                 if (xHeuristic > currentHeuristic) {
                     sign = 1;
@@ -65,9 +65,10 @@ public class GradientDescentBot implements Bot {
             currentShot.translate(gradient.scaled(sign*learningRate));
             currentHeuristic = heuristic.getShotValue(gameState.simulateShot(currentShot), gameState);
             numIterations++;
-            System.out.println(gradient.length());
         } while (numIterations < 1000);
 
         return currentShot;
+
+        //3.3417236174836797, 1.300176219807547
     }
 }
