@@ -54,7 +54,6 @@ public class RungeKutta2Solver implements IODESolver {
     
     @Override
     public String getSolverName() {
-        // TODO Auto-generated method stub
         return "RK2";
     }
 }

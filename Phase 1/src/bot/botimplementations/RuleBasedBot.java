@@ -1,19 +1,278 @@
+/**
+ * In this class the general rules and conditions for the bot to play the simple putting game are defined.
+ * Input:
+ * - terrain function
+ * - target position
+ * - ball position
+ * - obstacles
+ *   Basically the whole geometry of the current state
+ */
 package bot.botimplementations;
+import datastorage.*;
+import datastorage.obstacles.IObstacle;
+import utility.math.*;
 
-import bot.heuristics.Heuristic;
-import datastorage.GameState;
-import utility.math.Vector2;
+public class RuleBasedBot implements IBot{
 
-public class RuleBasedBot implements IBot {
+    private Terrain terrain;
+    private Ball ball;
+    private Vector2 targetPos;
+    private double sFriction;
+    private double kFriction;
+    private final double maxSpeed = 5.0;
+    private Vector2 distance;
+    private Vector2 speed;
+    private double dotProduct;
+    private double normX, normY;
+    private boolean hill;
+    private boolean upHill = false;
+    private boolean downHill = false;
+    private double ballPosX;
+    private double ballPosY;
+    private Vector2 ballPos;
+    private double tarPosX;
+    private double tarPosY;
+    private double maxSlopeX = Double.MIN_VALUE;
+    private double maxSlopeY = Double.MIN_VALUE;
+    private double minSlopeX = Double.MAX_VALUE;
+    private double minSlopeY = Double.MAX_VALUE;
+    private Rectangle rec = new Rectangle();
 
-    private final Heuristic heuristic;
-
-    public RuleBasedBot(Heuristic heuristic) {
-        this.heuristic = heuristic;
+    private void setup(GameState gameState) {
+        this.terrain = gameState.getTerrain();
+        this.sFriction = terrain.staticFriction;
+        this.kFriction = terrain.staticFriction;
+        this.targetPos = terrain.target.position;
+        this.ball = gameState.getBall();
+        // POSITION VALUES, i.e. current x-position of ball
+        this.ballPosX = ball.state.position.x;
+        this.ballPosY = ball.state.position.y;
+        this.tarPosX = terrain.target.position.x;
+        this.tarPosY = terrain.target.position.y;
+        this.ballPos = new Vector2(this.ballPosX, this.ballPosY);
     }
 
-    @Override
-    public Vector2 findBestShot(GameState gameState) {
-        return null;
+    // HELPER METHODS
+    /**
+     * compute distance between current ball position and target position in the terrain
+     */
+    public Vector2 computeDistance(){
+        double distanceX = tarPosX - ballPosX;
+        double distanceY = tarPosY - ballPosY;
+        System.out.println(" TARGET POSITION: x = "+ tarPosX+"; y = "+tarPosY);
+        System.out.println(" BALL POSITION: x = "+ ballPosX+"; y = "+ballPosY);
+        return distance = new Vector2(distanceX, distanceY);
     }
+
+    public Vector2 getNormalizedDistance(Vector2 distance){
+        return distance.normalized();
+    }
+
+    public void findHill(){
+        hill = false;
+        int positive_Derivative = 0;
+        int negative_Derivative = 0;
+        int zero_Derivative = 0;
+
+
+        // for every x in between ball and target x-position (along the distance vector)
+        for (double x = ballPosX,  y = ballPosY; x <= tarPosX && y <= tarPosY; x++, y++){
+
+            // if HILL is nearby, adjust velocity or shoot around it // consider level of STEEPNESS
+            Vector2 slope = new Vector2(terrain.terrainFunction.xDerivativeAt(x, y), terrain.terrainFunction.yDerivativeAt(x, y));
+            if (slope.x > 0 && slope.y > 0) {
+                positive_Derivative++;
+                hill = true;
+            }
+            if (slope.x < 0 && slope.y < 0) {
+                negative_Derivative++;
+                hill = true;
+            }
+            if (slope.x == 0 && slope.y == 0) {
+                zero_Derivative++;
+            }
+            /* // get largest derivative, so steepest point in uphill slope
+             if (slope.x >= maxSlopeX && slope.y >= maxSlopeY){
+             maxSlopeX = slope.x;
+             maxSlopeY = slope.y;
+             //maxSlope = new Vector2(maxSlopeX, maxSlopeY);
+             }
+             // get smallest derivative, so steepest point in downhill slope
+             if (slope.x <= minSlopeX && slope.y <= maxSlopeY){
+             minSlopeX = slope.x;
+             minSlopeY= slope.y;
+             //minSlope = new Vector2(minSlopeX, minSlopeY);
+             } */
+        }
+        if (positive_Derivative > negative_Derivative && positive_Derivative > zero_Derivative){
+            upHill = true;
+        }
+        if (negative_Derivative > positive_Derivative && negative_Derivative > zero_Derivative){
+            downHill = true;
+        }
+        if (zero_Derivative > negative_Derivative && zero_Derivative > positive_Derivative){
+            hill = false;
+        }
+    }
+
+    public Vector2 findBestShot(GameState gameState){
+        gameState = gameState.copy();
+        setup(gameState);
+        findHill();
+        // return a velocity vector
+        distance = computeDistance();
+        double initalSpeed = 2.5;
+        double speedMargin = 1;     // a constant by which the speed is conditionally increased
+        double threshold = 0.1;
+        double angle = 15.0;
+        System.out.println(" Distance vector: x = " + distance.x+"; y = "+distance.y);
+        normX = getNormalizedDistance(distance).x;
+        normY = getNormalizedDistance(distance).y;
+        System.out.println(" Normalized distance vector: x = "+ normX+"; y = "+normY);
+
+        speed = new Vector2(normX * initalSpeed, normY * initalSpeed);
+        System.out.println("*** INITIAL velocity vector: x = "+ speed.x+"; y = "+speed.y+" ***");
+        // if OBSTACLE is nearby (i.e. sandpit on the slope, consider correct friction in this case)
+        Vector2 slope;
+
+        for (double x = ballPosX,  y = ballPosY; x <= tarPosX && y <= tarPosY; x+=normX, y+=normY){
+            boolean inObstacle = false;
+            for (IObstacle obstacle : terrain.obstacles) {
+                if (obstacle.isPositionColliding(ballPos)) {
+                    inObstacle = true;
+                    break;
+                }
+            }
+            //THIS IS STILL TO BE COMPLETED
+            if (inObstacle){          // checking for obstacles other than water
+                // rotate speed vector by 15 degrees angle
+                // rotated as follows: x2 = cos (𝛽𝑥1) − sin(𝛽𝑦) and y2 = sin(𝛽𝑦) + cos (𝛽𝑥1)
+                speed = new Vector2(Math.cos(angle*speed.x) - Math.sin(angle*speed.y), Math.sin(angle*speed.x) + Math.cos(angle*speed.y));
+                System.out.println("*** ROTATION: Rotated the vector by " + angle + " degrees ***");
+            }
+            if (ball.getZCoordinate(terrain) < 0){     // checking for water
+                // rotate speed vector s.t. the new vector shoots around the water
+            }
+        }
+        System.out.println("*** Velocity vector after rotation: x = "+ speed.x+"; y = "+speed.y+" ***");
+
+        for (double x = ballPosX,  y = ballPosY; x <= tarPosX && y <= tarPosY; x+=normX, y+=normY){
+
+            // take derivative at current point on the line and dot product of speed and derivative
+            slope = new Vector2(terrain.terrainFunction.xDerivativeAt(x, y), terrain.terrainFunction.yDerivativeAt(x, y));
+            dotProduct = Vector2.dotProduct(speed, slope);
+
+            System.out.println("*** DISTANCE: " + distance.length() + " ***");
+            // if LONG distance
+            if (distance.length() > 5){
+                //System.out.println("*** SLOPE-VALUES: x = "+ slope.x+"; y = "+slope.y+" ***");
+                if (hill){
+                    if (dotProduct > 0){        // uphill       // !!! changed !!! was dotProduct < 0 before
+                        System.out.println("*** DOT PRODUCT: "+dotProduct+" ***");
+                        System.out.println("*** UPHILL ***");
+                        // if easy slope ...
+                        System.out.println("*** SLOPE STEEPNESS: x = "+slope.length()+" ***");
+                        if (slope.length() <= threshold){
+                            System.out.println("*** EASY SLOPE ***");
+                            System.out.println("+++ INCREASED BY: 0.5 * speedMargin +++");
+                            if (speed.x <= maxSpeed-speedMargin && speed.y <= maxSpeed-speedMargin) {
+                                speed = new Vector2(speed.x + speedMargin, speed.y + speedMargin);
+                                //speed.scale(1.4);
+                            }
+                        }
+                        // if steep slope ...
+                        if (slope.length() > threshold){
+                            System.out.println("*** STEEP SLOPE ***");
+                            System.out.println("+++ INCREASED BY: speedMargin +++");
+                            // added IF statement here !!
+                            if (speed.x <= maxSpeed-2*speedMargin && speed.y <= maxSpeed-2*speedMargin) {
+                                speed = new Vector2(speed.x + 2* speedMargin, speed.y + 2*speedMargin);
+                                //speed.scale(1.4);
+                            }
+                            else speed = new Vector2(maxSpeed, maxSpeed);
+                        }
+                    }
+                    if (dotProduct < 0){        // downhill
+                        System.out.println("*** DOT PRODUCT: "+dotProduct+" ***");
+                        System.out.println("*** DOWNHILL ***");
+                        // if easy slope ...
+                        System.out.println("*** SLOPE STEEPNESS: x = "+slope.length()+" ***");
+                        if (slope.length() <= threshold){
+                            System.out.println("*** EASY SLOPE ***");
+                            System.out.println("--- DECREASED BY: 0.5 * speedMargin ---");
+                            if (speed.x >= -maxSpeed + 0.5 * speedMargin && speed.y >= -maxSpeed + 0.5 * speedMargin){
+                                speed = new Vector2(speed.x - 0.5 * speedMargin, speed.y - 0.5 * speedMargin);
+                                //speed.scale(1.4);
+                            }
+                        }
+                        // if steep slope ...
+                        if (slope.length() > threshold){
+                            System.out.println("*** STEEP SLOPE ***");
+                            System.out.println("--- DECREASED BY: speedMargin ---");
+                            if (speed.x >= -maxSpeed + speedMargin && speed.y >= -maxSpeed + speedMargin) {
+                                speed = new Vector2(initalSpeed - speedMargin, initalSpeed - speedMargin);
+                                //speed.scale(1.4);
+                            }
+                        }
+                    }
+                }
+            }
+            // if SHORT distance
+            if (distance.length() <= 5) {
+                if (hill){
+                    if (dotProduct > 0){        // uphill      // !!! changed !!!
+                        System.out.println("*** DOT PRODUCT: "+dotProduct+" ***");
+                        System.out.println("*** UPHILL ***");
+                        // if easy slope ...
+                        System.out.println("*** SLOPE STEEPNESS: x = "+slope.length()+" ***");
+                        if (slope.length() <= threshold){
+                            System.out.println("*** EASY SLOPE ***");
+                            System.out.println("+++ INCREASED BY: 0.5 * speedMargin +++");
+                            if (speed.x <= maxSpeed-speedMargin && speed.y <= maxSpeed-speedMargin) {
+                                speed = new Vector2(speed.x + speedMargin, speed.y + speedMargin);
+                                //speed.scale(1.4);
+                            }
+                        }
+                        // if steep slope ...
+                        if (slope.length() > threshold){
+                            System.out.println("*** STEEP SLOPE ***");
+                            System.out.println("+++ INCREASED BY: speedMargin +++");
+                            if (speed.x <= maxSpeed-2.2*speedMargin && speed.y <= maxSpeed-2.2*speedMargin) {
+                                speed = new Vector2(speed.x + 2.2 * speedMargin, speed.y + 2.2 * speedMargin);
+                                //speed.scale(1.4);
+                            }
+                        }
+                    }
+                    if (dotProduct < 0){        // downhill
+                        System.out.println("*** DOT PRODUCT: "+dotProduct+" ***");
+                        System.out.println("*** DOWNHILL ***");
+                        // if easy slope ...
+                        System.out.println("*** SLOPE STEEPNESS: x = "+slope.length()+" ***");
+                        if (slope.length() <= threshold){
+                            System.out.println("*** EASY SLOPE ***");
+                            System.out.println("--- DECREASED BY: 0.5 * speedMargin ---");
+                            if (speed.x >= -maxSpeed + speedMargin && speed.y >= -maxSpeed + speedMargin) {
+                                speed = new Vector2(speed.x - 0.5 * speedMargin, speed.y - 0.5 * speedMargin);
+                                //speed.scale(1.4);
+                            }
+                        }
+                        // if steep slope ...
+                        if (slope.length() > threshold){
+                            System.out.println("*** STEEP SLOPE ***");
+                            System.out.println("--- DECREASED BY: speedMargin ---");
+                            if (speed.x >= -maxSpeed + speedMargin && speed.y >= -maxSpeed + speedMargin) {
+                                speed = new Vector2(initalSpeed - speedMargin, initalSpeed - speedMargin);
+                                //speed.scale(1.4);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("*** FINAL Velocity vector: x = "+ speed.x+"; y = "+speed.y+" ***");
+        System.out.println();
+        System.out.println("========================================================");
+        return speed;
+    }
+
 }

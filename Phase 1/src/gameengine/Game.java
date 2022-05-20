@@ -237,6 +237,7 @@ public class Game extends JPanel implements Runnable, GameObject {
      */
     private boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
+        boolean noBot = bot == null || !botThread.isAlive();
         boolean notWaitingForBot = (bot != null && !botThread.isAlive()) || (bot == null);
         boolean ballHasBeenPushed = shotForce == null;
         return ballHasBeenPushed && notWaitingForBot && ballStopped;

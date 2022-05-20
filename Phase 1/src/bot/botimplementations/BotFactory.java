@@ -23,7 +23,7 @@ public class BotFactory {
             return new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10);
         }
         if (implementation == BotImplementations.RULE) {
-            return new RuleBasedBot(new FinalEuclidianDistanceHeuristic());
+            return new RuleBasedBot();
         }
         if (implementation == BotImplementations.HILL_CLIMBING) {
             return new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
