@@ -36,7 +36,12 @@ targetY = 1;
 //To create tree "treeX", "treeY", "treeRadius", "treeBounciness";
 treeX = 10;
 treeY = 15
-treeRadius = 1;
+treeRadius = 2;
+treeBounciness = 0.5;
+
+treeX = -10;
+treeY = 10
+treeRadius = 2;
 treeBounciness = 0.5;
 
 //To create box "boxX", "boxY", "boxBounciness";

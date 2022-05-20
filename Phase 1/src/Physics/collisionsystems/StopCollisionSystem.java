@@ -26,6 +26,7 @@ public class StopCollisionSystem implements ICollisionSystem {
 
     private BallState getStoppedState(BallState previousState){
         BallState stoppedState = previousState.copy();
+        System.out.println(".");
         stoppedState.velocity = Vector2.zeroVector();
         return stoppedState;
     }

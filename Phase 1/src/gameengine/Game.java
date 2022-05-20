@@ -14,10 +14,6 @@ import gui.InterfaceFactory;
 import gui.ShotInputWindow;
 import bot.botimplementations.IBot;
 import bot.botimplementations.BotFactory;
-import bot.botimplementations.GradientDescentBot;
-import bot.botimplementations.HillClimbingBot;
-import bot.botimplementations.ParticleSwarmBot;
-import bot.heuristics.FinalEuclidianDistanceHeuristic;
 import gui.BallVelocityInput;
 
 public class Game extends JPanel implements Runnable, GameObject {
@@ -50,7 +46,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     public Game(int fps) {
         game = this;
 
-        setupInitialBot();
+        // setupInitialBot();
         FPS = fps;
         createGameState();
         resetStartingVariables();
