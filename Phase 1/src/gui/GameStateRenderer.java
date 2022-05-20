@@ -90,20 +90,20 @@ public class GameStateRenderer {
                 // First point
                 double x1 = terrain.topLeftCorner.x + xx * xStep;
                 double y1 = terrain.topLeftCorner.y + yy * yStep;
-                double h1 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x1, y1), -10, 10);
+                double h1 = UtilityClass.clamp(terrain.getTerrainFunction().valueAt(x1, y1), -10, 10);
                 // Second point
                 double x2 = terrain.topLeftCorner.x + (xx + 1) * xStep;
                 double y2 = terrain.topLeftCorner.y + yy * yStep;
-                double h2 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x2, y2), -10, 10);
+                double h2 = UtilityClass.clamp(terrain.getTerrainFunction().valueAt(x2, y2), -10, 10);
                 // Third point
                 double x3 = terrain.topLeftCorner.x + xx * xStep;
                 double y3 = terrain.topLeftCorner.y + (yy + 1) * yStep;
-                double h3 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x3, y3), -10, 10);
+                double h3 = UtilityClass.clamp(terrain.getTerrainFunction().valueAt(x3, y3), -10, 10);
 
                 // Fourth point
                 double x4 = terrain.topLeftCorner.x + (xx + 1) * xStep;
                 double y4 = terrain.topLeftCorner.y + (yy + 1) * yStep;
-                double h4 = UtilityClass.clamp(terrain.terrainFunction.valueAt(x4, y4), -10, 10);
+                double h4 = UtilityClass.clamp(terrain.getTerrainFunction().valueAt(x4, y4), -10, 10);
 
                 double heightRange = getTerrainHeightRange();
                 double maxHeight = UtilityClass.getMaxValue(new double[] { h1, h2, h3, h4 });
@@ -214,7 +214,7 @@ public class GameStateRenderer {
             for (int xx = 0; xx < numVertices; xx++) {
                 double x = terrain.topLeftCorner.x + xx * xStep;
                 double y = terrain.topLeftCorner.y + yy * yStep;
-                double h = terrain.terrainFunction.valueAt(x, y);
+                double h = terrain.getTerrainFunction().valueAt(x, y);
                 if (h > 10) {
                     h = 10;
                 }
@@ -353,7 +353,7 @@ public class GameStateRenderer {
 
     private void renderFlag(Graphics2D g2, Camera camera) {
         Target target = gameState.getTerrain().target;
-        double z = gameState.getTerrain().terrainFunction.valueAt(target.position.x, target.position.y);
+        double z = gameState.getTerrain().getTerrainFunction().valueAt(target.position.x, target.position.y);
         int x = (int) ((target.position.x - camera.xPos + camera.WIDTH / 2) * PIXELS_PER_GAME_UNIT);
         int y = (int) ((target.position.y - z - camera.yPos + camera.HEIGHT / 2 - 2) * PIXELS_PER_GAME_UNIT);
         g2.setColor(Color.WHITE);
@@ -398,7 +398,7 @@ public class GameStateRenderer {
         for (int deg = 0; deg <= 360; deg++) {
             double xx = x + radius * Math.cos(deg / (2 * Math.PI));
             double yy = y + radius * Math.sin(deg / (2 * Math.PI));
-            double h = terrain.terrainFunction.valueAt(xx, yy);
+            double h = terrain.getTerrainFunction().valueAt(xx, yy);
             if (h > 10) {
                 h = 10;
             }
@@ -464,7 +464,7 @@ public class GameStateRenderer {
         double heightRange = terrain.maxVal - terrain.minVal;
         double xx = point.x;
         double yy = point.y;
-        double h = terrain.terrainFunction.valueAt(xx, yy);
+        double h = terrain.getTerrainFunction().valueAt(xx, yy);
         int renderX = (int) ((xx - terrain.topLeftCorner.x) * PIXELS_PER_GAME_UNIT);
         int renderY = (int) ((yy - h - terrain.topLeftCorner.y + heightRange / 2) * PIXELS_PER_GAME_UNIT);
         return new Vector2(renderX, renderY);

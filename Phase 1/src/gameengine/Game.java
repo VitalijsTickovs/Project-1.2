@@ -196,7 +196,7 @@ public class Game extends JPanel implements Runnable, GameObject {
 
     private void handleBallInWater() {
         if (isSimulationFinished()) {
-            boolean isBallInWater = gameState.getTerrain().terrainFunction.valueAt(gameState.getBall().state.position.x,
+            boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(gameState.getBall().state.position.x,
                     gameState.getBall().state.position.y) < 0;
             if (isBallInWater) {
                 resetGame();

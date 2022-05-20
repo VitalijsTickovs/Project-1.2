@@ -347,7 +347,7 @@ public class AStar {
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
 
-                double value = terrain.terrainFunction.valueAt(x + halfTileOffset, y + halfTileOffset);
+                double value = terrain.getTerrainFunction().valueAt(x + halfTileOffset, y + halfTileOffset);
                 boolean cannotGoHere = value <= 0
                         || !terrain.isPointInObstacle(translateGridPositionIntoGameUnits(x, y));
                 if (cannotGoHere) {

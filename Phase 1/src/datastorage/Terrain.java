@@ -201,6 +201,15 @@ public class Terrain {
         }
     }
 
+    public boolean isPositionCollidingWithMapBorder(BallState state) {
+        boolean isOutOfMap = state.position.x > bottomRightCorner.x || state.position.x < topLeftCorner.x
+                || state.position.y > bottomRightCorner.y || state.position.y < topLeftCorner.y;
+        if (isOutOfMap) {
+            return true;
+        }
+        return false;
+    }
+
     public void print() {
         System.out.println("Mesh grid:");
         System.out.print("Starting position: ");
@@ -223,9 +232,14 @@ public class Terrain {
         }
         target.print();
     }
-    public void setTerrainFunction(TerrainHeightFunction terrainFunction){
+
+    public void setTerrainFunction(TerrainHeightFunction terrainFunction) {
         this.terrainFunction = terrainFunction;
         calculateHeightMap(VERTECES_PER_SIDE);
+    }
+
+    public TerrainHeightFunction getTerrainFunction(){
+        return terrainFunction;
     }
 
 }

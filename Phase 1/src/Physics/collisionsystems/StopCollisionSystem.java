@@ -3,6 +3,7 @@ package physics.collisionsystems;
 import datastorage.BallState;
 import datastorage.Terrain;
 import datastorage.obstacles.IObstacle;
+import utility.math.Vector2;
 
 public class StopCollisionSystem implements ICollisionSystem {
 
@@ -10,20 +11,23 @@ public class StopCollisionSystem implements ICollisionSystem {
     public BallState modifyStateDueToCollisions(BallState state, BallState previousState, double ballRadius, Terrain terrain) {
         BallState newState = state.copy();
         // Check if out of map
-        if (newState.position.x > terrain.bottomRightCorner.x ||
-            newState.position.x < terrain.topLeftCorner.x ||
-            newState.position.y > terrain.bottomRightCorner.y ||
-            newState.position.y < terrain.topLeftCorner.y) {
+        if (terrain.isPositionCollidingWithMapBorder(newState)) {
 
-            return previousState.copy();
+                return getStoppedState(previousState);
         }
         // Check if inside an obstacle
         for (IObstacle obstacle : terrain.obstacles) {
             if (obstacle.isPositionColliding(state.position)) {
-                return previousState.copy();
+                return getStoppedState(previousState);
             }
         }
         return newState;
+    }
+
+    private BallState getStoppedState(BallState previousState){
+        BallState stoppedState = previousState.copy();
+        stoppedState.velocity = Vector2.zeroVector();
+        return stoppedState;
     }
 
     @Override

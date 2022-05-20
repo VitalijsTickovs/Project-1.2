@@ -157,7 +157,7 @@ import java.util.Queue;
 
             //Finding the position for the target
             float val;
-            val = (float) terrain.terrainFunction.valueAt(targetPos.x * terrain.xOff,targetPos.y * terrain.yOff);
+            val = (float) terrain.getTerrainFunction().valueAt(targetPos.x * terrain.xOff,targetPos.y * terrain.yOff);
             val += Math.abs(terrain.minVal);
             val /= terrain.maxVal - terrain.minVal;
             if (val < 0) {
@@ -228,7 +228,7 @@ import java.util.Queue;
                 this.y = (float) ballState.y;
                 //Getting height value corresponding to x and y values
                 float val;
-                val = (float) terrain.terrainFunction.valueAt( this.x* terrain.xOff, this.y * terrain.yOff);
+                val = (float) terrain.getTerrainFunction().valueAt( this.x* terrain.xOff, this.y * terrain.yOff);
                 val += Math.abs(terrain.minVal);
                 val /= terrain.maxVal - terrain.minVal;
                 if (val < 0) {
@@ -399,7 +399,7 @@ import java.util.Queue;
 
         private void handleBallInWater() {
             if (isSimulationFinished()) {
-                boolean isBallInWater = gameState.getTerrain().terrainFunction.valueAt(gameState.getBall().state.position.x, gameState.getBall().state.position.y) < 0;
+                boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(gameState.getBall().state.position.x, gameState.getBall().state.position.y) < 0;
                 if (isBallInWater) {
                     resetGame();
                 }

@@ -82,7 +82,7 @@ public class GameStateSaver {
       
       printWriter.println("greenStaticFriction = " + terrain.staticFriction + delimiter);
       printWriter.println("greenKineticFriction = " + terrain.kineticFriction + delimiter);
-      printWriter.println("terrainFunction = " + terrain.terrainFunction.f.getString() + delimiter);
+      printWriter.println("terrainFunction = " + terrain.getTerrainFunction().f.getString() + delimiter);
       printWriter.println("");
 
       printWriter.println("targetRadius = " + terrain.target.radius + delimiter);
