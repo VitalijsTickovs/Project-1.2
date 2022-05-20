@@ -29,7 +29,7 @@ public class MeshGenerator extends SimpleApplication {
             for (int y = 0; y < yRepetitions; y++) {
                 double xCoord = x * resolution;
                 double yCoord = y * resolution;
-                double zCoord = terrain.terrainFunction.valueAt(xCoord, yCoord);
+                double zCoord = terrain.getTerrainFunction().valueAt(xCoord, yCoord);
                 vertices[y][x] = new Vector3(xCoord, yCoord, zCoord);
             }
         }
@@ -100,9 +100,9 @@ public class MeshGenerator extends SimpleApplication {
         return vertices;
     }
 
-    public static Mesh createTerrainMesh(TerrainFunction1 t) {
+    public static Mesh createTerrainMesh(TerrainHeightFunction t) {
         Terrain terrain = new Terrain();
-        terrain.terrainFunction = t;
+        terrain.setTerrainFunction(t);
         terrain.topLeftCorner = new Vector2(0, 0);
         terrain.bottomRightCorner = new Vector2(2, 3);
 

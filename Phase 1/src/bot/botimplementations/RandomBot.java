@@ -8,7 +8,7 @@ import datastorage.Ball;
 import datastorage.GameState;
 import utility.math.Vector2;
 
-public class RandomBot implements Bot {
+public class RandomBot implements IBot {
 
     private final int numShots;
     private final Heuristic heuristic;

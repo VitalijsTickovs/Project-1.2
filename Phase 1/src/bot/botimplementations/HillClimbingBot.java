@@ -7,14 +7,14 @@ import datastorage.Ball;
 import datastorage.GameState;
 import utility.math.Vector2;
 
-public class HillClimbingBot implements Bot {
+public class HillClimbingBot implements IBot {
 
     private final Heuristic heuristic;
     private final double learningRate;
     private final int numNeighbours;
-    private final Bot initialShotTaker;
+    private final IBot initialShotTaker;
 
-    public HillClimbingBot(Heuristic heuristic, double learningRate, int numNeighbours, Bot initialShotTaker) {
+    public HillClimbingBot(Heuristic heuristic, double learningRate, int numNeighbours, IBot initialShotTaker) {
         this.heuristic = heuristic;
         this.learningRate = learningRate;
         this.numNeighbours = numNeighbours;

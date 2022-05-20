@@ -16,7 +16,7 @@ public class TerrainGenerator {
 
                 double xCoord = x * step;
                 double yCoord = y * step;
-                meshGrid[x][y] = terrain.terrainFunction.valueAt(xCoord, yCoord);
+                meshGrid[x][y] = terrain.getTerrainFunction().valueAt(xCoord, yCoord);
             }
         }
         terrain.meshGrid2 = meshGrid;

@@ -135,4 +135,32 @@ public class UtilityClass {
         }
         return null;
     }
+
+    public static double clamp(double value, double minLimit, double topLimit){
+        if (value > topLimit) {
+            return topLimit;
+        }
+        if(value < minLimit){
+            return minLimit;
+        }
+        return value;
+    }
+    public static double getMaxValue(double[] values){
+        double max = Double.MIN_VALUE;
+        for (double value : values) {
+            if (value > max) {
+                max = value;
+            }
+        }
+        return max;
+    }
+    public static double getMinValue(double[] values){
+        double min = Double.MAX_VALUE;
+        for (double value : values) {
+            if (value < min) {
+                min = value;
+            }
+        }
+        return min;
+    }
 }

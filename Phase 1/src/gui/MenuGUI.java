@@ -235,13 +235,13 @@ public class MenuGUI extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-    Renderer render = new Renderer();
-    Game game = new Game(60);
+
     private void singleBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_singleBActionPerformed
   
         /////FETCH LEVEL INDEX
         /////OPEN PUTTING RENDER
         //render.start3d();
+        Game game = new Game(60);
         game.start();
         this.setVisible(false);
     }//GEN-LAST:event_singleBActionPerformed
@@ -251,6 +251,7 @@ public class MenuGUI extends javax.swing.JFrame {
         /////FETCH LEVEL INDEX
         ////FETCH PLAYER/BOT BOOLEAN
         /////OPEN PUTTING RENDER
+        Renderer render = new Renderer();
         render.start3d();
         this.dispose();
     }//GEN-LAST:event_multiBActionPerformed

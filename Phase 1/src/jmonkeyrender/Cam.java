@@ -1,14 +1,7 @@
 package jmonkeyrender;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.asset.AssetManager;
 import com.jme3.input.ChaseCamera;
-import com.jme3.input.InputManager;
-import com.jme3.math.FastMath;
-import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 
 public class Cam extends SimpleApplication{
     /**

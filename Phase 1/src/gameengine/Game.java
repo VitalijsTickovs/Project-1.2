@@ -6,12 +6,17 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
 
-import bot.botimplementations.*;
+import datastorage.Ball;
 import datastorage.GameState;
 import utility.math.Vector2;
 import gui.GameStateRenderer;
 import gui.InterfaceFactory;
 import gui.ShotInputWindow;
+import bot.botimplementations.IBot;
+import bot.botimplementations.BotFactory;
+import bot.botimplementations.GradientDescentBot;
+import bot.botimplementations.HillClimbingBot;
+import bot.botimplementations.ParticleSwarmBot;
 import bot.heuristics.FinalEuclidianDistanceHeuristic;
 import gui.BallVelocityInput;
 
@@ -19,16 +24,14 @@ public class Game extends JPanel implements Runnable, GameObject {
     public JFrame frame;
     public GameState gameState;
     public int numShots;
-    
+
     private final int FPS;
     private boolean running;
     private Thread thread;
-    private BufferedImage terrainImage;
-    private Renderer renderer;
     private Vector2 shotForce;
-    private Camera cam;
+    private Camera camera;
     private BallVelocityInput ballVelocityInput;
-    private Bot bot;
+    private IBot bot = null;
     private Thread botThread;
     private Input input;
     private static Game game;
@@ -52,26 +55,15 @@ public class Game extends JPanel implements Runnable, GameObject {
         createGameState();
         resetStartingVariables();
         setManualInputType();
+        // createTerrain();
         createCamera();
         createRenderer();
-        createTerrainImage();
         createFrame();
         createInput();
     }
 
-    private void setupInitialBot(){
-        // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
-        // null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));
-        // bot = new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5,
-        // 0.5, 100, 10);
-        // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
-        // null);
-        setBot(new HillClimbingBot(
-                new FinalEuclidianDistanceHeuristic(),
-                0.01,
-                8,
-                new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
-        //setBot(new RuleBasedBot());
+    private void setupInitialBot() {
+        setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
         resetBotThread();
     }
 
@@ -81,20 +73,21 @@ public class Game extends JPanel implements Runnable, GameObject {
         requestFocus();
         addKeyListener(input);
     }
-    
-    private void resetBotThread(){
+
+    private void resetBotThread() {
         botThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 System.out.println("Calculating shot...");
                 shotForce = bot.findBestShot(gameState);
-                System.out.println("Velocity: "+shotForce);
+                System.out.println("Velocity: " + shotForce);
             }
         });
     }
 
     private void createGameState() {
         gameState = reader.GameStateLoader.readFile();
+        BotFactory.setTerrain(gameState.getTerrain());
     }
 
     private void resetStartingVariables() {
@@ -108,32 +101,18 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private void createCamera() {
-        cam = new Camera();
-        cam.width = 15;
-        cam.height = 15;
-        cam.x = gameState.getBall().state.position.x;
-        cam.y = gameState.getBall().state.position.y;
+        camera = new Camera(15, 15);
+        camera.xPos = gameState.getBall().state.position.x;
+        camera.yPos = gameState.getBall().state.position.y;
     }
 
     private void createRenderer() {
-        renderer = new Renderer();
-        renderer.heightRange = 20;
-        renderer.terrain = gameState.getTerrain();
-        renderer.cam = cam;
-        renderer.ball = gameState.getBall();
-        renderer.unitSizePixels = 40;
-        renderer.createTerrainImage();
-        gameStateRenderer = new GameStateRenderer(gameState, 40);
-    }
-
-    private void createTerrainImage() {
-        terrainImage = new BufferedImage((int) (cam.width * renderer.unitSizePixels),
-                (int) (cam.height * renderer.unitSizePixels), BufferedImage.TYPE_4BYTE_ABGR);
+        gameStateRenderer = new GameStateRenderer(gameState);
     }
 
     private void createFrame() {
-        Vector2 frameSize = new Vector2((int) (cam.width * renderer.unitSizePixels),
-                (int) (cam.height * renderer.unitSizePixels));
+        Vector2 frameSize = new Vector2((int) (camera.WIDTH * gameStateRenderer.PIXELS_PER_GAME_UNIT),
+                (int) (camera.HEIGHT * gameStateRenderer.PIXELS_PER_GAME_UNIT));
         frame = InterfaceFactory.createFrame("Crazy Putting", frameSize, false, null, null);
         frame.add(this);
         frame.setVisible(true);
@@ -179,12 +158,13 @@ public class Game extends JPanel implements Runnable, GameObject {
     // region Update
     private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
 
-    public void setBot(Bot bot) {
+    public void setBot(IBot bot) {
         this.bot = bot;
     }
 
     /**
      * Checks if a key was pressed.
+     * 
      * @param key The key to check. see {@code Input}
      * @return {@code true} if it was pressed and {@code false} otherwise
      */
@@ -194,6 +174,7 @@ public class Game extends JPanel implements Runnable, GameObject {
 
     /**
      * Checks if a key is being held down.
+     * 
      * @param key The key to check. see {@code Input}
      * @return {@code true} if it is being helf down and {@code false} otherwise
      */
@@ -207,18 +188,16 @@ public class Game extends JPanel implements Runnable, GameObject {
     public void update() {
         handleBallInWater();
         handleInput();
-        // Find the positions after a shot
         simulateShot();
-        // Update the ball position if it has been calculated
         moveBall();
         moveCamera();
-        // Reset the game
         handleKeyInputs();
     }
 
     private void handleBallInWater() {
         if (isSimulationFinished()) {
-            boolean isBallInWater = gameState.getTerrain().terrainFunction.valueAt(gameState.getBall().state.position.x, gameState.getBall().state.position.y) < 0;
+            boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(gameState.getBall().state.position.x,
+                    gameState.getBall().state.position.y) < 0;
             if (isBallInWater) {
                 resetGame();
             }
@@ -252,7 +231,8 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private boolean hasReachedTarget() {
-        double distance = gameState.getBall().state.position.copy().translate(gameState.getTerrain().target.position.copy().scale(-1)).length();
+        double distance = gameState.getBall().state.position.copy()
+                .translate(gameState.getTerrain().target.position.copy().scale(-1)).length();
         return distance <= gameState.getTerrain().target.radius;
     }
 
@@ -262,8 +242,9 @@ public class Game extends JPanel implements Runnable, GameObject {
     private boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
         boolean noBot = bot == null || !botThread.isAlive();
+        boolean notWaitingForBot = (bot != null && !botThread.isAlive()) || (bot == null);
         boolean ballHasBeenPushed = shotForce == null;
-        return ballHasBeenPushed && noBot && ballStopped;
+        return ballHasBeenPushed && notWaitingForBot && ballStopped;
     }
 
     private void simulateShot() {
@@ -289,46 +270,37 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private void moveCamera() {
-        cam.x += (gameState.getBall().state.position.x - cam.x) / 10;
-        cam.y += (gameState.getBall().state.position.y - cam.y) / 10;
+        Ball ball = gameState.getBall();
+        camera.xPos += (ball.state.position.x - camera.xPos) / 10;
+        double zOffset = ball.getZCoordinate(gameState.getTerrain());
+        camera.yPos += (ball.state.position.y - zOffset - camera.yPos) / 10;
     }
 
-    private void handleKeyInputs(){
+    // region keyInputs
+    private void handleKeyInputs() {
         checkResetGame();
         changeBotImplementation();
         input.removeFromPressed();
     }
 
-    private void checkResetGame(){
+    private void checkResetGame() {
         if (checkKeyPressed(Input.R)) {
             resetGame();
         }
     }
 
-    private void changeBotImplementation(){
+    private void changeBotImplementation() {
         if (checkKeyPressed(Input.H)) {
-            setBot(new HillClimbingBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.001,
-                    16,
-                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+            setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
         }
         if (checkKeyPressed(Input.P)) {
-            setBot(new ParticleSwarmBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.5,
-                    0.5,
-                    0.5,
-                    100,
-                    10));
+            setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
         }
         if (checkKeyPressed(Input.G)) {
-            setBot(new GradientDescentBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.01,
-                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10)));
+            setBot(BotFactory.getBot(BotFactory.BotImplementations.GRADIENT_DESCENT));
         }
     }
+    // endregion
     // endregion
 
     // region Render
@@ -338,20 +310,19 @@ public class Game extends JPanel implements Runnable, GameObject {
      * Renders the game
      */
     public void render() {
-        Graphics2D g2 = (Graphics2D) terrainImage.getGraphics();
-        g2.setColor(Color.WHITE);
-        g2.fillRect(0 ,0, terrainImage.getWidth(), terrainImage.getHeight());
-        //renderer.render(g2);
-        gameStateRenderer.render(g2, cam.x, cam.y, cam.width, cam.height, 0, 0);
-        g2.dispose();
+        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera);
+        drawImage(gameStateImage);
+        gameStateImage.flush();
+    }
 
-        g2 = (Graphics2D) getGraphics();
-        g2.drawImage(terrainImage, null, 0, 0);
-        g2.dispose();
+    private void drawImage(BufferedImage gameStateImage) {
+        Graphics2D gameg2 = (Graphics2D) getGraphics();
+        gameg2.drawImage(gameStateImage, null, 0, 0);
+        gameg2.dispose();
     }
     // endregion
 
-    public void setShotForce(Vector2 newShotVector){
+    public void setShotForce(Vector2 newShotVector) {
         shotForce = newShotVector;
     }
 

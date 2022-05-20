@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import bot.botimplementations.IBot;
+import bot.botimplementations.BotFactory;
 import datastorage.*;
 import datastorage.obstacles.IObstacle;
 import datastorage.obstacles.ObstacleBox;
@@ -42,6 +44,8 @@ public class GameStateLoader {
    private static double targetRadius;
    private static double targetX;
    private static double targetY;
+
+   private static IBot bot;
 
    // ArrayList values
    private static ArrayList<Double> sandZoneX0 = new ArrayList<Double>();
@@ -87,6 +91,8 @@ public class GameStateLoader {
    private final static double deftargetRadius = 0.1;
    private final static double deftargetX = 4;
    private final static double deftargetY = 4;
+
+   private static final IBot defbot = BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM);
 
    // ArrayList values
    private final static double defsandZoneX0 = 0;
@@ -182,13 +188,14 @@ public class GameStateLoader {
     */
    private static void createScanner() {
       try {
-         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase 1/src/Reader/UserInput.csv"));
+         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase
+         // 1/src/Reader/UserInput.csv"));
          // The top line does not work on my computer, so I put the one at the bottom -
          // comment it out and switch.
          // I was not able to come up with a line of code that would work on everyone's
          // computer
          scanner = new Scanner(
-         new FileReader(System.getProperty("user.dir") +"/Phase 1/src/reader/UserInput.csv"));
+               new FileReader(getPath()));
       } catch (FileNotFoundException e) {
          throw new NullPointerException("File not found - the path to the save file is wrong, see comment above");
       } catch (NullPointerException e) {
@@ -206,7 +213,7 @@ public class GameStateLoader {
       if (stansLaptop) {
          return System.getProperty("user.dir") + "\\reader\\UserInput.csv";
       } else {
-         return System.getProperty("user.dir") + "Phase 1/src/reader/UserInput.csv";
+         return System.getProperty("user.dir") + "/Phase 1/src/reader/UserInput.csv";
       }
    }
 
@@ -238,6 +245,10 @@ public class GameStateLoader {
       }
       if (lineContainsKeywordAndEqualSign(line, "collisionSystem")) {
          collisionSystem = readCollisionSystem(line);
+      }
+      // Bot
+      if (lineContainsKeywordAndEqualSign(line, "bot")) {
+         bot = readBotImplementation(line);
       }
       // Green
       if (lineContainsKeywordAndEqualSign(line, "terrainX0")) {
@@ -398,6 +409,36 @@ public class GameStateLoader {
          return defcollisionSystem;
       }
    }
+   
+   private static IBot readBotImplementation(String line) {
+      try {
+         String name = line.substring(line.lastIndexOf("=") + 1);
+         return getBotImplementationFromName(name);
+      } catch (IndexOutOfBoundsException e) {
+         System.out.println("There was nothing after the = sign");
+         return defbot;
+      }
+   }
+
+   private static IBot getBotImplementationFromName(String name) {
+      if (name.contains("hillClimbing")) {
+         return BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING);
+      }
+      if (name.contains("particleSwarm")) {
+         return BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM);
+      }
+      if (name.contains("random")) {
+         return BotFactory.getBot(BotFactory.BotImplementations.RANDOM);
+      }
+      if (name.contains("rule")) {
+         return BotFactory.getBot(BotFactory.BotImplementations.RULE);
+      }
+      if (name.contains("gradientDescent")) {
+         return BotFactory.getBot(BotFactory.BotImplementations.GRADIENT_DESCENT);
+      } else {
+         return defbot;
+      }
+   }
    // endregion
 
    // region Read Values
@@ -486,11 +527,11 @@ public class GameStateLoader {
       } else {
          terrain.staticFriction = greenStaticFriction;
       }
-      TerrainFunction1 decodedFunction;
+      TerrainHeightFunction decodedFunction;
       if (terrainFunction == null) {
-         decodedFunction = new TerrainFunction1(defterrainFunction);
+         decodedFunction = new TerrainHeightFunction(defterrainFunction);
       } else {
-         decodedFunction = new TerrainFunction1(terrainFunction);
+         decodedFunction = new TerrainHeightFunction(terrainFunction);
       }
       terrain.setTerrainFunction(decodedFunction);
 
@@ -721,7 +762,7 @@ public class GameStateLoader {
       return new PhysicsEngine(savedSolver, savedCondition, savedCollisionSystem);
    }
 
-   private static Ball createBall(){
+   private static Ball createBall() {
       Ball newBall = new Ball(terrain.ballStartingPosition, Vector2.zeroVector());
       newBall.radius = ballRadius;
       return newBall;

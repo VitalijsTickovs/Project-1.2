@@ -1,6 +1,6 @@
 package bot;
 
-import bot.botimplementations.Bot;
+import bot.botimplementations.IBot;
 import bot.botimplementations.HillClimbingBot;
 import bot.heuristics.FinalEuclidianDistanceHeuristic;
 import datastorage.GameState;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class BotTester {
 
-    public String testBot(Bot bot, GameState gameState, int numShots) {
+    public String testBot(IBot bot, GameState gameState, int numShots) {
         String data = "";
         int numHolesInOne = 0;
         // Test a bot multiplte times with the same shot
@@ -71,7 +71,7 @@ public class BotTester {
                         new StopCollisionSystem()
                 )
         );
-        Bot bot = new HillClimbingBot(
+        IBot bot = new HillClimbingBot(
                 new FinalEuclidianDistanceHeuristic(),
                 0.01,
                 8,

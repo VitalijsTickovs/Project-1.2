@@ -23,11 +23,16 @@ public class Ball {
     }
 
     public double getZCoordinate(Terrain terrain) {
-        return terrain.terrainFunction.valueAt(state.position.x, state.position.y);
+        return terrain.getTerrainFunction().valueAt(state.position.x, state.position.y);
+    }
+    public double getZCoordinate(Terrain terrain, boolean r) {
+        double value = terrain.getTerrainFunction().valueAt(state.position.x, state.position.y);
+        System.out.println(" position " + state.position + " value " + value);
+        return value;
     }
 
     public Ball copy() {
-        Ball newBall = new Ball(state.position, state.velocity);
+        Ball newBall = new Ball(state.position.copy(), state.velocity.copy());
         newBall.mass = mass;
         newBall.radius = radius;
         return newBall;

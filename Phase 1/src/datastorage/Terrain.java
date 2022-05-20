@@ -29,11 +29,16 @@ public class Terrain {
     public double staticFriction;
     public double kineticFriction;
 
-    public TerrainFunction1 terrainFunction;
+    public TerrainHeightFunction terrainFunction;
     public double scaleFactor = 1;
 
     public int xRes = 500;
     public int yRes = 500;
+
+    public float minVal = -10;
+    public float maxVal = 10;
+    public double xOff;
+    public double yOff;
 
     public Terrain() {
     }
@@ -45,7 +50,7 @@ public class Terrain {
 
     public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner,
             Vector2 limitingCorner) {
-        this.terrainFunction = new TerrainFunction1(function);
+        this.terrainFunction = new TerrainHeightFunction(function);
         this.staticFriction = staticFriction;
         this.kineticFriction = kineticFriction;
         this.topLeftCorner = startingCorner;
@@ -82,11 +87,6 @@ public class Terrain {
         temp[temp.length - 1] = z;
         zones = temp;
     }
-
-    public float minVal = -10;
-    public float maxVal = 10;
-    public double xOff;
-    public double yOff;
 
     public boolean isValid(int accuracy) {
         double xStep = (bottomRightCorner.x - topLeftCorner.x) / accuracy;
@@ -133,24 +133,6 @@ public class Terrain {
             return 0;
         } else {
             return terrainFunction.yDerivativeAt(position.x, position.y);
-        }
-    }
-
-    public double xDerivativeAt(double x, double y) {
-        double functionVal = terrainFunction.valueAt(x, y);
-        if (functionVal > maxVal || functionVal < minVal) {
-            return 0;
-        } else {
-            return terrainFunction.xDerivativeAt(x, y);
-        }
-    }
-
-    public double yDerivativeAt(double x, double y) {
-        double functionVal = terrainFunction.valueAt(x, y);
-        if (functionVal > maxVal || functionVal < minVal) {
-            return 0;
-        } else {
-            return terrainFunction.yDerivativeAt(x, y);
         }
     }
 
@@ -219,6 +201,15 @@ public class Terrain {
         }
     }
 
+    public boolean isPositionCollidingWithMapBorder(BallState state) {
+        boolean isOutOfMap = state.position.x > bottomRightCorner.x || state.position.x < topLeftCorner.x
+                || state.position.y > bottomRightCorner.y || state.position.y < topLeftCorner.y;
+        if (isOutOfMap) {
+            return true;
+        }
+        return false;
+    }
+
     public void print() {
         System.out.println("Mesh grid:");
         System.out.print("Starting position: ");
@@ -241,9 +232,14 @@ public class Terrain {
         }
         target.print();
     }
-    public void setTerrainFunction(TerrainFunction1 terrainFunction){
+
+    public void setTerrainFunction(TerrainHeightFunction terrainFunction) {
         this.terrainFunction = terrainFunction;
         calculateHeightMap(VERTECES_PER_SIDE);
+    }
+
+    public TerrainHeightFunction getTerrainFunction(){
+        return terrainFunction;
     }
 
 }

@@ -12,7 +12,7 @@ import datastorage.*;
 import datastorage.obstacles.IObstacle;
 import utility.math.*;
 
-public class RuleBasedBot implements Bot{
+public class RuleBasedBot implements IBot{
 
     private Terrain terrain;
     private Ball ball;
