@@ -51,16 +51,21 @@ public class GameStateRenderer {
     }
 
     private void drawObstacles(Graphics2D g2) {
-        Color obstacleColor = new Color(96, 69, 38);
+        Color treeColor = new Color(28, 140, 3);
+        Color treeOutlineColor = new Color(16, 87, 3);
+        Color boxColor = new Color(125, 111, 79);
+        Color boxOutlineColor = new Color(79, 70, 51);
 
         for (IObstacle o : terrain.obstacles) {
             // Trees
             if (o instanceof ObstacleTree) {
                 ObstacleTree t = (ObstacleTree) o;
-                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, obstacleColor, true);
+                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, treeColor, true);
+                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, treeOutlineColor, false);
             } else if (o instanceof ObstacleBox) {
                 ObstacleBox b = (ObstacleBox) o;
-                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, obstacleColor, true);
+                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, boxColor, true);
+                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, boxOutlineColor, false);
             }
         }
     }
@@ -256,6 +261,7 @@ public class GameStateRenderer {
         }
         renderBallAndFlag(g2, camera);
         drawText(g2);
+        g2.dispose();
 
         return image;
     }
@@ -281,16 +287,30 @@ public class GameStateRenderer {
     }
 
     private void drawText(Graphics2D g2) {
-        g2.setFont(new Font("TimesRoman", Font.BOLD, PIXELS_PER_GAME_UNIT / 2));
+        setupFont(g2);
+        drawBallPosition(g2);
+        drawMousePosition(g2);
+    }
+
+    private void setupFont(Graphics2D g2) {
+        final int FONT_SIZE = 20;
+        g2.setFont(new Font("TimesRoman", Font.BOLD, FONT_SIZE));
         g2.setColor(Color.WHITE);
+    }
+
+    private void drawBallPosition(Graphics2D g2) {
         BigDecimal xx = new BigDecimal(gameState.getBall().state.position.x);
         xx = xx.setScale(5, RoundingMode.HALF_UP);
         BigDecimal yy = new BigDecimal(gameState.getBall().state.position.y);
         yy = yy.setScale(5, RoundingMode.HALF_UP);
         g2.drawString("x = " + xx, PIXELS_PER_GAME_UNIT, PIXELS_PER_GAME_UNIT);
         g2.drawString("y = " + yy, PIXELS_PER_GAME_UNIT, 2 * PIXELS_PER_GAME_UNIT);
-        // Dispose of the graphics
-        g2.dispose();
+    }
+
+    private void drawMousePosition(Graphics2D g2) {
+        Vector2 mousePosition = Game.getMiddleMousePosition().translated(gameState.getBall().state.position);
+        g2.drawString("x = " + mousePosition.x, PIXELS_PER_GAME_UNIT, 3 * PIXELS_PER_GAME_UNIT);
+        g2.drawString("y = " + mousePosition.y, PIXELS_PER_GAME_UNIT, 4 * PIXELS_PER_GAME_UNIT);
     }
 
     private Canvas calculateVisibleTerrainArea(Camera camera, BufferedImage image) {

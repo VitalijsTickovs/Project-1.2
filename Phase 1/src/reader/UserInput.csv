@@ -2,7 +2,7 @@
 solverStep = 0.01;
 
 //Solvers "Euler", "RK2", "RK4"
-ODEsolver = RK4;
+ODEsolver = Euler;
 
 // Stopping conditions "smallV" only for now
 stoppingCondition = smallV;
@@ -18,7 +18,7 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
-terrainFunction = sin(x+y)/5 + 0.4;
+terrainFunction = 0;
 
 //To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
 ballStartPointX = -3;
@@ -45,3 +45,6 @@ treeRadius = 2;
 treeBounciness = 0.5;
 
 //To create box "boxX", "boxY", "boxBounciness";
+boxX = 10<20;
+boxY = -15<-5;
+boxBounciness = 0.8;
