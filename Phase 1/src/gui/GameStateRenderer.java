@@ -395,7 +395,7 @@ public class GameStateRenderer {
 
     private void renderBall(Graphics2D g2, Camera camera) {
         Ball ball = gameState.getBall();
-        double z = ball.getZCoordinate(terrain);
+        double z = ball.state.getZCoordinate(terrain);
         int x = (int) ((ball.state.position.x - camera.xPos + camera.WIDTH / 2 - ball.radius) * PIXELS_PER_GAME_UNIT);
         int y = (int) ((ball.state.position.y - z - camera.yPos + camera.HEIGHT / 2 - ball.radius)
                 * PIXELS_PER_GAME_UNIT);
@@ -407,7 +407,7 @@ public class GameStateRenderer {
 
     // region Render Arrow
     private Vector2 getBallPositionOnScreen() {
-        double ballZOffset = gameState.getBall().getZCoordinate(gameState.getTerrain());
+        double ballZOffset = gameState.getBall().state.getZCoordinate(gameState.getTerrain());
         Vector2 ballPosition = gameState.getBall().state.position.translated(0, -ballZOffset);
         return ballPosition;
     }

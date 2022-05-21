@@ -21,8 +21,8 @@ greenStaticFriction = 0.2;
 terrainFunction = 0;
 
 //To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
-ballStartPointX = -3;
-ballStartPointY = 0;
+ballStartPointX = -5;
+ballStartPointY = -2;
 ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";

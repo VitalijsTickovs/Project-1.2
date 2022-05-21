@@ -268,7 +268,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
     private void moveCamera() {
         Ball ball = gameState.getBall();
         camera.xPos += (ball.state.position.x - camera.xPos) / 10;
-        double zOffset = ball.getZCoordinate(gameState.getTerrain());
+        double zOffset = ball.state.getZCoordinate(gameState.getTerrain());
         camera.yPos += (ball.state.position.y - zOffset - camera.yPos) / 10;
     }
 
@@ -359,7 +359,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         Vector2 mPosFromCenterOfScreen = mPosInGameUnits
                 .translate(new Vector2(halfCameraWidth, halfCameraHeight).reversed());
 
-        double ballZOffset = game.gameState.getBall().getZCoordinate(game.gameState.getTerrain());
+        double ballZOffset = game.gameState.getBall().state.getZCoordinate(game.gameState.getTerrain());
         Vector2 deltaPosFromBall = mPosFromCenterOfScreen.translated(Game.getMiddleOfWindowPosition()).translate(0,
                 ballZOffset);
         Vector2 ballPosition = game.gameState.getBall().state.position;

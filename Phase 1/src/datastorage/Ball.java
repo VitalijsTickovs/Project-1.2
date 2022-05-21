@@ -22,6 +22,10 @@ public class Ball {
         ballStopped = false;
     }
 
+    /**
+     * Use state.getZCoordinate instead
+     */
+    @Deprecated
     public double getZCoordinate(Terrain terrain) {
         return terrain.getTerrainFunction().valueAt(state.position.x, state.position.y);
     }

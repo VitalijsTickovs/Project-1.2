@@ -15,4 +15,8 @@ public class BallState {
         BallState b = new BallState(position.copy(), velocity.copy());
         return b;
     }
+    
+    public double getZCoordinate(Terrain terrain) {
+        return terrain.getTerrainFunction().valueAt(position.x, position.y);
+    }
 }

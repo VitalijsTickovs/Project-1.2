@@ -21,8 +21,8 @@ public class Line2D {
     }
 
     public Line2D(Vector2 firstPosition, Vector2 secondPosition) {
-        this.firstPosition = firstPosition;
-        this.secondPosition = secondPosition;
+        this.firstPosition = firstPosition.copy();
+        this.secondPosition = secondPosition.copy();
         slope = getSlope();
 
         if (Double.isInfinite(slope)) {

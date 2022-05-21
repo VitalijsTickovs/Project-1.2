@@ -20,7 +20,7 @@ public class BounceCollisionSystem implements ICollisionSystem {
                 ballRadius);
         if (collisionData != null) {
             collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition, ballRadius);
-            System.out.println("Previous position: " + collisionData.previousPosition + " position after bounce: " + state.position);
+            System.out.println("Previous position: " + collisionData.previousPosition + " collision position: " + collisionData.collisionPosition);
             bounceBall(state, collisionData);
         }
 
