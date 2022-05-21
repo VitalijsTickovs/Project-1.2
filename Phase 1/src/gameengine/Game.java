@@ -51,6 +51,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
      */
     public Game(int fps) {
         game = this;
+        running = false;
 
         // setupInitialBot();
         FPS = fps;
@@ -63,7 +64,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
     }
 
     private void setupInitialBot() {
-        setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
+        setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
         resetBotThread();
     }
 
@@ -98,7 +99,6 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
     private void resetStartingVariables() {
         numShots = 0;
-        running = false;
         shotForce = null;
         ballPositions = new ArrayList<Vector2>();
     }

@@ -2,7 +2,7 @@
 solverStep = 0.01;
 
 //Solvers "Euler", "RK2", "RK4"
-ODEsolver = Euler;
+ODEsolver = RK4;
 
 // Stopping conditions "smallV" only for now
 stoppingCondition = smallV;
@@ -18,33 +18,33 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
-terrainFunction = 0;
+terrainFunction = 0.4*(0.9-e**(-(x*x + y*y)/8));
 
 //To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
-ballStartPointX = -2;
-ballStartPointY = 2;
+ballStartPointX = -3;
+ballStartPointY = 0;
 ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";
 targetRadius = 0.15;
-targetX = 6;
-targetY = 3;
+targetX = 4;
+targetY = 1;
 
 //To create sand zone "sandZoneX", "sandZoneY", "sandKineticFriction", "sandStaticFriction";
 //Make this a range Eg. variableX = -2<5;
 
 //To create tree "treeX", "treeY", "treeRadius", "treeBounciness";
-treeX = -5;
-treeY = 15
-treeRadius = 2;
-treeBounciness = 1;
+//treeX = -5;
+//treeY = 15
+//treeRadius = 2;
+//treeBounciness = 1;
 
-treeX = -10;
-treeY = 10
-treeRadius = 2;
-treeBounciness = 0.9;
+//treeX = -10;
+//treeY = 10
+//treeRadius = 2;
+//treeBounciness = 0.9;
 
 //To create box "boxX", "boxY", "boxBounciness";
-boxX = -15<2;
-boxY = -5<-1;
-boxBounciness = 0.95;
+//boxX = -15<2;
+//boxY = -5<-1;
+//boxBounciness = 0.95;

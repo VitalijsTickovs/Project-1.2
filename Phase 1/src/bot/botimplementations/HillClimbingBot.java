@@ -23,7 +23,8 @@ public class HillClimbingBot implements IBot {
 
     @Override
     public Vector2 findBestShot(GameState gameState) {
-        gameState = gameState.copy();// Take an initial shot
+        gameState = gameState.copy();
+        // Take an initial shot
         Vector2 bestShot;
         if (initialShotTaker == null) {
             bestShot = new Vector2(Math.random() * 2 - 1, Math.random() * 2 - 1);
@@ -57,10 +58,6 @@ public class HillClimbingBot implements IBot {
                 positions = gameState.simulateShot(velocity);
 
                 double heuristicVal = heuristic.getShotValue(positions, gameState);
-
-                if (heuristicVal == bestHeuristicVal) {
-                    System.out.println("Same: "+"new shot: "+velocity+" best shot: "+tempBestShot);
-                }
 
                 if (heuristic.firstBetterThanSecond(heuristicVal, bestHeuristicVal)) {
                     tempBestShot = velocity.copy();

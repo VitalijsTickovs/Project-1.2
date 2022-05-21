@@ -44,18 +44,48 @@ public class PhysicsEngine {
         // Add the initial position
         coordinates.add(tempState.position.copy());
 
+/*<<<<<<< HEAD
+        while (tempBall.state.velocity.length() != 0) {
+            // Clamp the velocity to the ball max speed
+            if (tempBall.state.velocity.length() > Ball.maxSpeed) {
+                tempBall.state.velocity.normalize().scale(Ball.maxSpeed);
+            }
+            // Store the previous state
+            BallState prevState = tempBall.state.copy();
+            // Perform a single step using the ODE solver
+            tempBall.state = odeSolver.calculateNewBallState(tempBall.state, terrain, this);
+
+            // Check if velocity should be 0
+            if (stoppingCondition.shouldStop(tempBall.state, prevState, odeSolver.getStepSize())) {
+                Vector2 slope = calculateSlope(tempBall.state.position, terrain);
+                // If the static friction is smaller than the slope then set the velocity to the
+                // slope
+                if (terrain.getStaticFriction(tempBall.state.position) < slope.length()) {
+                    tempBall.state.velocity = slope.copy().reversed();
+                } else {
+                    // Otherwise, make the velocity 0
+                    tempBall.state.velocity = Vector2.zeroVector();
+                }
+            }
+            // Perform collisions
+            tempBall.state = collisionSystem.modifyStateDueToCollisions(tempBall.state, prevState, ball.radius,
+                    terrain);
+            // Check if in water, and if so, stop
+            if (tempBall.getZCoordinate(terrain) < 0) {
+                tempBall.state.velocity = Vector2.zeroVector();
+=======*/
         while (tempState.velocity.length() != 0) {
             clampVelocity(tempState);
             BallState previousState = tempState.copy();
             tempState = odeSolver.calculateNewBallState(tempState, terrain, this);
-            tempState = collisionSystem.modifyStateDueToCollisions(tempState, previousState, ball.radius,
-                    terrain);
 
             boolean shouldSetVelocityToZero = stoppingCondition.shouldStop(tempState, previousState,
                     odeSolver.getStepSize());
             if (shouldSetVelocityToZero) {
                 handleStaticFriction(tempState, terrain);
             }
+            tempState = collisionSystem.modifyStateDueToCollisions(tempState, previousState, ball.radius,
+                    terrain);
             handleBallInWater(tempState, terrain);
             // Store the new position
             coordinates.add(tempState.position.copy());

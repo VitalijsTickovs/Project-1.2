@@ -1,8 +1,8 @@
 package bot;
 
-import bot.botimplementations.IBot;
-import bot.botimplementations.HillClimbingBot;
+import bot.botimplementations.*;
 import bot.heuristics.FinalEuclidianDistanceHeuristic;
+import bot.heuristics.Heuristic;
 import datastorage.GameState;
 import datastorage.Target;
 import datastorage.Terrain;
@@ -71,14 +71,7 @@ public class BotTester {
                         new StopCollisionSystem()
                 )
         );
-        IBot bot = new HillClimbingBot(
-                new FinalEuclidianDistanceHeuristic(),
-                0.01,
-                8,
-                null
-        );
-        BotTester bt = new BotTester();
-        bt.storeData(bt.testBot(bot, gameState, 100), "SimpleHillClimbing");
+
     }
 
 }

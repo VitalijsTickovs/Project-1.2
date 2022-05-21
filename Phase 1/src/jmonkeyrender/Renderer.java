@@ -15,8 +15,6 @@ import gui.GameStateRenderer;
 import gui.MenuGUI;
 import gui.shotinput.BallVelocityInput;
 
-import gui.ShotInputWindow;
-import org.lwjgl.Sys;
 import physics.*;
 import physics.collisionsystems.StopCollisionSystem;
 import physics.solvers.RungeKutta4Solver;
@@ -238,7 +236,7 @@ import java.util.Queue;
 
                 minimapImg = minimapGenerator.getSubimage(camera, false, false);
                 img = loader.load(minimapImg, false);
-                minimapImg = minimapGenerator.getSubimage(camera);
+                minimapImg = minimapGenerator.getSubimage(camera, false, false);
                 img = loader.load(minimapImg, true);
                 texture2D.setImage(img);
                 pic.setTexture(assetManager, texture2D, true);
