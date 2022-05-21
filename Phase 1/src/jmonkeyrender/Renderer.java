@@ -1,5 +1,6 @@
 package jmonkeyrender;
 
+import bot.botimplementations.BotFactory;
 import bot.botimplementations.IBot;
 import bot.botimplementations.HillClimbingBot;
 import bot.botimplementations.ParticleSwarmBot;
@@ -14,6 +15,7 @@ import gui.GameStateRenderer;
 import gui.MenuGUI;
 import gui.shotinput.BallVelocityInput;
 
+import gui.ShotInputWindow;
 import org.lwjgl.Sys;
 import physics.*;
 import physics.collisionsystems.StopCollisionSystem;
@@ -67,34 +69,26 @@ import java.util.Queue;
         Ball ball;
         double targetRadius;
         Vector2 targetPos;
-        private PhysicsEngine engine;
 
         BitmapText text;
         private static final DecimalFormat df = new DecimalFormat("0.00");
 
         Node mainScene = new Node("Water");
 
-        float x = 0;
-        float y = 0;
-        float val = 0;
         float normalFactor;
         float terScale = 5;
+        float pixelScale = totalSize/100;
         private Terrain terrain;
 
         /**
          * Initializes area terrain based on the function given in input file
          */
         public void initTerrain(String texPath){
-
-            //Calculating offset to spawn the terrain arround the ball
-            this.xoff = (float) (this.ball.state.position.x - this.totalSize/2);
-            this.yoff = (float) (this.ball.state.position.y - this.totalSize/2);
-
             //Creating heightmap representation of the terrain
             AlphaMapGenerator.generateAlphaMap(terrain);
 
             //Setting terrain using heightmap
-            this.terrainQuad = new TerrainQuad("Course", 65, (int) (totalSize+1), this.terrain.heightmap);
+            this.terrainQuad = new TerrainQuad("Course", 128, (int) (totalSize+1), this.terrain.heightmap);
 
             //Setting up the Texture of the ground
             Material matTerrain = new Material(assetManager,"Common/MatDefs/Terrain/Terrain.j3md");
@@ -110,6 +104,12 @@ import java.util.Queue;
             sand.setWrap(Texture.WrapMode.Repeat);
             matTerrain.setTexture("Tex2", sand);
             matTerrain.setFloat("Tex2Scale", 32f);
+
+            Texture targetRadius = assetManager.loadTexture(
+                    "Terrain/dirt.jpeg");
+            targetRadius.setWrap(Texture.WrapMode.Repeat);
+            matTerrain.setTexture("Tex3", targetRadius);
+            matTerrain.setFloat("Tex3Scale", 32f);
 
             AmbientLight amb = new AmbientLight();
             amb.setColor(ColorRGBA.White.mult(5));
@@ -159,7 +159,7 @@ import java.util.Queue;
 
             //Finding the position for the target
             float val;
-            val = (float) terrain.getTerrainFunction().valueAt(targetPos.x * terrain.xOff,targetPos.y * terrain.yOff);
+            val = (float) terrain.getTerrainFunction().valueAt(targetPos.x,targetPos.y);
             val += Math.abs(terrain.minVal);
             val /= terrain.maxVal - terrain.minVal;
             if (val < 0) {
@@ -168,11 +168,10 @@ import java.util.Queue;
             if (val > 1) {
                 val = 1;
             }
-            val *= normalFactor;
-            this.val = val;
+            val *= normalFactor*terScale;
 
-            //Moving the cylinder to the calculatd position
-            target.setLocalTranslation((float) this.targetPos.x, val*terScale, (float) this.targetPos.y);
+            //Moving the cylinder to the calculated position
+            target.setLocalTranslation((float) (this.targetPos.x *totalSize/100 ), val, (float) (this.targetPos.y*totalSize/100));
 
             //Adding it to the scene
             rootNode.attachChild(target);
@@ -196,25 +195,12 @@ import java.util.Queue;
          * Moves the by finding the normal tangent by radius of the ball
          * so it would not seem that ball is in the terrain
          */
-        public void findTangent(){
-            Vector3f terNormal = terrainQuad.getNormal(new Vector2f(getBallX(),getBallY()));
+        public void findTangent(Vector2 ballState){
+            Vector3f terNormal = terrainQuad.getNormal(new Vector2f((float)ballState.x*pixelScale, (float)ballState.y*pixelScale));
             double scalar = ballRadius/terNormal.length();
             terNormal = terNormal.mult((float) scalar);
             //Just put 0.2 as a threshold, like if the difference is above that, is gonna be visible
             ballRender.move(terNormal.x, terNormal.y, terNormal.z);
-        }
-
-
-        public float getBallX(){
-            return this.x;
-        }
-
-        public float getBallY(){
-            return this.y;
-        }
-
-        public float getBallZ(){
-            return this.val;
         }
 
         /**
@@ -224,13 +210,11 @@ import java.util.Queue;
         Picture pic = new Picture("HUD Picture");
         Image img;
         Texture2D texture2D = new Texture2D();
+        float val;
         public void moveBall(Vector2 ballState){
-            if(ballState.x<(this.totalSize)/2 && ballState.y < (this.totalSize)/2) {
-                this.x = (float) ballState.x;
-                this.y = (float) ballState.y;
+            if(ballState.x*pixelScale<(this.totalSize)/2 && ballState.y*pixelScale < (this.totalSize)/2) {
                 //Getting height value corresponding to x and y values
-                float val;
-                val = (float) terrain.getTerrainFunction().valueAt( this.x* terrain.xOff, this.y * terrain.yOff);
+                val = (float) terrain.getTerrainFunction().valueAt( ballState.x, ballState.y);
                 val += Math.abs(terrain.minVal);
                 val /= terrain.maxVal - terrain.minVal;
                 if (val < 0) {
@@ -240,21 +224,22 @@ import java.util.Queue;
                     val = 1;
                 }
                 val *= normalFactor * terScale;
-                this.val = val;
 
                 //Moving the ball object to specified position
-                ballRender.setLocalTranslation((float) (this.x + terrain.xOff), (float) (this.val + terrain.xOff), (float) (this.y + terrain.xOff));
+                ballRender.setLocalTranslation((float) (ballState.x*pixelScale), val, (float) (ballState.y*pixelScale));
                 //Adjusting the ball not to be in the ground
-                findTangent();
+                findTangent(ballState);
                 //Outputting the position of the ball
-                text.setText("x: " + df.format(getBallX()) + "  y: " + df.format(getBallY()) + "  z: "+ df.format(getBallZ()/terScale));
+                text.setText("x: " + df.format(ballState.x) + "  y: " + df.format(ballState.y) + "  z: "+ df.format(val/terScale));
 
-                Camera camera = new Camera(15,15);
-                camera.xPos = this.x;
-                camera.yPos = this.y;
+                Camera camera = new Camera(50,50);
+                camera.xPos = ball.state.position.x;
+                camera.yPos = ball.state.position.y;
 
                 minimapImg = minimapGenerator.getSubimage(camera, false, false);
                 img = loader.load(minimapImg, false);
+                minimapImg = minimapGenerator.getSubimage(camera);
+                img = loader.load(minimapImg, true);
                 texture2D.setImage(img);
                 pic.setTexture(assetManager, texture2D, true);
                 pic.setHeight(300);
@@ -317,8 +302,8 @@ import java.util.Queue;
             this.normalFactor = (float) terrain.NORMAL_FACTOR;
 
             this.ball = this.gameState.getBall();
-            this.targetRadius = GameStateLoader.getTargetRadius();
-            this.targetPos = new Vector2(GameStateLoader.getTargetX(), GameStateLoader.getTargetY());
+            this.targetRadius = terrain.target.radius;
+            this.targetPos = terrain.target.position;
 
             minimapGenerator = new GameStateRenderer(this.gameState);
 
@@ -372,6 +357,10 @@ import java.util.Queue;
             });
         }
 
+        public void setShotForce(Vector2 newShotVector) {
+            shotForce = newShotVector;
+        }
+
 
 
         Queue<Vector2> q;
@@ -401,7 +390,7 @@ import java.util.Queue;
 
         private void handleBallInWater() {
             if (isSimulationFinished()) {
-                boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(gameState.getBall().state.position.x, gameState.getBall().state.position.y) < 0;
+                boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(ball.state.position.x, ball.state.position.y) < 0;
                 if (isBallInWater) {
                     resetGame();
                 }
@@ -415,7 +404,6 @@ import java.util.Queue;
         }
         private void resetGame() {
             gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
-            int numShots = 0;
             if (bot != null && botThread.isAlive()) {
                 // End the bot thread if it is still running
                 try {
@@ -428,46 +416,33 @@ import java.util.Queue;
             points = new ArrayList<Vector2>();
         }
 
-        private BallVelocityInput ballVelocityInput;
         private void handleInput() {
             if (isSimulationFinished() && !isInTarget(ball)) {
-                if (bot == null) {
-                    ballVelocityInput.readyForNextInput();
-                } else {
                     resetBotThread();
                     botThread.start();
                 }
-            }
         }
+
 
         @Override
         public void simpleUpdate(float tpf) {
                 //simulates from Vectors.csv file
                 //moves the ball with calculated position
-                //if (points.size() != 0) {
-                //ball.state.position = points.get(0);
-//            handleBallInWater();
-//            handleInput();
-//            if (points.size() == 0 && shotForce != null && !isInTarget(ball)) {
-//                points = gameState.simulateShot(shotForce);
-//                //numShots++;
-//                shotForce = null;
+//            if (points.size() != 0) {
+//                ball.state.position = points.get(0);
 //            }
-//            if(points.size() != 0) {
-//                moveBall(points.get(0));
-//                points.remove(0);
-//            }
-            ball.state.position.x+=1;
-            ball.state.position.y+=1;
-            moveBall(ball.state.position);
-
-
-                //points.remove(0);
-                //}
-                //checks if the ball is in the hole
-                if(isInTarget(ball)){
-                    System.exit(0);
-                }
+            handleBallInWater();
+            handleInput();
+            if (points.size() == 0 && shotForce != null && !inTarget) {
+                points = gameState.simulateShot(shotForce);
+                //numShots++;
+                shotForce = null;
+            }
+            if(points.size() != 0) {
+                gameState.setBallPosition(points.get(0));
+                moveBall(ball.state.position);
+                points.remove(0);
+            }
         }
 
         public void start3d(){
