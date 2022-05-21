@@ -38,12 +38,13 @@ public class PhysicsEngine {
      * @return ArrayList containing ball positions throughout the shot
      */
     public ArrayList<Vector2> simulateShot(Vector2 initialSpeed, Ball ball, Terrain terrain) {
-        Ball tempBall = ball.copy();
+        BallState tempState = ball.state.copy();
         ArrayList<Vector2> coordinates = new ArrayList<Vector2>();
-        tempBall.state.velocity = initialSpeed.copy();
+        tempState.velocity = initialSpeed.copy();
         // Add the initial position
-        coordinates.add(tempBall.state.position.copy());
+        coordinates.add(tempState.position.copy());
 
+/*<<<<<<< HEAD
         while (tempBall.state.velocity.length() != 0) {
             // Clamp the velocity to the ball max speed
             if (tempBall.state.velocity.length() > Ball.maxSpeed) {
@@ -72,12 +73,53 @@ public class PhysicsEngine {
             // Check if in water, and if so, stop
             if (tempBall.getZCoordinate(terrain) < 0) {
                 tempBall.state.velocity = Vector2.zeroVector();
+=======*/
+        while (tempState.velocity.length() != 0) {
+            clampVelocity(tempState);
+            BallState previousState = tempState.copy();
+            tempState = odeSolver.calculateNewBallState(tempState, terrain, this);
+
+            boolean shouldSetVelocityToZero = stoppingCondition.shouldStop(tempState, previousState,
+                    odeSolver.getStepSize());
+            if (shouldSetVelocityToZero) {
+                handleStaticFriction(tempState, terrain);
             }
+            tempState = collisionSystem.modifyStateDueToCollisions(tempState, previousState, ball.radius,
+                    terrain);
+            handleBallInWater(tempState, terrain);
             // Store the new position
-            coordinates.add(tempBall.state.position.copy());
+            coordinates.add(tempState.position.copy());
         }
 
         return coordinates;
+    }
+
+    private void clampVelocity(BallState state) {
+        if (state.velocity.length() > Ball.maxSpeed) {
+            state.velocity.normalize().scale(Ball.maxSpeed);
+        }
+    }
+
+    private void handleStaticFriction(BallState tempState, Terrain terrain) {
+        Vector2 slope = calculateSlope(tempState.position, terrain);
+
+        if (terrain.getStaticFriction(tempState.position) < slope.length()) {
+            //If the static friction is smaller than the slope then set the velocity to the
+            //slope
+            tempState.velocity = slope.copy().reversed();
+        } else {
+            // Otherwise, make the velocity 0
+            tempState.velocity = Vector2.zeroVector();
+        }
+    }
+
+    /**
+     * Set tempState's velocity to zero if ball is in water
+     */
+    private void handleBallInWater(BallState tempState, Terrain terrain) {
+        if (tempState.getZCoordinate(terrain) < 0) {
+            tempState.velocity = Vector2.zeroVector();
+        }
     }
 
     private Vector2 calculateSlope(Vector2 position, Terrain terrain) {

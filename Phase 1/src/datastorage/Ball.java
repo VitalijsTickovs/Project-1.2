@@ -22,13 +22,12 @@ public class Ball {
         ballStopped = false;
     }
 
+    /**
+     * Use state.getZCoordinate instead
+     */
+    @Deprecated
     public double getZCoordinate(Terrain terrain) {
         return terrain.getTerrainFunction().valueAt(state.position.x, state.position.y);
-    }
-    public double getZCoordinate(Terrain terrain, boolean r) {
-        double value = terrain.getTerrainFunction().valueAt(state.position.x, state.position.y);
-        System.out.println(" position " + state.position + " value " + value);
-        return value;
     }
 
     public Ball copy() {

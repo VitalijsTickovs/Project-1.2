@@ -8,7 +8,7 @@ ODEsolver = RK4;
 stoppingCondition = smallV;
 
 //Collision systems "bounce", "stop"
-collisionSystem = stop;
+collisionSystem = bounce;
 
 // To create terrain "terrainX0", "terrainY0", "terrainX1", "terrainY1", 
 // "greenKineticFriction", "greenStaticFriction", "terrainFunction";
@@ -34,9 +34,17 @@ targetY = 1;
 //Make this a range Eg. variableX = -2<5;
 
 //To create tree "treeX", "treeY", "treeRadius", "treeBounciness";
-treeX = 10;
-treeY = 15
-treeRadius = 1;
-treeBounciness = 0.5;
+//treeX = -5;
+//treeY = 15
+//treeRadius = 2;
+//treeBounciness = 1;
+
+//treeX = -10;
+//treeY = 10
+//treeRadius = 2;
+//treeBounciness = 0.9;
 
 //To create box "boxX", "boxY", "boxBounciness";
+//boxX = -15<2;
+//boxY = -5<-1;
+//boxBounciness = 0.95;

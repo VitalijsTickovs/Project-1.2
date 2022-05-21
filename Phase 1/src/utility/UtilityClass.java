@@ -2,11 +2,12 @@ package utility;
 
 import utility.math.Line2D;
 import utility.math.Vector2;
+import java.awt.*;
 
 public class UtilityClass {
 
-    private UtilityClass(){
-        //Cannot instantiate this class - it's just static
+    private UtilityClass() {
+        // Cannot instantiate this class - it's just static
     }
 
     /**
@@ -15,15 +16,16 @@ public class UtilityClass {
      * @param p2 second point of the first line
      * @param p3 first point of the second line
      * @param p4 second point of the second line
-     * @return a position the cross point of these two lines, if it is a part of one of the episodes.
-     * If it not, returns null
+     * @return a position the cross point of these two lines, if it is a part of one
+     *         of the episodes.
+     *         If it not, returns null
      */
-    public static Vector2 findEpisodeIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4){
+    public static Vector2 findEpisodeIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4) {
         Vector2 crossPoint = findLineIntersection(p1, p2, p3, p4);
         if (crossPoint == null) {
             return null;
         }
-        if (isPointInEpisode(crossPoint, p1, p2) && isPointInEpisode(crossPoint, p3, p4)){
+        if (isPointInEpisode(crossPoint, p1, p2) && isPointInEpisode(crossPoint, p3, p4)) {
             return crossPoint;
         }
         return null;
@@ -36,10 +38,10 @@ public class UtilityClass {
      * @param secondPos
      * @return true, if the position is a part of an episode
      */
-    public static boolean isPointInEpisode(Vector2 point, Vector2 firstPos, Vector2 secondPos){
+    public static boolean isPointInEpisode(Vector2 point, Vector2 firstPos, Vector2 secondPos) {
         double distanceA = point.distanceTo(firstPos);
         double distanceB = point.distanceTo(secondPos);
-        float distanceC =(float) firstPos.distanceTo(secondPos);
+        float distanceC = (float) firstPos.distanceTo(secondPos);
 
         float sum = (float) (distanceA + distanceB);
         if (sum == distanceC)
@@ -102,10 +104,11 @@ public class UtilityClass {
     /**
      *
      * @param closestTo the point that the distance is measured to
-     * @param points a list of points
-     * @return the closest point or null if all given points are null or closestTo is null
+     * @param points    a list of points
+     * @return the closest point or null if all given points are null or closestTo
+     *         is null
      */
-    public static Vector2 getClosestPoint(Vector2 closestTo, Vector2[] points){
+    public static Vector2 getClosestPoint(Vector2 closestTo, Vector2[] points) {
         if (closestTo == null || points == null || points.length == 0) {
             return null;
         }
@@ -124,7 +127,7 @@ public class UtilityClass {
         return closestPoint;
     }
 
-    public static Vector2 getFirstNotNullPoint(Vector2[] points){
+    public static Vector2 getFirstNotNullPoint(Vector2[] points) {
         if (points == null) {
             return null;
         }
@@ -136,16 +139,26 @@ public class UtilityClass {
         return null;
     }
 
-    public static double clamp(double value, double minLimit, double topLimit){
+    public static double clamp(double value, double minLimit, double topLimit) {
         if (value > topLimit) {
             return topLimit;
         }
-        if(value < minLimit){
+        if (value < minLimit) {
             return minLimit;
         }
         return value;
     }
-    public static double getMaxValue(double[] values){
+    public static Vector2 clamp(Vector2 vector, double minLength, double maxLength) {
+        if (vector.length() > maxLength) {
+            return vector.normalized().scale(maxLength);
+        }
+        if (vector.length() < minLength) {
+            return vector.normalized().scale(minLength);
+        }
+        return vector;
+    }
+
+    public static double getMaxValue(double[] values) {
         double max = Double.NEGATIVE_INFINITY;
         for (double value : values) {
             if (value > max) {
@@ -154,13 +167,38 @@ public class UtilityClass {
         }
         return max;
     }
-    public static double getMinValue(double[] values){
-        double min = Double.MAX_VALUE;
+
+    public static double getMinValue(double[] values) {
+        double min = Double.POSITIVE_INFINITY;
         for (double value : values) {
             if (value < min) {
                 min = value;
             }
         }
         return min;
+    }
+
+    /**
+     * @param startingValue
+     * @param targetValue
+     * @param percentage    a value from 0 to 1. If outside of specified range, it
+     *                      will be clamped
+     * @return
+     */
+    public static double lerp(double startingValue, double targetValue, double percentage) {
+        percentage = clamp(percentage, -1, 1);
+
+        return (targetValue - startingValue) * percentage + startingValue;
+    }
+
+    public static int lerp(int startingValue, int targetValue, double percentage) {
+        return (int) lerp((double) startingValue, (double) targetValue, percentage);
+    }
+
+    public static Color lerp(Color firstColor, Color secondColor, double percentage) {
+        int redValue = UtilityClass.lerp(firstColor.getRed(), secondColor.getRed(), percentage);
+        int greenValue = UtilityClass.lerp(firstColor.getGreen(), secondColor.getGreen(), percentage);
+        int blueValue = UtilityClass.lerp(firstColor.getBlue(), secondColor.getBlue(), percentage);
+        return new Color(redValue, greenValue, blueValue);
     }
 }

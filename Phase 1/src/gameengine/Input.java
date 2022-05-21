@@ -2,11 +2,11 @@ package gameengine;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class Input implements KeyListener {
-    public static final int
-            A = KeyEvent.VK_A,
+public class Input implements KeyListener{
+    public static final int A = KeyEvent.VK_A,
             B = KeyEvent.VK_B,
             C = KeyEvent.VK_C,
             D = KeyEvent.VK_D,
@@ -44,8 +44,9 @@ public class Input implements KeyListener {
             NINE = KeyEvent.VK_9,
             SPACE = KeyEvent.VK_SPACE,
             SHIFT = KeyEvent.VK_SHIFT,
-            ENTER = KeyEvent.VK_ENTER;
-
+            ENTER = KeyEvent.VK_ENTER,
+            LEFT_MOUSE = MouseEvent.BUTTON1,
+            RIGHT_MOUSE = MouseEvent.BUTTON2;
 
     private ArrayList<Integer> keysPressed = new ArrayList<Integer>();
     private ArrayList<Integer> keysDown = new ArrayList<Integer>();
@@ -76,8 +77,21 @@ public class Input implements KeyListener {
         }
     }
 
+    
+
+    public void mouseReleased(MouseEvent e) {
+        int key = e.getID();
+        if (keysDown.contains(key)) {
+            keysDown.remove((Integer) key);
+        }
+        if (keysPressed.contains(key)) {
+            keysPressed.remove((Integer) key);
+        }
+    }
+
     /**
      * Checks if a key was pressed
+     * 
      * @param key The ID of the key to check
      * @return true if the key was pressed and false otherwise
      */
@@ -87,11 +101,22 @@ public class Input implements KeyListener {
 
     /**
      * Checks if a key is being held down
+     * 
      * @param key The ID of the key to check
      * @return true if the key is being held down and false otherwise
      */
     public boolean isDown(int key) {
         return keysDown.contains(key);
+    }
+
+    /**
+     * Checks if a key was clicked
+     * 
+     * @param key The ID of the key to check
+     * @return true if the key was clicked and false otherwise
+     */
+    public boolean wasClicked(int key) {
+        return keysWerePressed.contains(key);
     }
 
     /**
@@ -107,7 +132,8 @@ public class Input implements KeyListener {
         keysWerePressed = new ArrayList<Integer>();
     }
 
-    // Unused
-    public void keyTyped(KeyEvent e) {}
+    // region Unused
+    public void keyTyped(KeyEvent e) {
+    }
+    // endregion
 }
-

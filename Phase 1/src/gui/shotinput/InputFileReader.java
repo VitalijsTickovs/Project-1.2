@@ -1,4 +1,4 @@
-package physics;
+package gui.shotinput;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -7,7 +7,6 @@ import java.util.Queue;
 import java.util.Scanner;
 
 import gameengine.Game;
-import gui.BallVelocityInput;
 import utility.math.Vector2;
 
 public class InputFileReader extends BallVelocityInput {
