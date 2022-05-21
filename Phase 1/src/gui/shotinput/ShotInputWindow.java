@@ -1,6 +1,8 @@
-package gui;
+package gui.shotinput;
 
 import gameengine.Game;
+import gui.InputPanel;
+import gui.InterfaceFactory;
 import utility.math.Vector2;
 
 import javax.swing.*;

@@ -12,7 +12,7 @@ public class BounceCollisionSystem implements ICollisionSystem {
     public IObstacle[] obstacles;
 
     public BallState modifyStateDueToCollisions(BallState state, BallState previousState, double ballRadius, Terrain terrain) {
-        Vector2 previousPosition = previousState.velocity;
+        Vector2 previousPosition = previousState.position;
         obstacles = terrain.obstacles;
         double searchRadius = state.position.distanceTo(previousPosition) + ballRadius;
         ArrayList<IObstacle> collidesWith = getTouchedObstacles(previousPosition, searchRadius);
@@ -20,6 +20,7 @@ public class BounceCollisionSystem implements ICollisionSystem {
                 ballRadius);
         if (collisionData != null) {
             collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition, ballRadius);
+            System.out.println("Previous position: " + collisionData.previousPosition + " collision position: " + collisionData.collisionPosition);
             bounceBall(state, collisionData);
         }
 
@@ -160,7 +161,7 @@ public class BounceCollisionSystem implements ICollisionSystem {
     }
     
     @Override
-    public String getCollisionSystemName() {
+    public String getName() {
         // TODO Auto-generated method stub
         return "bounce";
     }

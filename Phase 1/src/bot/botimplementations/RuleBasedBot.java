@@ -150,7 +150,7 @@ public class RuleBasedBot implements IBot{
                 speed = new Vector2(Math.cos(angle*speed.x) - Math.sin(angle*speed.y), Math.sin(angle*speed.x) + Math.cos(angle*speed.y));
                 System.out.println("*** ROTATION: Rotated the vector by " + angle + " degrees ***");
             }
-            if (ball.getZCoordinate(terrain) < 0){     // checking for water
+            if (ball.state.getZCoordinate(terrain) < 0){     // checking for water
                 // rotate speed vector s.t. the new vector shoots around the water
             }
         }

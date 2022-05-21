@@ -40,7 +40,6 @@ public class EulerSolver implements IODESolver {
 
     @Override
     public String getSolverName() {
-        // TODO Auto-generated method stub
         return "Euler";
     }
 

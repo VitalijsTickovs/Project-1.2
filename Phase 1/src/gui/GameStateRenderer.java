@@ -3,6 +3,7 @@ package gui;
 import datastorage.*;
 import datastorage.obstacles.*;
 import gameengine.Camera;
+import gameengine.Game;
 import utility.UtilityClass;
 import utility.math.*;
 
@@ -17,7 +18,8 @@ public class GameStateRenderer {
      */
     private final GameState gameState;
     private final Terrain terrain;
-    public final int PIXELS_PER_GAME_UNIT = 40;
+    public static final int PIXELS_PER_GAME_UNIT = 40;
+    public static final double MAX_ARROW_LENGTH = 5;
     /**
      * Contains the green with all obstacles, zones and the target added. Displays
      * the entire map.
@@ -49,16 +51,21 @@ public class GameStateRenderer {
     }
 
     private void drawObstacles(Graphics2D g2) {
-        Color obstacleColor = new Color(96, 69, 38);
+        Color treeColor = new Color(28, 140, 3);
+        Color treeOutlineColor = new Color(16, 87, 3);
+        Color boxColor = new Color(125, 111, 79);
+        Color boxOutlineColor = new Color(79, 70, 51);
 
         for (IObstacle o : terrain.obstacles) {
             // Trees
             if (o instanceof ObstacleTree) {
                 ObstacleTree t = (ObstacleTree) o;
-                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, obstacleColor, true);
+                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, treeColor, true);
+                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, treeOutlineColor, false);
             } else if (o instanceof ObstacleBox) {
                 ObstacleBox b = (ObstacleBox) o;
-                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, obstacleColor, true);
+                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, boxColor, true);
+                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, boxOutlineColor, false);
             }
         }
     }
@@ -236,18 +243,25 @@ public class GameStateRenderer {
     // endregion
     // endregion
 
-    public BufferedImage getSubimage(Camera camera) {
+    public BufferedImage getSubimage(Camera camera, boolean drawArrow) {
         BufferedImage image = getEmptyTerrainImage(camera);
         fillImageWithBrown(image, camera);
         Graphics2D g2 = (Graphics2D) image.getGraphics();
 
         // Render a part of the image
-        BufferedImage subImage = cropImage(STATIC_TERRAIN_IMAGE, calculateVisibleTerrainArea(camera));
+        BufferedImage subImage = cropImage(STATIC_TERRAIN_IMAGE, calculateVisibleTerrainArea(camera,
+                STATIC_TERRAIN_IMAGE));
         g2.drawImage(subImage, null, 0, 0);
         subImage.flush();
 
+        // Render moving objects
+        if (drawArrow) {
+            Vector2 ballPosition = getBallPositionOnScreen();
+            renderArrow(g2, camera, ballPosition, ballPosition.translated(getMousePositionOnScreen()));
+        }
         renderBallAndFlag(g2, camera);
         drawText(g2);
+        g2.dispose();
 
         return image;
     }
@@ -273,19 +287,33 @@ public class GameStateRenderer {
     }
 
     private void drawText(Graphics2D g2) {
-        g2.setFont(new Font("TimesRoman", Font.BOLD, PIXELS_PER_GAME_UNIT / 2));
+        setupFont(g2);
+        drawBallPosition(g2);
+        drawMousePosition(g2);
+    }
+
+    private void setupFont(Graphics2D g2) {
+        final int FONT_SIZE = 20;
+        g2.setFont(new Font("TimesRoman", Font.BOLD, FONT_SIZE));
         g2.setColor(Color.WHITE);
+    }
+
+    private void drawBallPosition(Graphics2D g2) {
         BigDecimal xx = new BigDecimal(gameState.getBall().state.position.x);
         xx = xx.setScale(5, RoundingMode.HALF_UP);
         BigDecimal yy = new BigDecimal(gameState.getBall().state.position.y);
         yy = yy.setScale(5, RoundingMode.HALF_UP);
         g2.drawString("x = " + xx, PIXELS_PER_GAME_UNIT, PIXELS_PER_GAME_UNIT);
         g2.drawString("y = " + yy, PIXELS_PER_GAME_UNIT, 2 * PIXELS_PER_GAME_UNIT);
-        // Dispose of the graphics
-        g2.dispose();
     }
 
-    private Canvas calculateVisibleTerrainArea(Camera camera) {
+    private void drawMousePosition(Graphics2D g2) {
+        Vector2 mousePosition = Game.getMiddleMousePosition().translated(gameState.getBall().state.position);
+        g2.drawString("x = " + mousePosition.x, PIXELS_PER_GAME_UNIT, 3 * PIXELS_PER_GAME_UNIT);
+        g2.drawString("y = " + mousePosition.y, PIXELS_PER_GAME_UNIT, 4 * PIXELS_PER_GAME_UNIT);
+    }
+
+    private Canvas calculateVisibleTerrainArea(Camera camera, BufferedImage image) {
         // Render the terrain
         double camTLx = camera.xPos - camera.WIDTH / 2;
         double camTLy = camera.yPos - camera.HEIGHT / 2;
@@ -330,11 +358,13 @@ public class GameStateRenderer {
             }
         }
 
-        Canvas visibleTerrainArea = new Canvas();
+        Canvas visibleTerrainArea = new Canvas(image);
         visibleTerrainArea.topLeftX = xTL;
         visibleTerrainArea.topLeftY = yTL;
         visibleTerrainArea.width = xBR - xTL;
         visibleTerrainArea.height = yBR - yTL;
+
+        // visibleTerrainArea.clampCanvas();
 
         return visibleTerrainArea;
     }
@@ -365,7 +395,7 @@ public class GameStateRenderer {
 
     private void renderBall(Graphics2D g2, Camera camera) {
         Ball ball = gameState.getBall();
-        double z = ball.getZCoordinate(terrain);
+        double z = ball.state.getZCoordinate(terrain);
         int x = (int) ((ball.state.position.x - camera.xPos + camera.WIDTH / 2 - ball.radius) * PIXELS_PER_GAME_UNIT);
         int y = (int) ((ball.state.position.y - z - camera.yPos + camera.HEIGHT / 2 - ball.radius)
                 * PIXELS_PER_GAME_UNIT);
@@ -375,6 +405,157 @@ public class GameStateRenderer {
                 360);
     }
 
+    // region Render Arrow
+    private Vector2 getBallPositionOnScreen() {
+        double ballZOffset = gameState.getBall().state.getZCoordinate(gameState.getTerrain());
+        Vector2 ballPosition = gameState.getBall().state.position.translated(0, -ballZOffset);
+        return ballPosition;
+    }
+
+    private Vector2 getMousePositionOnScreen() {
+        Vector2 mousePositionOnScreen = Game.getMiddleMousePosition();
+        if (mousePositionOnScreen.length() > MAX_ARROW_LENGTH) {
+            mousePositionOnScreen.normalize().scale(MAX_ARROW_LENGTH);
+        }
+        return mousePositionOnScreen;
+    }
+
+    /**
+     * Documentation
+     * https://drive.google.com/file/d/16GReA5Fd6xL5yreBKhzWaXLGMchfEYjl/view?usp=sharing
+     * 
+     * @param g2
+     * @param camera
+     * @param startingPos the position given in game units where the arrow starts
+     * @param targetPos   the position given in game units where the arrow ends
+     */
+    private void renderArrow(Graphics2D g2, Camera camera, Vector2 startingPos, Vector2 targetPos) {
+        // The maximum length of the arrow in game units. This is the maximum distance
+        // to the mouse cursor that will affect the arrow
+        double arrowLength = startingPos.distanceTo(targetPos);
+        double arrowBaseWidth = arrowLength * 0.05d; // In game units
+        double triangleSideSize = arrowLength * 0.35d; // In game units
+
+        Polygon arrowBase = getArrowBase(camera, startingPos.copy(), targetPos.copy(), arrowBaseWidth,
+                triangleSideSize);
+        Polygon arrowTriangle = getArrowTriangle(camera, startingPos.copy(), targetPos.copy(), triangleSideSize);
+        // Draw the colored shape
+        g2.setColor(getArrowColor(startingPos, targetPos, MAX_ARROW_LENGTH));
+        g2.fillPolygon(arrowBase);
+        g2.fillPolygon(arrowTriangle);
+        // Make a black outline
+        g2.setColor(Color.BLACK);
+        g2.drawPolygon(arrowBase);
+        g2.drawPolygon(arrowTriangle);
+    }
+
+    private Polygon getArrowBase(Camera camera, Vector2 startPos, Vector2 targetPos, double arrowBaseWidth,
+            double triangleSideSize) {
+        translatePositionsByCamera(camera, startPos);
+        translatePositionsByCamera(camera, targetPos);
+
+        Line2D arrowLine = new Line2D(startPos, targetPos);
+        Line2D startingPosLine = arrowLine.getPerpendicularLineAtPoint(startPos);
+        Vector2 arrowBaseEndPos = calculateArrowBaseEndPosition(startPos, targetPos, triangleSideSize);
+        Line2D targetPosLine = arrowLine.getPerpendicularLineAtPoint(arrowBaseEndPos);
+
+        Vector2 startingPosLineDirection = startingPosLine.getDirectionVector().normalize().scale(arrowBaseWidth);
+        Vector2 targetPosLineDirection = targetPosLine.getDirectionVector().normalize().scale(arrowBaseWidth);
+
+        // Make the direction line always point to the right from the arrow line
+        if (startPos.y > targetPos.y) {
+            startingPosLineDirection.reverse();
+            targetPosLineDirection.reverse();
+        }
+
+        ArrowBase arrowBase = new ArrowBase();
+        arrowBase.startRightPosition = gameUnitToPixels(startPos.translated(startingPosLineDirection));
+        arrowBase.startLeftPosition = gameUnitToPixels(startPos.translated(startingPosLineDirection.reversed()));
+        arrowBase.targetRightPosition = gameUnitToPixels(arrowBaseEndPos.translated(targetPosLineDirection));
+        arrowBase.targetLeftPosition = gameUnitToPixels(arrowBaseEndPos.translated(targetPosLineDirection.reversed()));
+        return new Polygon(arrowBase.getXPoints(), arrowBase.getYPoints(), 4);
+    }
+
+    private Polygon getArrowTriangle(Camera camera, Vector2 startPos, Vector2 targetPos, double triangleSideSize) {
+        translatePositionsByCamera(camera, startPos);
+        translatePositionsByCamera(camera, targetPos);
+
+        Line2D arrowLine = new Line2D(startPos, targetPos);
+        Line2D startPosLine = arrowLine.getPerpendicularLineAtPoint(startPos);
+        Vector2 arrowBaseEndPos = calculateArrowBaseEndPosition(startPos, targetPos, triangleSideSize);
+
+        Vector2 startPosLineDirection = startPosLine.getDirectionVector().normalize().scale(triangleSideSize / 2);
+
+        // Make the direction line always point to the right from the arrow line
+        if (startPos.y >= targetPos.y) {
+            startPosLineDirection.reverse();
+        }
+
+        ArrowTriangle arrowTriangle = new ArrowTriangle();
+        arrowTriangle.rightPosition = gameUnitToPixels(arrowBaseEndPos.translated(startPosLineDirection));
+        arrowTriangle.leftPosition = gameUnitToPixels(arrowBaseEndPos.translated(startPosLineDirection.reversed()));
+        arrowTriangle.topPosition = gameUnitToPixels(targetPos);
+        return new Polygon(arrowTriangle.getXPoints(), arrowTriangle.getYPoints(), 3);
+    }
+
+    private void translatePositionsByCamera(Camera camera, Vector2 position) {
+        double xOffset = -camera.xPos + camera.WIDTH / 2;
+        double yOffset = -camera.yPos + camera.HEIGHT / 2;
+        position.translate(xOffset, yOffset);
+    }
+
+    private Color getArrowColor(Vector2 startingPos, Vector2 targetPos, double MAX_LENGTH) {
+        double arrowLength = startingPos.distanceTo(targetPos);
+        Color yellowColor = new Color(247, 238, 52);
+        Color redColor = new Color(255, 17, 0);
+
+        double maxLengthPercentage = arrowLength / MAX_LENGTH;
+        return UtilityClass.lerp(yellowColor, redColor, maxLengthPercentage);
+    }
+
+    private Vector2 calculateArrowBaseEndPosition(Vector2 startPos, Vector2 targetPos, double triangleSideSize) {
+        Vector2 deltaPosition = startPos.deltaPositionTo(targetPos);
+        Vector2 triangleHeightVector = deltaPosition.modifyLength(-getTriangleHeight(triangleSideSize));
+        return startPos.translated(triangleHeightVector);
+    }
+
+    private double getTriangleHeight(double triangleSideSize) {
+        return triangleSideSize / 2 * Math.sqrt(3);
+    }
+
+    private class ArrowBase {
+        // The vectors are translated from game units into pixels
+        public int[] startRightPosition;
+        public int[] startLeftPosition;
+        public int[] targetRightPosition;
+        public int[] targetLeftPosition;
+
+        public int[] getXPoints() {
+
+            return new int[] { targetLeftPosition[0], targetRightPosition[0], startRightPosition[0],
+                    startLeftPosition[0] };
+        }
+
+        public int[] getYPoints() {
+            return new int[] { targetLeftPosition[1], targetRightPosition[1], startRightPosition[1],
+                    startLeftPosition[1] };
+        }
+    }
+
+    private class ArrowTriangle {
+        public int[] leftPosition;
+        public int[] rightPosition;
+        public int[] topPosition;
+
+        public int[] getXPoints() {
+            return new int[] { leftPosition[0], rightPosition[0], topPosition[0] };
+        }
+
+        public int[] getYPoints() {
+            return new int[] { leftPosition[1], rightPosition[1], topPosition[1] };
+        }
+    }
+    // endregion
     // endregion
 
     // region Draw shapes
@@ -484,6 +665,18 @@ public class GameStateRenderer {
         return terrain.maxVal - terrain.minVal;
 
     }
+
+    /**
+     * @param gameUnitPosition
+     * @return array with [xPos, yPos]
+     */
+    private int[] gameUnitToPixels(Vector2 gameUnitPosition) {
+        // Vector2 translatedVector =
+        // terrain.topLeftCorner.deltaPositionTo(gameUnitPosition).scale(PIXELS_PER_GAME_UNIT);
+        Vector2 translatedVector = gameUnitPosition.scaled(PIXELS_PER_GAME_UNIT);
+        int[] pixelsVector = new int[] { (int) translatedVector.x, (int) translatedVector.y };
+        return pixelsVector;
+    }
     // endregion
 
     // region Helper classes
@@ -512,10 +705,33 @@ public class GameStateRenderer {
     }
 
     public class Canvas {
+
+        public Canvas(BufferedImage image) {
+            this.image = image;
+        }
+
+        BufferedImage image;
+
         public int topLeftX;
         public int topLeftY;
         public int width;
         public int height;
+
+        public void clampCanvas() {
+            if (topLeftX < width) {
+                topLeftX = width;
+            }
+            if (topLeftX > image.getWidth() - width) {
+                topLeftX = image.getWidth() - width;
+            }
+            if (topLeftY < height) {
+                topLeftY = height;
+            }
+            if (topLeftY > image.getHeight() - height) {
+                topLeftY = image.getHeight() - height;
+            }
+        }
     }
     // endregion
+
 }

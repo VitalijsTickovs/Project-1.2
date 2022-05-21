@@ -10,9 +10,11 @@ import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import com.jme3.texture.plugins.AWTLoader;
 import com.jme3.ui.Picture;
-import gui.BallVelocityInput;
+
 import gui.GameStateRenderer;
 import gui.MenuGUI;
+import gui.shotinput.BallVelocityInput;
+
 import gui.ShotInputWindow;
 import org.lwjgl.Sys;
 import physics.*;
@@ -234,6 +236,8 @@ import java.util.Queue;
                 camera.xPos = ball.state.position.x;
                 camera.yPos = ball.state.position.y;
 
+                minimapImg = minimapGenerator.getSubimage(camera, false);
+                img = loader.load(minimapImg, false);
                 minimapImg = minimapGenerator.getSubimage(camera);
                 img = loader.load(minimapImg, true);
                 texture2D.setImage(img);
@@ -332,7 +336,11 @@ import java.util.Queue;
             // 0.5, 100, 10);
             // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
             // null);
-            bot = bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,null);
+            bot = new HillClimbingBot(
+                    new FinalEuclidianDistanceHeuristic(),
+                    0.01,
+                    16,
+                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10));
             resetBotThread();
         }
 

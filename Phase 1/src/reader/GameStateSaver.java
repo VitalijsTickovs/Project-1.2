@@ -60,7 +60,7 @@ public class GameStateSaver {
       printWriter.println("solverStep = " + physicsEngine.odeSolver.getStepSize() + delimiter);
       printWriter.println("solver = " + physicsEngine.odeSolver.getSolverName() + delimiter);
       printWriter.println("stoppingCondition = " + physicsEngine.stoppingCondition.getConditionName() + delimiter);
-      printWriter.println("collisionSystem = " + physicsEngine.collisionSystem.getCollisionSystemName() + delimiter);
+      printWriter.println("collisionSystem = " + physicsEngine.collisionSystem.getName() + delimiter);
       printWriter.println("");
    }
 

@@ -11,32 +11,38 @@ import datastorage.GameState;
 import utility.math.Vector2;
 import gui.GameStateRenderer;
 import gui.InterfaceFactory;
-import gui.ShotInputWindow;
+import gui.shotinput.BallVelocityInput;
+import gui.shotinput.IClickListener;
+import gui.shotinput.MouseInputReader;
 import bot.botimplementations.IBot;
-import bot.botimplementations.BotFactory;
-import gui.BallVelocityInput;
 
-public class Game extends JPanel implements Runnable, GameObject {
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import bot.botimplementations.BotFactory;
+
+public class Game extends JPanel implements Runnable, GameObject, MouseListener {
+    public int numShots;
+    public boolean drawArrow = false;
+
     public JFrame frame;
     public GameState gameState;
-    public int numShots;
+    public Camera camera;
+    public static Game game;
 
     private final int FPS;
     private boolean running;
-    private Thread thread;
+    private Thread gameThread;
     private Vector2 shotForce;
-    private Camera camera;
-    private BallVelocityInput ballVelocityInput;
     private IBot bot = null;
     private Thread botThread;
-    private Input input;
-    private static Game game;
+    public Input input;
+    private BallVelocityInput ballVelocityInput;
+    private GameStateRenderer gameStateRenderer;
+    private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
 
-    public static Game getInstance() {
-        if (game == null) {
-            game = new Game(60);
-        }
-        return game;
+    public static void main(String[] args) {
+        Game g = new Game(256);
+        g.start();
     }
 
     // region Startup
@@ -49,10 +55,7 @@ public class Game extends JPanel implements Runnable, GameObject {
         // setupInitialBot();
         FPS = fps;
         createGameState();
-        resetStartingVariables();
-        //setManualInputType();
-        setupInitialBot();
-        // createTerrain();
+        setManualInputType();
         createCamera();
         createRenderer();
         createFrame();
@@ -69,6 +72,7 @@ public class Game extends JPanel implements Runnable, GameObject {
         setFocusable(true);
         requestFocus();
         addKeyListener(input);
+        addMouseListener(this);
     }
 
     private void resetBotThread() {
@@ -87,14 +91,16 @@ public class Game extends JPanel implements Runnable, GameObject {
         BotFactory.setTerrain(gameState.getTerrain());
     }
 
+    private void setManualInputType() {
+        // ballVelocityInput = new ShotInputWindow(this);
+        ballVelocityInput = new MouseInputReader(this);
+    }
+
     private void resetStartingVariables() {
         numShots = 0;
         running = false;
         shotForce = null;
-    }
-
-    private void setManualInputType() {
-        ballVelocityInput = new ShotInputWindow(this);
+        ballPositions = new ArrayList<Vector2>();
     }
 
     private void createCamera() {
@@ -108,8 +114,8 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private void createFrame() {
-        Vector2 frameSize = new Vector2((int) (camera.WIDTH * gameStateRenderer.PIXELS_PER_GAME_UNIT),
-                (int) (camera.HEIGHT * gameStateRenderer.PIXELS_PER_GAME_UNIT));
+        Vector2 frameSize = new Vector2((int) (camera.WIDTH * GameStateRenderer.PIXELS_PER_GAME_UNIT),
+                (int) (camera.HEIGHT * GameStateRenderer.PIXELS_PER_GAME_UNIT));
         frame = InterfaceFactory.createFrame("Crazy Putting", frameSize, false, null, null);
         frame.add(this);
         frame.setVisible(true);
@@ -153,12 +159,6 @@ public class Game extends JPanel implements Runnable, GameObject {
     // endregion
 
     // region Update
-    private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
-
-    public void setBot(IBot bot) {
-        this.bot = bot;
-    }
-
     /**
      * Checks if a key was pressed.
      * 
@@ -193,7 +193,8 @@ public class Game extends JPanel implements Runnable, GameObject {
 
     private void handleBallInWater() {
         if (isSimulationFinished()) {
-            boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(gameState.getBall().state.position.x,
+            boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(
+                    gameState.getBall().state.position.x,
                     gameState.getBall().state.position.y) < 0;
             if (isBallInWater) {
                 resetGame();
@@ -203,7 +204,6 @@ public class Game extends JPanel implements Runnable, GameObject {
 
     private void resetGame() {
         gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
-        numShots = 0;
         if (bot != null && botThread.isAlive()) {
             // End the bot thread if it is still running
             try {
@@ -212,8 +212,7 @@ public class Game extends JPanel implements Runnable, GameObject {
                 e.printStackTrace();
             }
         }
-        shotForce = null;
-        ballPositions = new ArrayList<Vector2>();
+        resetStartingVariables();
     }
 
     private void handleInput() {
@@ -238,8 +237,7 @@ public class Game extends JPanel implements Runnable, GameObject {
      */
     private boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
-        boolean noBot = bot == null || !botThread.isAlive();
-        boolean notWaitingForBot = (bot != null && !botThread.isAlive()) || (bot == null);
+        boolean notWaitingForBot = (bot == null || botThread == null) || (bot != null && !botThread.isAlive());
         boolean ballHasBeenPushed = shotForce == null;
         return ballHasBeenPushed && notWaitingForBot && ballStopped;
     }
@@ -249,6 +247,7 @@ public class Game extends JPanel implements Runnable, GameObject {
             ballPositions = gameState.simulateShot(shotForce);
             numShots++;
             shotForce = null;
+            drawArrow = false;
         }
     }
 
@@ -269,7 +268,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     private void moveCamera() {
         Ball ball = gameState.getBall();
         camera.xPos += (ball.state.position.x - camera.xPos) / 10;
-        double zOffset = ball.getZCoordinate(gameState.getTerrain());
+        double zOffset = ball.state.getZCoordinate(gameState.getTerrain());
         camera.yPos += (ball.state.position.y - zOffset - camera.yPos) / 10;
     }
 
@@ -301,13 +300,8 @@ public class Game extends JPanel implements Runnable, GameObject {
     // endregion
 
     // region Render
-    private GameStateRenderer gameStateRenderer;
-
-    /**
-     * Renders the game
-     */
     public void render() {
-        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera);
+        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera, drawArrow);
         drawImage(gameStateImage);
         gameStateImage.flush();
     }
@@ -319,22 +313,105 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
     // endregion
 
-    public void setShotForce(Vector2 newShotVector) {
+    public synchronized void setShotForce(Vector2 newShotVector) {
         shotForce = newShotVector;
     }
 
     /**
      * Starts the game.
-     * WARNING: Uses a sepparate thread
+     * WARNING: Uses a separate thread
      */
     public void start() {
         running = true;
-        thread = new Thread(this, "Game loop thread");
-        thread.start();
+        gameThread = new Thread(this, "Game loop thread");
+        gameThread.start();
     }
 
-    public static void main(String[] args) {
-        Game g = new Game(256);
-        g.start();
+    public void setBot(IBot bot) {
+        this.bot = bot;
     }
+
+    // region Static accessor methods
+    /**
+     * @return mouse position in the window as a vector in pixels where point(0,0)
+     *         is in the top left corner of the screen
+     */
+    public static Vector2 getMousePositionInPixels() {
+        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+        Point windowPosition = game.getLocationOnScreen();
+        Vector2 mousePositionInWindow = new Vector2(mousePoint.getX() - windowPosition.getX(),
+                mousePoint.getY() - windowPosition.getY());
+        return mousePositionInWindow;
+    }
+
+    /**
+     * @return the position of the mouse in the window in game units where
+     *         point(0,0) is in the middle of the screen
+     */
+    public static Vector2 getMiddleMousePosition() {
+        // Here: mPos = mousePosition
+        Vector2 mPosInWindow = Game.getMousePositionInPixels(); // In pixels
+        Vector2 mPosInGameUnits = mPosInWindow.scale(1d / GameStateRenderer.PIXELS_PER_GAME_UNIT); // In game units from
+                                                                                                   // now on
+
+        double halfCameraWidth = Game.game.camera.WIDTH / 2;
+        double halfCameraHeight = Game.game.camera.HEIGHT / 2;
+        Vector2 mPosFromCenterOfScreen = mPosInGameUnits
+                .translate(new Vector2(halfCameraWidth, halfCameraHeight).reversed());
+
+        double ballZOffset = game.gameState.getBall().state.getZCoordinate(game.gameState.getTerrain());
+        Vector2 deltaPosFromBall = mPosFromCenterOfScreen.translated(Game.getMiddleOfWindowPosition()).translate(0,
+                ballZOffset);
+        Vector2 ballPosition = game.gameState.getBall().state.position;
+        Vector2 deltaPosition = ballPosition.deltaPositionTo(deltaPosFromBall);
+
+        return deltaPosition;
+    }
+
+    /**
+     * @return the position of the middle of the window as if it was placed on the
+     *         map in game units.
+     */
+    public static Vector2 getMiddleOfWindowPosition() {
+        Camera cam = game.camera;
+        Vector2 middlePosition = new Vector2(cam.xPos, cam.yPos);
+        return middlePosition;
+    }
+    // endregion
+
+    // region Mouse listening
+    public ArrayList<IClickListener> clickListeners = new ArrayList<>();
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        int key = e.getButton();
+        if (key == MouseEvent.BUTTON1) {
+            for (IClickListener listener : clickListeners) {
+                listener.mouseWasClicked();
+            }
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+    // endregion
 }

@@ -1,4 +1,4 @@
-package gui;
+package gui.shotinput;
 
 import gameengine.Game;
 
