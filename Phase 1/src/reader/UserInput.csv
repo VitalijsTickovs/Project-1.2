@@ -8,7 +8,7 @@ ODEsolver = RK4;
 stoppingCondition = smallV;
 
 //Collision systems "bounce", "stop"
-collisionSystem = bounce;
+collisionSystem = stop;
 
 // To create terrain "terrainX0", "terrainY0", "terrainX1", "terrainY1", 
 // "greenKineticFriction", "greenStaticFriction", "terrainFunction";
@@ -18,11 +18,7 @@ terrainX1 = 50;
 terrainY1 = 50;
 greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
-<<<<<<< HEAD
 terrainFunction = 0.4*(0.9-e**(-(x*x + y*y)/8));
-=======
-terrainFunction = sin(x+y)/5 + 1;
->>>>>>> a12afce0fa07b6d72716170c12bf5017fbb911fc
 
 //To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
 ballStartPointX = -3;

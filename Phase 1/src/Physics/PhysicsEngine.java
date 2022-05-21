@@ -53,9 +53,7 @@ public class PhysicsEngine {
             BallState prevState = tempBall.state.copy();
             // Perform a single step using the ODE solver
             tempBall.state = odeSolver.calculateNewBallState(tempBall.state, terrain, this);
-            // Perform collisions
-            tempBall.state = collisionSystem.modifyStateDueToCollisions(tempBall.state, prevState, ball.radius,
-                    terrain);
+
             // Check if velocity should be 0
             if (stoppingCondition.shouldStop(tempBall.state, prevState, odeSolver.getStepSize())) {
                 Vector2 slope = calculateSlope(tempBall.state.position, terrain);
@@ -68,6 +66,9 @@ public class PhysicsEngine {
                     tempBall.state.velocity = Vector2.zeroVector();
                 }
             }
+            // Perform collisions
+            tempBall.state = collisionSystem.modifyStateDueToCollisions(tempBall.state, prevState, ball.radius,
+                    terrain);
             // Check if in water, and if so, stop
             if (tempBall.getZCoordinate(terrain) < 0) {
                 tempBall.state.velocity = Vector2.zeroVector();

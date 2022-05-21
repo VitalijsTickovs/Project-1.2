@@ -9,7 +9,9 @@ public class BotFactory {
         RANDOM,
         HILL_CLIMBING,
         GRADIENT_DESCENT,
-        PARTICLE_SWARM
+        PARTICLE_SWARM,
+        SIMULATED_ANNEALING,
+        HUMAN
     }
 
     static Terrain terrain;
@@ -30,8 +32,15 @@ public class BotFactory {
                     getBot(BotImplementations.PARTICLE_SWARM));
         }
         if (implementation == BotImplementations.GRADIENT_DESCENT) {
-            return new GradientDescentBot(new FinalEuclidianDistanceHeuristic(), 0.01,
+            return new GradientDescentBot(new ClosestEuclidianDistanceHeuristic(), 0.01,
                     getBot(BotImplementations.PARTICLE_SWARM));
+        }
+        if (implementation == BotImplementations.SIMULATED_ANNEALING) {
+            return new SimulatedAnnealingBot(new FinalEuclidianDistanceHeuristic(), 0.1, 1000,
+                    null);
+        }
+        if (implementation == BotImplementations.HUMAN) {
+            return null;
         }
         return new RandomBot(new FinalEuclidianDistanceHeuristic(), 1000);
     }

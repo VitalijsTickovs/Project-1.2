@@ -63,7 +63,7 @@ public class Game extends JPanel implements Runnable, GameObject {
     }
 
     private void setupInitialBot() {
-        setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
+        setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
         resetBotThread();
     }
 

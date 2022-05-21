@@ -15,6 +15,8 @@ public class ParticleSwarmBot implements IBot {
     private final Random random;
     private final int numParticles, numGenerations;
 
+    public int numSimulations = 0; // Used for testing
+
     public ParticleSwarmBot(Heuristic heuristic, double w, double c1, double c2, int numParticles, int numGenerations) {
         this.heuristic = heuristic;
         this.w = w;
@@ -27,6 +29,7 @@ public class ParticleSwarmBot implements IBot {
 
     @Override
     public Vector2 findBestShot(GameState gameState) {
+        numSimulations = 0;
         gameState = gameState.copy();
         Vector2 bestShot = null;
         double bestHeuristic = 0;
@@ -80,6 +83,7 @@ public class ParticleSwarmBot implements IBot {
 
         void updateBestPosition() {
             ArrayList<Vector2> ballPositions = gameState.simulateShot(position);
+            numSimulations++;
             double heuristicVal = heuristic.getShotValue(ballPositions, gameState);
             if (bestPosition == null || heuristic.firstBetterThanSecond(heuristicVal, bestHeuristicValue)) {
                 bestPosition = position.copy();

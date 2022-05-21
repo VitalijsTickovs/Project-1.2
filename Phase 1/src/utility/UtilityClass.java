@@ -146,7 +146,7 @@ public class UtilityClass {
         return value;
     }
     public static double getMaxValue(double[] values){
-        double max = Double.MIN_VALUE;
+        double max = Double.NEGATIVE_INFINITY;
         for (double value : values) {
             if (value > max) {
                 max = value;

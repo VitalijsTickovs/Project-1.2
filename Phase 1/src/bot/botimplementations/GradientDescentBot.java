@@ -18,6 +18,52 @@ public class GradientDescentBot implements IBot {
         this.initialShotTaker = initialShotTaker;
     }
 
+    public Vector2 getGradient(GameState gameState, Vector2 shot, double stepSize) {
+        // Calculate the x partial derivative
+        double dx = 0;
+        for (int i=-2; i<=2; i++) {
+            if (i != 0) {
+                double h = i * stepSize;
+                Vector2 xShot = new Vector2(
+                        shot.x + h,
+                        shot.y
+                );
+                ArrayList<Vector2> positions = gameState.simulateShot(xShot);
+                double heuristicVal = heuristic.getShotValue(positions, gameState);
+                switch (i) {
+                    case -2 -> dx += heuristicVal;
+                    case 2 -> dx -= heuristicVal;
+                    case -1 -> dx -= 8 * heuristicVal;
+                    case 1 -> dx += 8 * heuristicVal;
+                }
+            }
+        }
+        dx /= 12*stepSize;
+
+        // Calculate the y partial derivative
+        double dy = 0;
+        for (int i=-2; i<=2; i++) {
+            if (i != 0) {
+                double h = i * stepSize;
+                Vector2 yShot = new Vector2(
+                        shot.x,
+                        shot.y + h
+                );
+                ArrayList<Vector2> positions = gameState.simulateShot(yShot);
+                double heuristicVal = heuristic.getShotValue(positions, gameState);
+                switch (i) {
+                    case -2 -> dy += heuristicVal;
+                    case 2 -> dy -= heuristicVal;
+                    case -1 -> dy -= 8 * heuristicVal;
+                    case 1 -> dy += 8 * heuristicVal;
+                }
+            }
+        }
+        dy /= 12*stepSize;
+
+        return new Vector2(dx, dy);
+    }
+
     @Override
     public Vector2 findBestShot(GameState gameState) {
         gameState = gameState.copy();
@@ -30,23 +76,15 @@ public class GradientDescentBot implements IBot {
             currentShot = initialShotTaker.findBestShot(gameState);
         }
         double currentHeuristic = heuristic.getShotValue(gameState.simulateShot(currentShot), gameState);
-        final double derivativeStep = learningRate/10;
+        final double derivativeStep = 0.0001;
         Vector2 gradient;
         int numIterations = 0;
         do {
+            // Calculate whether to do descent or ascent
             Vector2 xStepShot = new Vector2(currentShot.x + derivativeStep, currentShot.y);
             ArrayList<Vector2> xShotPositions = gameState.simulateShot(xStepShot);
             double xHeuristic = heuristic.getShotValue(xShotPositions, gameState);
-            Vector2 yStepShot = new Vector2(currentShot.x, currentShot.y + derivativeStep);
-            ArrayList<Vector2> yShotPositions = gameState.simulateShot(yStepShot);
-            double yHeuristic = heuristic.getShotValue(yShotPositions, gameState);
-            // Calculate the gradient
-            gradient = new Vector2(
-                    (xHeuristic - currentHeuristic) / derivativeStep,
-                    (yHeuristic - currentHeuristic) / derivativeStep
-            );
-            // Move in the direction of the gradient (either down or up depending on the heuristic
-            // Check whether to move up or down
+            gradient = getGradient(gameState, currentShot, derivativeStep);
             int sign;
             if (heuristic.firstBetterThanSecond(xHeuristic, currentHeuristic)) {
                 if (xHeuristic > currentHeuristic) {
@@ -62,12 +100,14 @@ public class GradientDescentBot implements IBot {
                 }
             }
             currentShot.translate(gradient.scaled(sign*learningRate));
+            // Clamp the velocity
+            if (currentShot.length() > Ball.maxSpeed) {
+                currentShot.normalize().scale(Ball.maxSpeed);
+            }
             currentHeuristic = heuristic.getShotValue(gameState.simulateShot(currentShot), gameState);
             numIterations++;
-        } while (numIterations < 1000);
+        } while (numIterations < 100);
 
         return currentShot;
-
-        //3.3417236174836797, 1.300176219807547
     }
 }
