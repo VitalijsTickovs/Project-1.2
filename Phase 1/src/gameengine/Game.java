@@ -301,7 +301,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
     // region Render
     public void render() {
-        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera, drawArrow);
+        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera, drawArrow, true);
         drawImage(gameStateImage);
         gameStateImage.flush();
     }

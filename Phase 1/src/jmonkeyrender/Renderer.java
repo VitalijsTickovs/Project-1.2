@@ -253,7 +253,7 @@ import java.util.Queue;
                 camera.xPos = this.x;
                 camera.yPos = this.y;
 
-                minimapImg = minimapGenerator.getSubimage(camera, false);
+                minimapImg = minimapGenerator.getSubimage(camera, false, false);
                 img = loader.load(minimapImg, false);
                 texture2D.setImage(img);
                 pic.setTexture(assetManager, texture2D, true);

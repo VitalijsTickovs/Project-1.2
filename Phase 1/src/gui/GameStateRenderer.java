@@ -25,6 +25,7 @@ public class GameStateRenderer {
      * the entire map.
      */
     private final BufferedImage STATIC_TERRAIN_IMAGE;
+    private boolean displayMouseCoordinates = false;
 
     public GameStateRenderer(GameState gameState) {
         this.gameState = gameState;
@@ -243,7 +244,7 @@ public class GameStateRenderer {
     // endregion
     // endregion
 
-    public BufferedImage getSubimage(Camera camera, boolean drawArrow) {
+    public BufferedImage getSubimage(Camera camera, boolean drawArrow, boolean drawText) {
         BufferedImage image = getEmptyTerrainImage(camera);
         fillImageWithBrown(image, camera);
         Graphics2D g2 = (Graphics2D) image.getGraphics();
@@ -260,7 +261,9 @@ public class GameStateRenderer {
             renderArrow(g2, camera, ballPosition, ballPosition.translated(getMousePositionOnScreen()));
         }
         renderBallAndFlag(g2, camera);
-        drawText(g2);
+        if (drawText) {
+            drawText(g2);
+        }
         g2.dispose();
 
         return image;
@@ -288,8 +291,11 @@ public class GameStateRenderer {
 
     private void drawText(Graphics2D g2) {
         setupFont(g2);
+        drawNumberOfShots(g2);
         drawBallPosition(g2);
-        drawMousePosition(g2);
+        if (displayMouseCoordinates) {
+            drawMousePosition(g2);
+        }
     }
 
     private void setupFont(Graphics2D g2) {
@@ -298,19 +304,28 @@ public class GameStateRenderer {
         g2.setColor(Color.WHITE);
     }
 
+    private void drawNumberOfShots(Graphics2D g2) {
+        g2.drawString("Shots: " + Game.game.numShots, PIXELS_PER_GAME_UNIT, PIXELS_PER_GAME_UNIT);
+    }
+
     private void drawBallPosition(Graphics2D g2) {
         BigDecimal xx = new BigDecimal(gameState.getBall().state.position.x);
         xx = xx.setScale(5, RoundingMode.HALF_UP);
         BigDecimal yy = new BigDecimal(gameState.getBall().state.position.y);
         yy = yy.setScale(5, RoundingMode.HALF_UP);
-        g2.drawString("x = " + xx, PIXELS_PER_GAME_UNIT, PIXELS_PER_GAME_UNIT);
-        g2.drawString("y = " + yy, PIXELS_PER_GAME_UNIT, 2 * PIXELS_PER_GAME_UNIT);
+        g2.drawString("x = " + xx, PIXELS_PER_GAME_UNIT, 2 * PIXELS_PER_GAME_UNIT);
+        g2.drawString("y = " + yy, PIXELS_PER_GAME_UNIT, 3 * PIXELS_PER_GAME_UNIT);
     }
 
     private void drawMousePosition(Graphics2D g2) {
         Vector2 mousePosition = Game.getMiddleMousePosition().translated(gameState.getBall().state.position);
-        g2.drawString("x = " + mousePosition.x, PIXELS_PER_GAME_UNIT, 3 * PIXELS_PER_GAME_UNIT);
-        g2.drawString("y = " + mousePosition.y, PIXELS_PER_GAME_UNIT, 4 * PIXELS_PER_GAME_UNIT);
+        BigDecimal xx = new BigDecimal(mousePosition.x);
+        xx = xx.setScale(5, RoundingMode.HALF_UP);
+        BigDecimal yy = new BigDecimal(mousePosition.y);
+        yy = yy.setScale(5, RoundingMode.HALF_UP);
+
+        g2.drawString("x = " + xx, PIXELS_PER_GAME_UNIT, 4 * PIXELS_PER_GAME_UNIT);
+        g2.drawString("y = " + yy, PIXELS_PER_GAME_UNIT, 5 * PIXELS_PER_GAME_UNIT);
     }
 
     private Canvas calculateVisibleTerrainArea(Camera camera, BufferedImage image) {
