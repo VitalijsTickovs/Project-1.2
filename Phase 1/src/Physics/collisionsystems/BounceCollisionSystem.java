@@ -12,7 +12,7 @@ public class BounceCollisionSystem implements ICollisionSystem {
     public IObstacle[] obstacles;
 
     public BallState modifyStateDueToCollisions(BallState state, BallState previousState, double ballRadius, Terrain terrain) {
-        Vector2 previousPosition = previousState.velocity;
+        Vector2 previousPosition = previousState.position;
         obstacles = terrain.obstacles;
         double searchRadius = state.position.distanceTo(previousPosition) + ballRadius;
         ArrayList<IObstacle> collidesWith = getTouchedObstacles(previousPosition, searchRadius);

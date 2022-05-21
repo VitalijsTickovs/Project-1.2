@@ -43,7 +43,7 @@ public class ObstacleTree extends Circle implements IObstacle {
         collisionData.bounciness = bounciness;
         collisionData.collisionNormal = getNormal(closestCollisionPoint);
 
-        collisionData.ballRadius = ballRadius;
+        collisionData.ballRadius = 0;
         collisionData.previousPosition = previousPosition;
 
         return collisionData;
