@@ -3,6 +3,7 @@ package gui;
 import datastorage.*;
 import datastorage.obstacles.*;
 import gameengine.Camera;
+import gameengine.Game;
 import utility.UtilityClass;
 import utility.math.*;
 
@@ -17,7 +18,8 @@ public class GameStateRenderer {
      */
     private final GameState gameState;
     private final Terrain terrain;
-    public final int PIXELS_PER_GAME_UNIT = 40;
+    public static final int PIXELS_PER_GAME_UNIT = 40;
+    public static final double MAX_ARROW_LENGTH = 5;
     /**
      * Contains the green with all obstacles, zones and the target added. Displays
      * the entire map.
@@ -236,19 +238,22 @@ public class GameStateRenderer {
     // endregion
     // endregion
 
-    public BufferedImage getSubimage(Camera camera) {
+    public BufferedImage getSubimage(Camera camera, boolean drawArrow) {
         BufferedImage image = getEmptyTerrainImage(camera);
         fillImageWithBrown(image, camera);
         Graphics2D g2 = (Graphics2D) image.getGraphics();
 
         // Render a part of the image
-        BufferedImage subImage = cropImage(STATIC_TERRAIN_IMAGE, calculateVisibleTerrainArea(camera));
+        BufferedImage subImage = cropImage(STATIC_TERRAIN_IMAGE, calculateVisibleTerrainArea(camera,
+                STATIC_TERRAIN_IMAGE));
         g2.drawImage(subImage, null, 0, 0);
         subImage.flush();
 
-        renderArrow(g2, camera, new Vector2(-1, 0), new Vector2(0, 1));
-        renderArrow(g2, camera, new Vector2(-2, 1), new Vector2(-3, 3));
-        renderArrow(g2, camera, new Vector2(-3, 2), new Vector2(-4, 0));
+        // Render moving objects
+        if (drawArrow) {
+            Vector2 ballPosition = getBallPositionOnScreen();
+            renderArrow(g2, camera, ballPosition, ballPosition.translated(getMousePositionOnScreen()));
+        }
         renderBallAndFlag(g2, camera);
         drawText(g2);
 
@@ -288,7 +293,7 @@ public class GameStateRenderer {
         g2.dispose();
     }
 
-    private Canvas calculateVisibleTerrainArea(Camera camera) {
+    private Canvas calculateVisibleTerrainArea(Camera camera, BufferedImage image) {
         // Render the terrain
         double camTLx = camera.xPos - camera.WIDTH / 2;
         double camTLy = camera.yPos - camera.HEIGHT / 2;
@@ -333,11 +338,13 @@ public class GameStateRenderer {
             }
         }
 
-        Canvas visibleTerrainArea = new Canvas();
+        Canvas visibleTerrainArea = new Canvas(image);
         visibleTerrainArea.topLeftX = xTL;
         visibleTerrainArea.topLeftY = yTL;
         visibleTerrainArea.width = xBR - xTL;
         visibleTerrainArea.height = yBR - yTL;
+
+        // visibleTerrainArea.clampCanvas();
 
         return visibleTerrainArea;
     }
@@ -379,9 +386,24 @@ public class GameStateRenderer {
     }
 
     // region Render Arrow
+    private Vector2 getBallPositionOnScreen() {
+        double ballZOffset = gameState.getBall().getZCoordinate(gameState.getTerrain());
+        Vector2 ballPosition = gameState.getBall().state.position.translated(0, -ballZOffset);
+        return ballPosition;
+    }
+
+    private Vector2 getMousePositionOnScreen() {
+        Vector2 mousePositionOnScreen = Game.getMiddleMousePosition();
+        if (mousePositionOnScreen.length() > MAX_ARROW_LENGTH) {
+            mousePositionOnScreen.normalize().scale(MAX_ARROW_LENGTH);
+        }
+        return mousePositionOnScreen;
+    }
+
     /**
      * Documentation
      * https://drive.google.com/file/d/16GReA5Fd6xL5yreBKhzWaXLGMchfEYjl/view?usp=sharing
+     * 
      * @param g2
      * @param camera
      * @param startingPos the position given in game units where the arrow starts
@@ -390,7 +412,6 @@ public class GameStateRenderer {
     private void renderArrow(Graphics2D g2, Camera camera, Vector2 startingPos, Vector2 targetPos) {
         // The maximum length of the arrow in game units. This is the maximum distance
         // to the mouse cursor that will affect the arrow
-        double MAX_LENGTH = 5;
         double arrowLength = startingPos.distanceTo(targetPos);
         double arrowBaseWidth = arrowLength * 0.05d; // In game units
         double triangleSideSize = arrowLength * 0.35d; // In game units
@@ -399,7 +420,7 @@ public class GameStateRenderer {
                 triangleSideSize);
         Polygon arrowTriangle = getArrowTriangle(camera, startingPos.copy(), targetPos.copy(), triangleSideSize);
         // Draw the colored shape
-        g2.setColor(getArrowColor(startingPos, targetPos, MAX_LENGTH));
+        g2.setColor(getArrowColor(startingPos, targetPos, MAX_ARROW_LENGTH));
         g2.fillPolygon(arrowBase);
         g2.fillPolygon(arrowTriangle);
         // Make a black outline
@@ -465,11 +486,11 @@ public class GameStateRenderer {
 
     private Color getArrowColor(Vector2 startingPos, Vector2 targetPos, double MAX_LENGTH) {
         double arrowLength = startingPos.distanceTo(targetPos);
-        Color greenColor = new Color(71, 214, 0);
-        Color redColor = new Color(255, 87, 41);
+        Color yellowColor = new Color(247, 238, 52);
+        Color redColor = new Color(255, 17, 0);
 
         double maxLengthPercentage = arrowLength / MAX_LENGTH;
-        return UtilityClass.lerp(greenColor, redColor, maxLengthPercentage);
+        return UtilityClass.lerp(yellowColor, redColor, maxLengthPercentage);
     }
 
     private Vector2 calculateArrowBaseEndPosition(Vector2 startPos, Vector2 targetPos, double triangleSideSize) {
@@ -491,11 +512,13 @@ public class GameStateRenderer {
 
         public int[] getXPoints() {
 
-            return new int[] { targetLeftPosition[0], targetRightPosition[0], startRightPosition[0],startLeftPosition[0] };
+            return new int[] { targetLeftPosition[0], targetRightPosition[0], startRightPosition[0],
+                    startLeftPosition[0] };
         }
 
         public int[] getYPoints() {
-            return new int[] { targetLeftPosition[1], targetRightPosition[1], startRightPosition[1],startLeftPosition[1] };
+            return new int[] { targetLeftPosition[1], targetRightPosition[1], startRightPosition[1],
+                    startLeftPosition[1] };
         }
     }
 
@@ -628,7 +651,8 @@ public class GameStateRenderer {
      * @return array with [xPos, yPos]
      */
     private int[] gameUnitToPixels(Vector2 gameUnitPosition) {
-        // Vector2 translatedVector = terrain.topLeftCorner.deltaPositionTo(gameUnitPosition).scale(PIXELS_PER_GAME_UNIT);
+        // Vector2 translatedVector =
+        // terrain.topLeftCorner.deltaPositionTo(gameUnitPosition).scale(PIXELS_PER_GAME_UNIT);
         Vector2 translatedVector = gameUnitPosition.scaled(PIXELS_PER_GAME_UNIT);
         int[] pixelsVector = new int[] { (int) translatedVector.x, (int) translatedVector.y };
         return pixelsVector;
@@ -661,10 +685,32 @@ public class GameStateRenderer {
     }
 
     public class Canvas {
+
+        public Canvas(BufferedImage image) {
+            this.image = image;
+        }
+
+        BufferedImage image;
+
         public int topLeftX;
         public int topLeftY;
         public int width;
         public int height;
+
+        public void clampCanvas() {
+            if (topLeftX < width) {
+                topLeftX = width;
+            }
+            if (topLeftX > image.getWidth() - width) {
+                topLeftX = image.getWidth() - width;
+            }
+            if (topLeftY < height) {
+                topLeftY = height;
+            }
+            if (topLeftY > image.getHeight() - height) {
+                topLeftY = image.getHeight() - height;
+            }
+        }
     }
     // endregion
 

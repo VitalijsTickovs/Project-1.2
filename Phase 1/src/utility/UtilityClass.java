@@ -148,6 +148,15 @@ public class UtilityClass {
         }
         return value;
     }
+    public static Vector2 clamp(Vector2 vector, double minLength, double maxLength) {
+        if (vector.length() > maxLength) {
+            return vector.normalized().scale(maxLength);
+        }
+        if (vector.length() < minLength) {
+            return vector.normalized().scale(minLength);
+        }
+        return vector;
+    }
 
     public static double getMaxValue(double[] values) {
         double max = Double.NEGATIVE_INFINITY;
