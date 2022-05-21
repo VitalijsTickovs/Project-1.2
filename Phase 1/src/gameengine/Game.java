@@ -50,7 +50,8 @@ public class Game extends JPanel implements Runnable, GameObject {
         FPS = fps;
         createGameState();
         resetStartingVariables();
-        setManualInputType();
+        //setManualInputType();
+        setupInitialBot();
         // createTerrain();
         createCamera();
         createRenderer();
