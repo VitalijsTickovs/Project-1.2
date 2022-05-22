@@ -366,7 +366,7 @@ import java.util.ArrayList;
             initPhysics();
             //setting sky background to Sky.jpg
             String path = "Sky/Skysphere.jpeg";
-            if(GameStateLoader.OS.contains("Windows")) path = "Sky\\CubeSky.png";
+            if(GameStateLoader.OS.contains("Windows")) path = "Sky\\Skyphere.jpeg";
             InitSky(path);
             InitWater();
             InitText();
