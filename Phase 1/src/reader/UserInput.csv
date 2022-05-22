@@ -10,12 +10,10 @@ stoppingCondition = smallV;
 //Collision systems "bounce", "stop"
 collisionSystem = bounce;
 
-// To create terrain "terrainX0", "terrainY0", "terrainX1", "terrainY1", 
+// To create terrain "terrainBottomLeft", "terrainTopRight",
 // "greenKineticFriction", "greenStaticFriction", "terrainFunction";
-terrainX0 = -50;
-terrainY0 = -50;
-terrainX1 = 50;
-terrainY1 = 50;
+terrainTopLeft = -50,-50;
+terrainBottomRight = 50,50;
 greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
 terrainFunction = 0.4*(0.9-e**(-(x*x + y*y)/8));
@@ -30,21 +28,38 @@ targetRadius = 0.15;
 targetX = 4;
 targetY = 1;
 
-//To create sand zone "sandZoneX", "sandZoneY", "sandKineticFriction", "sandStaticFriction";
+//To create sand zone "sandZoneBottomLeft", "sandZoneTopRight", "sandKineticFriction", "sandStaticFriction";
 //Make this a range Eg. variableX = -2<5;
 
 //To create tree "treeX", "treeY", "treeRadius", "treeBounciness";
-//treeX = -5;
-//treeY = 15
+//treeX = -7.5;
+//treeY = 10;
 //treeRadius = 2;
-//treeBounciness = 1;
+//treeBounciness = 0.5;
 
 //treeX = -10;
-//treeY = 10
+//treeY = -10;
 //treeRadius = 2;
-//treeBounciness = 0.9;
+//treeBounciness = 0.85;
 
-//To create box "boxX", "boxY", "boxBounciness";
-//boxX = -15<2;
-//boxY = -5<-1;
-//boxBounciness = 0.95;
+//treeX = -35;
+//treeY = -3;
+//treeRadius = 2;
+//treeBounciness = 0.85;
+
+//To create box "boxBottomLeft", "boxTopRight", "boxBounciness";
+//boxBottomLeft = -10,5;
+//boxTopRight = -5,-5;
+//boxBounciness = 0.9;
+
+//boxBottomLeft = -25,-2;
+//boxTopRight = -13,-8;
+//boxBounciness = 0.8;
+
+//boxBottomLeft = -20,8;
+//boxTopRight = -13,3;
+//boxBounciness = 0.75;
+
+//boxBottomLeft = -35,12;
+//boxTopRight = -24,6;
+//boxBounciness = 0.75;

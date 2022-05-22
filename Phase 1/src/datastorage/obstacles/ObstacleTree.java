@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import utility.CollisionData;
 import utility.math.Circle;
-import utility.math.Line2D;
+import utility.math.InfLine2D;
 import utility.math.Vector2;
 
 public class ObstacleTree extends Circle implements IObstacle {
@@ -56,7 +56,7 @@ public class ObstacleTree extends Circle implements IObstacle {
      * or null if there is no collision
      */
     public Vector2[] getCollisionPoints(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
-        Line2D movementLine = new Line2D(currentPosition, previousPosition);
+        InfLine2D movementLine = new InfLine2D(currentPosition, previousPosition);
         ArrayList<Vector2> collisionsWithLine = movementLine.getCrossPointsWithCircle(originPosition, radius + ballRadius);
 
         if (collisionsWithLine.size() == 0) {

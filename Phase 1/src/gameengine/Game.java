@@ -104,7 +104,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
     }
 
     private void createCamera() {
-        camera = new Camera(15, 15);
+        camera = new Camera(25, 20);
         camera.xPos = gameState.getBall().state.position.x;
         camera.yPos = gameState.getBall().state.position.y;
     }

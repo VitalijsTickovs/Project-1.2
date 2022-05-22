@@ -1,6 +1,6 @@
 package utility;
 
-import utility.math.Line2D;
+import utility.math.InfLine2D;
 import utility.math.Vector2;
 import java.awt.*;
 
@@ -52,7 +52,7 @@ public class UtilityClass {
     /**
      * @return the cross point of these two lines
      */
-    public static Vector2 findLineIntersection(Line2D firstLine, Line2D secondLine) {
+    public static Vector2 findLineIntersection(InfLine2D firstLine, InfLine2D secondLine) {
         if (firstLine == null || secondLine == null) {
             return null;
         }
@@ -200,5 +200,21 @@ public class UtilityClass {
         int greenValue = UtilityClass.lerp(firstColor.getGreen(), secondColor.getGreen(), percentage);
         int blueValue = UtilityClass.lerp(firstColor.getBlue(), secondColor.getBlue(), percentage);
         return new Color(redValue, greenValue, blueValue);
+    }
+
+    /**
+     * If the corners are not actually representing the bottomLeft and topRight positions, switch the coordinates to make them so
+     */
+    public static void ensureCornersAreRight(Vector2 bottomLeft, Vector2 topRight){
+        if (bottomLeft.x > topRight.x) {
+            double x = bottomLeft.x;
+            bottomLeft.x = topRight.x;
+            topRight.x = x;
+        }
+        if (bottomLeft.y < topRight.y) {
+            double y = bottomLeft.y;
+            bottomLeft.y = topRight.y;
+            topRight.y = y;
+        }
     }
 }

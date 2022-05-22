@@ -16,7 +16,7 @@ public class Rectangle extends Shape {
     @Override
     public boolean isPositionInside(Vector2 objectPosition) {
         boolean isXInside = objectPosition.x > bottomLeftCorner.x && objectPosition.x < topRightCorner.x;
-        boolean isYInside = objectPosition.y > bottomLeftCorner.y && objectPosition.y < topRightCorner.y;
+        boolean isYInside = objectPosition.y < bottomLeftCorner.y && objectPosition.y > topRightCorner.y;
         if (isXInside && isYInside) {
             return true;
         }
@@ -26,7 +26,7 @@ public class Rectangle extends Shape {
     @Override
     protected boolean isCircleInside(Vector2 objectPosition, double ballRadius) {
         boolean isXInside = objectPosition.x + ballRadius > bottomLeftCorner.x && objectPosition.x - ballRadius < topRightCorner.x;
-        boolean isYInside = objectPosition.y + ballRadius > bottomLeftCorner.y && objectPosition.y - ballRadius < topRightCorner.y;
+        boolean isYInside = objectPosition.y - ballRadius < bottomLeftCorner.y && objectPosition.y + ballRadius > topRightCorner.y;
         if (isXInside && isYInside) {
             return true;
         }
