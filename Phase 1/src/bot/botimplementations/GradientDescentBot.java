@@ -21,45 +21,68 @@ public class GradientDescentBot implements IBot {
     public Vector2 getGradient(GameState gameState, Vector2 shot, double stepSize) {
         // Calculate the x partial derivative
         double dx = 0;
-        for (int i=-2; i<=2; i++) {
+        for (int i = -2; i <= 2; i++) {
             if (i != 0) {
                 double h = i * stepSize;
                 Vector2 xShot = new Vector2(
                         shot.x + h,
-                        shot.y
-                );
+                        shot.y);
                 ArrayList<Vector2> positions = gameState.simulateShot(xShot);
                 double heuristicVal = heuristic.getShotValue(positions, gameState);
                 switch (i) {
-                    case -2 -> dx += heuristicVal;
-                    case 2 -> dx -= heuristicVal;
-                    case -1 -> dx -= 8 * heuristicVal;
-                    case 1 -> dx += 8 * heuristicVal;
+                    case -2: {
+                        dx += heuristicVal;
+                        break;
+                    }
+
+                    case 2: {
+                        dx -= heuristicVal;
+                        break;
+                    }
+                    case -1: {
+                        dx -= 8 * heuristicVal;
+                        break;
+                    }
+                    case 1: {
+                        dx += 8 * heuristicVal;
+                        break;
+                    }
                 }
             }
         }
-        dx /= 12*stepSize;
+        dx /= 12 * stepSize;
 
         // Calculate the y partial derivative
         double dy = 0;
-        for (int i=-2; i<=2; i++) {
+        for (int i = -2; i <= 2; i++) {
             if (i != 0) {
                 double h = i * stepSize;
                 Vector2 yShot = new Vector2(
                         shot.x,
-                        shot.y + h
-                );
+                        shot.y + h);
                 ArrayList<Vector2> positions = gameState.simulateShot(yShot);
                 double heuristicVal = heuristic.getShotValue(positions, gameState);
                 switch (i) {
-                    case -2 -> dy += heuristicVal;
-                    case 2 -> dy -= heuristicVal;
-                    case -1 -> dy -= 8 * heuristicVal;
-                    case 1 -> dy += 8 * heuristicVal;
+                    case -2: {
+                        dy += heuristicVal;
+                        break;
+                    }
+                    case 2: {
+                        dy -= heuristicVal;
+                        break;
+                    }
+                    case -1: {
+                        dy -= 8 * heuristicVal;
+                        break;
+                    }
+                    case 1: {
+                        dy += 8 * heuristicVal;
+                        break;
+                    }
                 }
             }
         }
-        dy /= 12*stepSize;
+        dy /= 12 * stepSize;
 
         return new Vector2(dx, dy);
     }
@@ -71,7 +94,7 @@ public class GradientDescentBot implements IBot {
         // Take an initial shot
         if (initialShotTaker == null) {
             currentShot = new Vector2(Math.random() * 2 - 1, Math.random() * 2 - 1);
-            currentShot.normalize().scale(Ball.maxSpeed*Math.random());
+            currentShot.normalize().scale(Ball.maxSpeed * Math.random());
         } else {
             currentShot = initialShotTaker.findBestShot(gameState);
         }
@@ -99,7 +122,7 @@ public class GradientDescentBot implements IBot {
                     sign = 1;
                 }
             }
-            currentShot.translate(gradient.scaled(sign*learningRate));
+            currentShot.translate(gradient.scaled(sign * learningRate));
             // Clamp the velocity
             if (currentShot.length() > Ball.maxSpeed) {
                 currentShot.normalize().scale(Ball.maxSpeed);
