@@ -266,12 +266,12 @@ public class GameStateLoader {
       }
       if (lineContainsKeywordAndEqualSign(line, "greenKineticFriction")) {
          double friction = readDouble(line);
-         UtilityClass.clamp(friction, 0.01, 1);
+         friction = UtilityClass.clamp(friction, 0.01, 1);
          greenKineticFriction = friction;
       }
       if (lineContainsKeywordAndEqualSign(line, "greenStaticFriction")) {
          double friction = readDouble(line);
-         UtilityClass.clamp(friction, 0.01, 1);
+         friction = UtilityClass.clamp(friction, 0.01, 1);
          greenStaticFriction = friction;
       }
       if (lineContainsKeywordAndEqualSign(line, "terrainFunction")) {
@@ -310,12 +310,12 @@ public class GameStateLoader {
       }
       if (lineContainsKeywordAndEqualSign(line, "sandKineticFriction")) {
          double friction = readDouble(line);
-         UtilityClass.clamp(friction, 0.01, 1);
+         friction = UtilityClass.clamp(friction, 0.01, 1);
          sandKineticFriction.add(friction);
       }
       if (lineContainsKeywordAndEqualSign(line, "sandStaticFriction")) {
          double friction = readDouble(line);
-         UtilityClass.clamp(friction, 0.01, 1);
+         friction = UtilityClass.clamp(friction, 0.01, 1);
          sandStaticFriction.add(friction);
       }
       // Tree
@@ -330,7 +330,7 @@ public class GameStateLoader {
       }
       if (lineContainsKeywordAndEqualSign(line, "treeBounciness")) {
          double bounciness = readDouble(line);
-         UtilityClass.clamp(bounciness,0.01, 2);
+         bounciness = UtilityClass.clamp(bounciness,0.01, 2);
          treeBounciness.add(bounciness);
       }
       // Box
@@ -346,7 +346,7 @@ public class GameStateLoader {
       }
       if (lineContainsKeywordAndEqualSign(line, "boxBounciness")) {
          double bounciness = readDouble(line);
-         UtilityClass.clamp(bounciness, 0.01, 2);
+         bounciness = UtilityClass.clamp(bounciness, 0.01, 2);
          boxBounciness.add(bounciness);
       }
    }

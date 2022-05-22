@@ -37,14 +37,14 @@ targetY = 1;
 //treeX = -5;
 //treeY = 15
 //treeRadius = 2;
-//treeBounciness = 2;
+//treeBounciness = 0.5;
 
 //treeX = -10;
 //treeY = 10
 //treeRadius = 2;
-//treeBounciness = 2;
+//treeBounciness = 0.85;
 
 //To create box "boxX", "boxY", "boxBounciness";
 //boxX = -15<2;
 //boxY = -5<-1;
-//boxBounciness = 0.01;
+//boxBounciness = 0;
