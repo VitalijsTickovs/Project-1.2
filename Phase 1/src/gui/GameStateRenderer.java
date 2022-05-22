@@ -8,9 +8,11 @@ import utility.UtilityClass;
 import utility.math.*;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.Buffer;
 
 public class GameStateRenderer {
     /**
@@ -244,28 +246,33 @@ public class GameStateRenderer {
     // endregion
     // endregion
 
+    /**
+     * Returns a round picture that is a circle
+     * 
+     * @param camera
+     * @return
+     */
+    public BufferedImage getMinimap(Camera camera) {
+        BufferedImage subimage = getSubimage(camera, false, false);
+
+        int radius = Math.min(subimage.getWidth(), subimage.getHeight());
+        BufferedImage circleBuffer = new BufferedImage(radius, radius, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = circleBuffer.createGraphics();
+        g2.setClip(new Ellipse2D.Float(0, 0, radius, radius));
+        g2.drawImage(subimage, 0, 0, radius, radius, null);
+
+        subimage.flush();
+        return circleBuffer;
+    }
+
     public BufferedImage getSubimage(Camera camera, boolean drawArrow, boolean drawText) {
         BufferedImage image = getEmptyTerrainImage(camera);
         fillImageWithBrown(image, camera);
         Graphics2D g2 = (Graphics2D) image.getGraphics();
 
-        // Render a part of the image
-        BufferedImage subImage = cropImage(STATIC_TERRAIN_IMAGE, calculateVisibleTerrainArea(camera,
-                STATIC_TERRAIN_IMAGE));
-        g2.drawImage(subImage, null, 0, 0);
-        subImage.flush();
+        renderCroppedImage(g2, camera);
 
-        // Render moving objects
-        if (drawArrow) {
-            Vector2 ballPosition = getBallPositionOnScreen();
-            renderArrow(g2, camera, ballPosition, ballPosition.translated(getMousePositionOnScreen()));
-        }
-        renderBallAndFlag(g2, camera);
-        if (drawText) {
-            drawText(g2);
-        }
-        g2.dispose();
-
+        renderChangingElements(g2, camera, drawArrow, drawText);
         return image;
     }
 
@@ -284,9 +291,32 @@ public class GameStateRenderer {
                 (int) (camera.HEIGHT * PIXELS_PER_GAME_UNIT));
     }
 
+    private void renderCroppedImage(Graphics2D g2, Camera camera) {
+        BufferedImage subImage = cropImage(STATIC_TERRAIN_IMAGE, calculateVisibleTerrainArea(camera,
+                STATIC_TERRAIN_IMAGE));
+        g2.drawImage(subImage, null, 0, 0);
+        subImage.flush();
+    }
+
     private BufferedImage cropImage(BufferedImage image, Canvas visibleTerrainArea) {
         return image.getSubimage(visibleTerrainArea.topLeftX,
                 visibleTerrainArea.topLeftY, visibleTerrainArea.width, visibleTerrainArea.height);
+    }
+
+    /**
+     * Renders everything that changes from frame to frame.
+     * Currently: ball, flag, input direction arrow and text
+     */
+    private void renderChangingElements(Graphics2D g2, Camera camera, boolean drawArrow, boolean drawText) {
+        if (drawArrow) {
+            Vector2 ballPosition = getBallPositionOnScreen();
+            renderArrow(g2, camera, ballPosition, ballPosition.translated(getMousePositionOnScreen()));
+        }
+        renderBallAndFlag(g2, camera);
+        if (drawText) {
+            drawText(g2);
+        }
+        g2.dispose();
     }
 
     private void drawText(Graphics2D g2) {
@@ -469,10 +499,10 @@ public class GameStateRenderer {
         translatePositionsByCamera(camera, startPos);
         translatePositionsByCamera(camera, targetPos);
 
-        Line2D arrowLine = new Line2D(startPos, targetPos);
-        Line2D startingPosLine = arrowLine.getPerpendicularLineAtPoint(startPos);
+        InfLine2D arrowLine = new InfLine2D(startPos, targetPos);
+        InfLine2D startingPosLine = arrowLine.getPerpendicularLineAtPoint(startPos);
         Vector2 arrowBaseEndPos = calculateArrowBaseEndPosition(startPos, targetPos, triangleSideSize);
-        Line2D targetPosLine = arrowLine.getPerpendicularLineAtPoint(arrowBaseEndPos);
+        InfLine2D targetPosLine = arrowLine.getPerpendicularLineAtPoint(arrowBaseEndPos);
 
         Vector2 startingPosLineDirection = startingPosLine.getDirectionVector().normalize().scale(arrowBaseWidth);
         Vector2 targetPosLineDirection = targetPosLine.getDirectionVector().normalize().scale(arrowBaseWidth);
@@ -495,8 +525,8 @@ public class GameStateRenderer {
         translatePositionsByCamera(camera, startPos);
         translatePositionsByCamera(camera, targetPos);
 
-        Line2D arrowLine = new Line2D(startPos, targetPos);
-        Line2D startPosLine = arrowLine.getPerpendicularLineAtPoint(startPos);
+        InfLine2D arrowLine = new InfLine2D(startPos, targetPos);
+        InfLine2D startPosLine = arrowLine.getPerpendicularLineAtPoint(startPos);
         Vector2 arrowBaseEndPos = calculateArrowBaseEndPosition(startPos, targetPos, triangleSideSize);
 
         Vector2 startPosLineDirection = startPosLine.getDirectionVector().normalize().scale(triangleSideSize / 2);

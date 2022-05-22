@@ -181,8 +181,8 @@ public class Vector2 {
      * The perpendicular vector will always have a positive x coordinate
      */
     public Vector2 getPerpendicularVector(){
-        Line2D line = new Line2D(this, Vector2.zeroVector());
-        Line2D perpendicularLine = line.getPerpendicularLineAtPoint(Vector2.zeroVector());
+        InfLine2D line = new InfLine2D(this, Vector2.zeroVector());
+        InfLine2D perpendicularLine = line.getPerpendicularLineAtPoint(Vector2.zeroVector());
         return perpendicularLine.secondPosition;
     }
 

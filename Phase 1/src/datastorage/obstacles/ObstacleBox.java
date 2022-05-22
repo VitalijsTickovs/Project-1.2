@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import utility.CollisionData;
 import utility.UtilityClass;
-import utility.math.Line2D;
+import utility.math.InfLine2D;
 import utility.math.Rectangle;
 import utility.math.Vector2;
 
@@ -113,7 +113,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
      */
     private Vector2[] getAllCrossPoints(Vector2 firstPosition, Vector2 secondPosition){
         ArrayList<Vector2> allCrossPoints = new ArrayList<>();
-        Line2D pathLine = new Line2D(firstPosition, secondPosition);
+        InfLine2D pathLine = new InfLine2D(firstPosition, secondPosition);
         double offsetScale = 1 - Math.abs(Math.sin(pathLine.getSlopeAngle()));
 
         addCrossPointsWithWalls(allCrossPoints, firstPosition, secondPosition, offsetScale);
@@ -168,7 +168,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
     }
 
     private ArrayList<Vector2> getCrossPointsInEpisode(Vector2[] episode, Vector2 position){
-        Line2D wallLine = new Line2D(episode[0], episode[1]);
+        InfLine2D wallLine = new InfLine2D(episode[0], episode[1]);
         ArrayList<Vector2> crossPointsWithWall = wallLine.getCrossPointsWithCircle(position, ballRadius);
 
         if (crossPointsWithWall.size() == 0) {
@@ -199,7 +199,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
      * @param secondPosition
      */
     private void addCrossPointsWithWalls(ArrayList<Vector2> allCrossPoints, Vector2 firstPosition, Vector2 secondPosition, double offsetScale){
-        Line2D pathLine = new Line2D(firstPosition, secondPosition);
+        InfLine2D pathLine = new InfLine2D(firstPosition, secondPosition);
         //Now we need the two lines that describe the edges of the ball's path
         Vector2[] firstParallelEpisode = getPathTravelledEpisode(pathLine, firstPosition, secondPosition, true, offsetScale);
         Vector2[] secondParallelEpisode = getPathTravelledEpisode(pathLine, firstPosition, secondPosition, false, offsetScale);
@@ -219,8 +219,8 @@ public class ObstacleBox extends Rectangle implements IObstacle {
         }
     }
 
-    private Vector2[] getPathTravelledEpisode(Line2D pathLine, Vector2 firstPosition, Vector2 secondPosition, boolean reverseTranslation, double offsetScale){
-        Line2D perpendicularToPathAtFirstPosition = pathLine.getPerpendicularLineAtPoint(firstPosition);
+    private Vector2[] getPathTravelledEpisode(InfLine2D pathLine, Vector2 firstPosition, Vector2 secondPosition, boolean reverseTranslation, double offsetScale){
+        InfLine2D perpendicularToPathAtFirstPosition = pathLine.getPerpendicularLineAtPoint(firstPosition);
         Vector2 translationToParallelLine = perpendicularToPathAtFirstPosition.getDirectionVector(ballRadius);
 
         //Set the translation vector's length and direction
@@ -228,7 +228,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
 
         //Offset the lines by a translation vector.
         Vector2 firstEpisodePosition = firstPosition.translated(translationToParallelLine);
-        Line2D parallelLine = pathLine.getLineTranslatedByVector(translationToParallelLine);
+        InfLine2D parallelLine = pathLine.getLineTranslatedByVector(translationToParallelLine);
         //Get the further cross point with circle
         Vector2 circleCrossPoint = getFurtherCrossPoint(pathLine, parallelLine, firstPosition, secondPosition);
 
@@ -246,7 +246,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
         }
     }
 
-    private Vector2 getFurtherCrossPoint(Line2D pathLine, Line2D parallelLine, Vector2 firstPosition, Vector2 secondPosition){
+    private Vector2 getFurtherCrossPoint(InfLine2D pathLine, InfLine2D parallelLine, Vector2 firstPosition, Vector2 secondPosition){
         ArrayList<Vector2> crossPoints = parallelLine.getCrossPointsWithCircle(secondPosition, ballRadius);
         if (crossPoints.size() == 0) {
             return pathLine.getCrossPointWithLine(parallelLine);

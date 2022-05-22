@@ -1,6 +1,6 @@
 package utility;
 
-import utility.math.Line2D;
+import utility.math.InfLine2D;
 import utility.math.Vector2;
 import java.awt.*;
 
@@ -52,7 +52,7 @@ public class UtilityClass {
     /**
      * @return the cross point of these two lines
      */
-    public static Vector2 findLineIntersection(Line2D firstLine, Line2D secondLine) {
+    public static Vector2 findLineIntersection(InfLine2D firstLine, InfLine2D secondLine) {
         if (firstLine == null || secondLine == null) {
             return null;
         }

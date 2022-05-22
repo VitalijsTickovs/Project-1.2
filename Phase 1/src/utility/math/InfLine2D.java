@@ -4,9 +4,12 @@ import java.util.ArrayList;
 
 import utility.UtilityClass;
 
-public class Line2D {
+/**
+ * An object representing an infinitely long line in 2D given as y = ax + b or described by two points
+ */
+public class InfLine2D {
 
-    public Line2D(double slope, Vector2 passByPoint) {
+    public InfLine2D(double slope, Vector2 passByPoint) {
         this.firstPosition = passByPoint;
         this.slope = slope;
 
@@ -20,7 +23,7 @@ public class Line2D {
         yZero = passByPoint.y - slope * passByPoint.x;
     }
 
-    public Line2D(Vector2 firstPosition, Vector2 secondPosition) {
+    public InfLine2D(Vector2 firstPosition, Vector2 secondPosition) {
         this.firstPosition = firstPosition.copy();
         this.secondPosition = secondPosition.copy();
         slope = getSlope();
@@ -46,8 +49,8 @@ public class Line2D {
         return secondPosition.copy();
     }
 
-    public Line2D copy() {
-        return new Line2D(firstPosition, secondPosition);
+    public InfLine2D copy() {
+        return new InfLine2D(firstPosition, secondPosition);
     }
 
     /**
@@ -104,7 +107,7 @@ public class Line2D {
     }
 
     public Vector2 getShortestVectorToPoint(Vector2 point) {
-        Line2D perpendicularLineThroughPoint = getPerpendicularLineAtPoint(point);
+        InfLine2D perpendicularLineThroughPoint = getPerpendicularLineAtPoint(point);
         Vector2 crossPoint = getCrossPointWithLine(perpendicularLineThroughPoint);
 
         return crossPoint.deltaPositionTo(point);
@@ -114,9 +117,9 @@ public class Line2D {
      * @return A new line that is perpendicular to this line and passes through the
      *         given point
      */
-    public Line2D getPerpendicularLineAtPoint(Vector2 point) {
+    public InfLine2D getPerpendicularLineAtPoint(Vector2 point) {
         double invertedCoefficient = -1 / slope;
-        return new Line2D(invertedCoefficient, point.copy());
+        return new InfLine2D(invertedCoefficient, point.copy());
     }
 
     /**
@@ -124,11 +127,11 @@ public class Line2D {
      * @return A new line that is parallel to this line and passes through the given
      *         point
      */
-    public Line2D getParallelLineAtPoint(Vector2 point) {
-        return new Line2D(slope, point.copy());
+    public InfLine2D getParallelLineAtPoint(Vector2 point) {
+        return new InfLine2D(slope, point.copy());
     }
 
-    public Line2D getLineTranslatedByVector(Vector2 translation) {
+    public InfLine2D getLineTranslatedByVector(Vector2 translation) {
         Vector2 translatedPoint = firstPosition.translated(translation);
         return getParallelLineAtPoint(translatedPoint);
     }
@@ -186,7 +189,7 @@ public class Line2D {
      * @return the position at which this line crosses another one. Returns null if
      *         they are parallel
      */
-    public Vector2 getCrossPointWithLine(Line2D line) {
+    public Vector2 getCrossPointWithLine(InfLine2D line) {
         return UtilityClass.findLineIntersection(firstPosition, secondPosition, line.firstPosition,
                 line.secondPosition);
     }
