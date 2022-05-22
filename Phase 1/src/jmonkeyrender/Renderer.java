@@ -2,9 +2,6 @@ package jmonkeyrender;
 
 import bot.botimplementations.BotFactory;
 import bot.botimplementations.IBot;
-import bot.botimplementations.HillClimbingBot;
-import bot.botimplementations.ParticleSwarmBot;
-import bot.heuristics.FinalEuclidianDistanceHeuristic;
 import com.jme3.input.ChaseCamera;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
@@ -13,7 +10,6 @@ import com.jme3.ui.Picture;
 
 import gui.GameStateRenderer;
 import gui.MenuGUI;
-import gui.shotinput.BallVelocityInput;
 
 import physics.*;
 import physics.collisionsystems.StopCollisionSystem;
@@ -45,7 +41,6 @@ import com.jme3.water.SimpleWaterProcessor;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Queue;
 
     public class Renderer extends Cam {
         private TerrainQuad terrainQuad;
@@ -61,9 +56,6 @@ import java.util.Queue;
         float ballRadius = 1f;
         float totalSize = 1024;
 
-        float xoff = 0;
-        float yoff = 0;
-
         Ball ball;
         double targetRadius;
         Vector2 targetPos;
@@ -75,7 +67,7 @@ import java.util.Queue;
 
         float normalFactor;
         float terScale = 5;
-        float pixelScale = totalSize/100;
+        float pixelScale = (totalSize+1)/100;
         private Terrain terrain;
 
         /**
@@ -144,7 +136,7 @@ import java.util.Queue;
          */
         public void InitTarget(){
             //Creating cylinder, which would represent target hole
-            Cylinder tar = new Cylinder(120, 120, (float) targetRadius, 0.1f, true);
+            Cylinder tar = new Cylinder(120, 120, (float) targetRadius*pixelScale, 0.1f, true);
             Geometry target = new Geometry("Target", tar);
 
             //Rotating the cylinder
@@ -169,7 +161,7 @@ import java.util.Queue;
             val *= normalFactor*terScale;
 
             //Moving the cylinder to the calculated position
-            target.setLocalTranslation((float) (this.targetPos.x *totalSize/100 ), val, (float) (this.targetPos.y*totalSize/100));
+            target.setLocalTranslation((float) (this.targetPos.x *totalSize/100), val, (float) (this.targetPos.y*totalSize/100));
 
             //Adding it to the scene
             rootNode.attachChild(target);
@@ -230,7 +222,7 @@ import java.util.Queue;
                 //Outputting the position of the ball
                 text.setText("x: " + df.format(ballState.x) + "  y: " + df.format(ballState.y) + "  z: "+ df.format(val/terScale));
 
-                Camera camera = new Camera(50,50);
+                Camera camera = new Camera(25,25);
                 camera.xPos = ball.state.position.x;
                 camera.yPos = ball.state.position.y;
 
@@ -282,7 +274,7 @@ import java.util.Queue;
 
                 //Setting location to be around the terrain
                 water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
-                water.setLocalTranslation(xoff - 100, this.terrain.minScaledVal * terScale, -yoff + 100);
+                water.setLocalTranslation(100, this.terrain.minScaledVal * terScale, 100);
                 water.move(0, (normalFactor/2-this.terrain.minScaledVal) * terScale, 0);
 
                 //Attaching water object to the scene
@@ -307,9 +299,6 @@ import java.util.Queue;
 
             //Initializing terrain
             initTerrain(MenuGUI.texPath);
-
-            //setting the physics engine
-            //gameState.set() = new PhysicsEngine(new RungeKutta4Solver(0.01), new SmallVelocityStoppingCondition(), new StopCollisionSystem());
         }
 
         /**
@@ -328,17 +317,7 @@ import java.util.Queue;
         }
         IBot bot;
         private void setupInitialBot(){
-            // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
-            // null);//new RandomBot(new FinalEuclidianDistanceHeuristic(), 100));
-            // bot = new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5,
-            // 0.5, 100, 10);
-            // bot = new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
-            // null);
-            bot = new HillClimbingBot(
-                    new FinalEuclidianDistanceHeuristic(),
-                    0.01,
-                    16,
-                    new ParticleSwarmBot(new FinalEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10));
+            bot = BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING);
             resetBotThread();
         }
 
@@ -361,24 +340,21 @@ import java.util.Queue;
 
 
 
-        Queue<Vector2> q;
         @Override
         public void simpleInitApp() {
             //Disabling unnecessary information
             setDisplayStatView(false);
-            //Reading from the file to get move set
-            q = VectorsReader.read("/Phase 1/src/Physics/Vectors.csv");
 
             initPhysics();
             //setting sky background to Sky.jpg
-            InitSky("Sky/Skysphere.jpeg");
+            String path = "Sky/Skysphere.jpeg";
+            if(GameStateLoader.OS.contains("Windows")) path = "Sky\\Skysphere.jpeg";
+            InitSky(path);
             InitWater();
             InitText();
             InitBall();
             InitTarget();
             setupInitialBot();
-
-
 
             //creating and attaching camera to ball
             ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
@@ -411,7 +387,7 @@ import java.util.Queue;
                 }
             }
             shotForce = null;
-            points = new ArrayList<Vector2>();
+            points = new ArrayList<>();
         }
 
         private void handleInput() {
@@ -424,11 +400,8 @@ import java.util.Queue;
 
         @Override
         public void simpleUpdate(float tpf) {
-                //simulates from Vectors.csv file
-                //moves the ball with calculated position
-//            if (points.size() != 0) {
-//                ball.state.position = points.get(0);
-//            }
+            //simulates from Vectors.csv file
+            //moves the ball with calculated position
             handleBallInWater();
             handleInput();
             if (points.size() == 0 && shotForce != null && !inTarget) {

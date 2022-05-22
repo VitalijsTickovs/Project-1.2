@@ -18,6 +18,7 @@ import utility.UtilityClass;
 import utility.math.Vector2;
 
 public class GameStateLoader {
+   public static String OS;
 
    private static final String delimiter = ";";
    private static Scanner scanner;
@@ -210,11 +211,12 @@ public class GameStateLoader {
       // I was not able to come up with a line of code that would work on everyone's
       // computer
       String dir = System.getProperty("user.dir");
-      boolean stansLaptop = dir.contains("src");
-      if (stansLaptop) {
-         return System.getProperty("user.dir") + "\\reader\\UserInput.csv";
+      String separator = System.getProperty("file.separator");
+      OS = System.getProperty("os.name");
+      if (OS.contains("Windows")) {
+         return dir + separator + "reader" + separator + "UserInput.csv";
       } else {
-         return System.getProperty("user.dir") + "/Phase 1/src/reader/UserInput.csv";
+         return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput.csv";
       }
    }
 
