@@ -2,7 +2,9 @@ package jmonkeyrender;
 
 import bot.botimplementations.BotFactory;
 import bot.botimplementations.IBot;
+import com.jme3.asset.TextureKey;
 import com.jme3.input.ChaseCamera;
+import com.jme3.scene.Spatial;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import com.jme3.texture.plugins.AWTLoader;
@@ -66,7 +68,7 @@ import java.util.ArrayList;
         Node mainScene = new Node("Water");
 
         float normalFactor;
-        float terScale = 5;
+        float terScale = 6;
         float pixelScale = (totalSize+1)/100;
         private Terrain terrain;
 
@@ -226,9 +228,7 @@ import java.util.ArrayList;
                 camera.xPos = ball.state.position.x;
                 camera.yPos = ball.state.position.y;
 
-                minimapImg = minimapGenerator.getSubimage(camera, false, false);
-                img = loader.load(minimapImg, false);
-                minimapImg = minimapGenerator.getSubimage(camera, false, false);
+                minimapImg = minimapGenerator.getMinimap(camera);
                 img = loader.load(minimapImg, true);
                 texture2D.setImage(img);
                 pic.setTexture(assetManager, texture2D, true);
@@ -247,8 +247,27 @@ import java.util.ArrayList;
          * @param path specification to load different background for different maps
          */
         public void InitSky(String path){
-            mainScene.attachChild(SkyFactory.createSky(getAssetManager(), path, SkyFactory.EnvMapType.EquirectMap));
+//            Texture westTex = assetManager.loadTexture(path+"/West.bmp");
+//            Texture eastTex = assetManager.loadTexture(path+"/East.bmp");
+//            Texture northTex = assetManager.loadTexture(path + "/North.bmp");
+//            Texture southTex = assetManager.loadTexture(path + "/South.bmp");
+//            Texture upTex = assetManager.loadTexture(path + "/Top.bmp");
+//            Texture downTex = assetManager.loadTexture(path + "/Bottom.bmp");
+
+            //final Vector3f normalScale = new Vector3f(-1, 1, 1);
+//            mainScene.attachChild(SkyFactory.createSky(
+//                    assetManager,
+//                    westTex,
+//                    eastTex,
+//                    northTex,
+//                    southTex,
+//                    upTex,
+//                    downTex));
+            Texture sky = assetManager.loadTexture(path);
+            mainScene.attachChild(SkyFactory.createSky(assetManager, sky, SkyFactory.EnvMapType.SphereMap));
             rootNode.attachChild(mainScene);
+
+
         }
 
         /**
@@ -338,7 +357,7 @@ import java.util.ArrayList;
         }
 
 
-
+        ChaseCamera chaseCam;
         @Override
         public void simpleInitApp() {
             //Disabling unnecessary information
@@ -347,7 +366,7 @@ import java.util.ArrayList;
             initPhysics();
             //setting sky background to Sky.jpg
             String path = "Sky/Skysphere.jpeg";
-            if(GameStateLoader.OS.contains("Windows")) path = "Sky\\Skysphere.jpeg";
+            if(GameStateLoader.OS.contains("Windows")) path = "Sky\\CubeSky.png";
             InitSky(path);
             InitWater();
             InitText();
@@ -356,9 +375,9 @@ import java.util.ArrayList;
             setupInitialBot();
 
             //creating and attaching camera to ball
-            ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
-            InitCam(chaseCam);
-            //flyCam.setMoveSpeed(100);
+//            chaseCam = new ChaseCamera(cam, ballRender, inputManager);
+//            InitCam(chaseCam);
+            flyCam.setMoveSpeed(100);
         }
 
         private void handleBallInWater() {
