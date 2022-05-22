@@ -14,6 +14,7 @@ import physics.collisionsystems.*;
 import physics.*;
 import physics.solvers.*;
 import physics.stoppingconditions.*;
+import utility.UtilityClass;
 import utility.math.Vector2;
 
 public class GameStateLoader {
@@ -264,10 +265,14 @@ public class GameStateLoader {
          terrainY1 = readDouble(line);
       }
       if (lineContainsKeywordAndEqualSign(line, "greenKineticFriction")) {
-         greenKineticFriction = readDouble(line);
+         double friction = readDouble(line);
+         UtilityClass.clamp(friction, 0.01, 1);
+         greenKineticFriction = friction;
       }
       if (lineContainsKeywordAndEqualSign(line, "greenStaticFriction")) {
-         greenStaticFriction = readDouble(line);
+         double friction = readDouble(line);
+         UtilityClass.clamp(friction, 0.01, 1);
+         greenStaticFriction = friction;
       }
       if (lineContainsKeywordAndEqualSign(line, "terrainFunction")) {
          terrainFunction = readString(line);
@@ -304,10 +309,14 @@ public class GameStateLoader {
          sandZoneY1.add(range[1]);
       }
       if (lineContainsKeywordAndEqualSign(line, "sandKineticFriction")) {
-         sandKineticFriction.add(readDouble(line));
+         double friction = readDouble(line);
+         UtilityClass.clamp(friction, 0.01, 1);
+         sandKineticFriction.add(friction);
       }
       if (lineContainsKeywordAndEqualSign(line, "sandStaticFriction")) {
-         sandStaticFriction.add(readDouble(line));
+         double friction = readDouble(line);
+         UtilityClass.clamp(friction, 0.01, 1);
+         sandStaticFriction.add(friction);
       }
       // Tree
       if (lineContainsKeywordAndEqualSign(line, "treeX")) {
@@ -320,7 +329,9 @@ public class GameStateLoader {
          treeRadius.add(readDouble(line));
       }
       if (lineContainsKeywordAndEqualSign(line, "treeBounciness")) {
-         treeBounciness.add(readDouble(line));
+         double bounciness = readDouble(line);
+         UtilityClass.clamp(bounciness,0.01, 2);
+         treeBounciness.add(bounciness);
       }
       // Box
       if (lineContainsKeywordAndEqualSign(line, "boxX")) {
@@ -334,7 +345,9 @@ public class GameStateLoader {
          boxY1.add(range[1]);
       }
       if (lineContainsKeywordAndEqualSign(line, "boxBounciness")) {
-         boxBounciness.add(readDouble(line));
+         double bounciness = readDouble(line);
+         UtilityClass.clamp(bounciness, 0.01, 2);
+         boxBounciness.add(bounciness);
       }
    }
 
