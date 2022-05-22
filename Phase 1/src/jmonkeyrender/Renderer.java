@@ -275,7 +275,7 @@ import java.util.ArrayList;
                 //Setting location to be around the terrain
                 water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
                 water.setLocalTranslation(-totalSize/2-100, this.terrain.minScaledVal * terScale, totalSize/2+100);
-                //water.move(0, (normalFactor/2-this.terrain.minScaledVal) * terScale, 0);
+                water.move(0, (normalFactor/2-this.terrain.minScaledVal) * terScale, 0);
                 //Attaching water object to the scene
                 rootNode.attachChild(water);
             }
