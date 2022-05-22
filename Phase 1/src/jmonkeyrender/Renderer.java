@@ -247,7 +247,7 @@ import java.util.ArrayList;
          * @param path specification to load different background for different maps
          */
         public void InitSky(String path){
-            mainScene.attachChild(SkyFactory.createSky(getAssetManager(), path, SkyFactory.EnvMapType.SphereMap));
+            mainScene.attachChild(SkyFactory.createSky(getAssetManager(), path, SkyFactory.EnvMapType.EquirectMap));
             rootNode.attachChild(mainScene);
         }
 
@@ -266,7 +266,7 @@ import java.util.ArrayList;
                 waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
                 viewPort.addProcessor(waterProcessor);
 
-                //Creating the box of water
+                //Creating the box of water'
                 Quad waveSize = new Quad(this.totalSize + 200, this.totalSize + 200);
                 Geometry water = new Geometry("water", waveSize);
                 water.setShadowMode(RenderQueue.ShadowMode.Receive);
@@ -274,9 +274,8 @@ import java.util.ArrayList;
 
                 //Setting location to be around the terrain
                 water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
-                water.setLocalTranslation(100, this.terrain.minScaledVal * terScale, 100);
-                water.move(0, (normalFactor/2-this.terrain.minScaledVal) * terScale, 0);
-
+                water.setLocalTranslation(-totalSize/2-100, this.terrain.minScaledVal * terScale, totalSize/2+100);
+                //water.move(0, (normalFactor/2-this.terrain.minScaledVal) * terScale, 0);
                 //Attaching water object to the scene
                 rootNode.attachChild(water);
             }
