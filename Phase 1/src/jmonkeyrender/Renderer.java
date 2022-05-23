@@ -144,7 +144,7 @@ public class Renderer extends Cam {
 
         //Finding the position for the target
 
-        float val = terrain.HeightMapValueAt(targetPos)*pixelScale;
+        float val = terrain.HeightMapValueAt(targetPos)*terScale;
 
         //Moving the cylinder to the calculated position
         target.setLocalTranslation((float) (this.targetPos.x *pixelScale), val, (float) (this.targetPos.y*pixelScale));
@@ -189,10 +189,10 @@ public class Renderer extends Cam {
     public void moveBall(Vector2 ballState){
         if(ballState.x*pixelScale<(this.totalSize)/2 && ballState.y*pixelScale < (this.totalSize)/2) {
             //Getting height value corresponding to x and y values
-            float val = terrain.HeightMapValueAt(ballState)*pixelScale;
+            float val = terrain.HeightMapValueAt(ballState)*terScale;
 
             //Moving the ball object to specified position
-            ballRender.setLocalTranslation((float) (ballState.x*pixelScale), val, (float) (ballState.y*pixelScale));
+            ballRender.setLocalTranslation((float) (ballState.x)*pixelScale, val, (float) (ballState.y*pixelScale));
             //Adjusting the ball not to be in the ground
             findTangent(ballState);
             //Outputting the position of the ball
@@ -339,8 +339,8 @@ public class Renderer extends Cam {
 
         initPhysics();
         //setting sky background to Sky.jpg
-        String path = "Sky/Skysphere.jpeg";
-        if(GameStateLoader.OS.contains("Windows")) path = "Sky/CubeSky.png";
+        String path = "Sky/BoxPieces";
+        if(GameStateLoader.OS.contains("Windows")) path = "Sky/BoxPieces";
         InitSky(path);
         InitWater();
         InitText();
