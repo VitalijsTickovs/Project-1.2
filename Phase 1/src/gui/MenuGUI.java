@@ -74,7 +74,7 @@ public class MenuGUI extends javax.swing.JFrame {
         singleB.setBackground(new java.awt.Color(0, 204, 0));
         singleB.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 24)); // NOI18N
         singleB.setForeground(new java.awt.Color(51, 51, 51));
-        singleB.setText("SINGLEPLAYER");
+        singleB.setText("2D");
         singleB.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255), 4));
         singleB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -85,7 +85,7 @@ public class MenuGUI extends javax.swing.JFrame {
         multiB.setBackground(new java.awt.Color(0, 204, 0));
         multiB.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 24)); // NOI18N
         multiB.setForeground(new java.awt.Color(51, 51, 51));
-        multiB.setText("MULTIPLAYER");
+        multiB.setText("3D");
         multiB.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255), 4));
         multiB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

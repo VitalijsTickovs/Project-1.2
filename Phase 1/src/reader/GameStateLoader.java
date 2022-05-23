@@ -164,12 +164,6 @@ public class GameStateLoader {
     */
    private static void createScanner() {
       try {
-         // scanner = new Scanner(new FileReader(System.getProperty("user.dir") + "/Phase
-         // 1/src/Reader/UserInput.csv"));
-         // The top line does not work on my computer, so I put the one at the bottom -
-         // comment it out and switch.
-         // I was not able to come up with a line of code that would work on everyone's
-         // computer
          scanner = new Scanner(
                new FileReader(getPath()));
       } catch (FileNotFoundException e) {
@@ -187,6 +181,11 @@ public class GameStateLoader {
       String dir = System.getProperty("user.dir");
       String separator = System.getProperty("file.separator");
       OS = System.getProperty("os.name");
+      
+      boolean stansLaptop = dir.contains("Phase 1");
+      if (stansLaptop) {
+         return dir + "\\reader\\UserInput.csv";
+      }
       if (OS.contains("Windows")) {
          return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput.csv";
       } else {
