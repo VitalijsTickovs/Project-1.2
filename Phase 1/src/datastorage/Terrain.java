@@ -201,6 +201,20 @@ public class Terrain {
         }
     }
 
+    public float HeightMapValueAt(Vector2 targetPos){
+        float val = (float) getTerrainFunction().valueAt(targetPos.x,targetPos.y);
+        val += Math.abs(minVal);
+        val /= maxVal - minVal;
+        if (val < 0) {
+            val = 0;
+        }
+        if (val > 1) {
+            val = 1;
+        }
+        val *= NORMAL_FACTOR;
+        return val;
+    }
+
     public boolean isPositionCollidingWithMapBorder(BallState state) {
         boolean isOutOfMap = state.position.x > bottomRightCorner.x || state.position.x < topLeftCorner.x
                 || state.position.y > bottomRightCorner.y || state.position.y < topLeftCorner.y;
