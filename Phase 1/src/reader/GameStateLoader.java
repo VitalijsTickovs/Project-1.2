@@ -188,7 +188,7 @@ public class GameStateLoader {
       String separator = System.getProperty("file.separator");
       OS = System.getProperty("os.name");
       if (OS.contains("Windows")) {
-         return dir + separator + "reader" + separator + "UserInput.csv";
+         return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput.csv";
       } else {
          return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput.csv";
       }

@@ -339,7 +339,8 @@ public class Renderer extends Cam {
 
         initPhysics();
         //setting sky background to Sky.jpg
-        String path = "Sky/BoxPieces";
+        String path = "Sky/Skysphere.jpeg";
+        if(GameStateLoader.OS.contains("Windows")) path = "Sky/CubeSky.png";
         InitSky(path);
         InitWater();
         InitText();
