@@ -48,21 +48,26 @@ public class Renderer extends Cam {
     private ArrayList<Vector2> points = new ArrayList<>();
     private Boolean inTarget = false;
 
-    float ballRadius = 1f;
-    float totalSize = 1024;
+    private final float ballRadius = 1f;
+    private final float totalSize = 1024;
 
-    Ball ball;
-    double targetRadius;
-    Vector2 targetPos;
+    private final AWTLoader loader = new AWTLoader();
+    private final Picture pic = new Picture("HUD Picture");
+    private final Texture2D texture2D = new Texture2D();
 
-    BitmapText text;
+    private IBot bot;
+    private Ball ball;
+    private double targetRadius;
+    private Vector2 targetPos;
+
+    private BitmapText text;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
-    Node mainScene = new Node("Water");
+    private final Node mainScene = new Node("Water");
 
-    float normalFactor;
-    float terScale = 6;
-    float pixelScale = (totalSize+1)/100;
+    private float normalFactor;
+    private final float terScale = 6;
+    private final float pixelScale = (totalSize+1)/100;
     private Terrain terrain;
 
     /**
@@ -75,7 +80,7 @@ public class Renderer extends Cam {
         //Setting terrain using heightmap
         this.terrainQuad = new TerrainQuad("Course", 128, (int) (totalSize+1), this.terrain.heightmap);
 
-        //Setting up the Texture of the ground
+        //Grass Texture
         Material matTerrain = new Material(assetManager,"Common/MatDefs/Terrain/Terrain.j3md");
         matTerrain.setTexture("Alpha", assetManager.loadTexture(
                 "Terrain/image.png"));
@@ -84,17 +89,12 @@ public class Renderer extends Cam {
         matTerrain.setTexture("Tex1", grass);
         matTerrain.setFloat("Tex1Scale", 64f);
 
+        //Sand Texture
         Texture sand = assetManager.loadTexture(
                 "Terrain/sand.jpeg");
         sand.setWrap(Texture.WrapMode.Repeat);
         matTerrain.setTexture("Tex2", sand);
         matTerrain.setFloat("Tex2Scale", 32f);
-
-        Texture targetRadius = assetManager.loadTexture(
-                "Terrain/dirt.jpeg");
-        targetRadius.setWrap(Texture.WrapMode.Repeat);
-        matTerrain.setTexture("Tex3", targetRadius);
-        matTerrain.setFloat("Tex3Scale", 32f);
 
         AmbientLight amb = new AmbientLight();
         amb.setColor(ColorRGBA.White.mult(5));
@@ -143,7 +143,6 @@ public class Renderer extends Cam {
         target.setMaterial(mat);
 
         //Finding the position for the target
-
         float val = terrain.HeightMapValueAt(targetPos)*terScale;
 
         //Moving the cylinder to the calculated position
@@ -157,14 +156,10 @@ public class Renderer extends Cam {
      *checks if final ball position is within the target radius
      */
     public boolean isInTarget(Ball ball){
-        if (ball.state.position.x >= targetPos.x - targetRadius && ball.state.position.x <= targetPos.x + targetRadius &&
-                ball.state.position.y >= targetPos.y - targetRadius && ball.state.position.y <= targetPos.y + targetRadius){
-            inTarget = true;
-        }
-        else inTarget = false;
+        inTarget = ball.state.position.x >= targetPos.x - targetRadius && ball.state.position.x <= targetPos.x + targetRadius &&
+                ball.state.position.y >= targetPos.y - targetRadius && ball.state.position.y <= targetPos.y + targetRadius;
 
         return inTarget;
-
     }
 
     /**
@@ -175,17 +170,12 @@ public class Renderer extends Cam {
         Vector3f terNormal = terrainQuad.getNormal(new Vector2f((float)ballState.x*pixelScale, (float)ballState.y*pixelScale));
         double scalar = ballRadius/terNormal.length();
         terNormal = terNormal.mult((float) scalar);
-        //Just put 0.2 as a threshold, like if the difference is above that, is gonna be visible
         ballRender.move(terNormal.x, terNormal.y, terNormal.z);
     }
 
     /**
      * Moves ball according to x & y coordinates
      */
-    AWTLoader loader = new AWTLoader();
-    Picture pic = new Picture("HUD Picture");
-    Image img;
-    Texture2D texture2D = new Texture2D();
     public void moveBall(Vector2 ballState){
         if(ballState.x*pixelScale<(this.totalSize)/2 && ballState.y*pixelScale < (this.totalSize)/2) {
             //Getting height value corresponding to x and y values
@@ -193,22 +183,25 @@ public class Renderer extends Cam {
 
             //Moving the ball object to specified position
             ballRender.setLocalTranslation((float) (ballState.x)*pixelScale, val, (float) (ballState.y*pixelScale));
+
             //Adjusting the ball not to be in the ground
             findTangent(ballState);
+
             //Outputting the position of the ball
             text.setText("x: " + df.format(ballState.x) + "  y: " + df.format(ballState.y) + "  z: "+ df.format(val/terScale));
 
-            generateMinimap();
+            //Displaying minimap based on the ball position
+            generateMinimap(ballState);
         }
-
     }
-    public void generateMinimap(){
-        Camera camera = new Camera(25,25);
-        camera.xPos = ball.state.position.x;
-        camera.yPos = ball.state.position.y;
+
+    public void generateMinimap(Vector2 ballState){
+        Camera camera = new Camera(30,30);
+        camera.xPos = ballState.x;
+        camera.yPos = ballState.y;
 
         BufferedImage minimapImg = minimapGenerator.getMinimap(camera);
-        img = loader.load(minimapImg, true);
+        Image img = loader.load(minimapImg, true);
         texture2D.setImage(img);
         pic.setTexture(assetManager, texture2D, true);
         pic.setHeight(300);
@@ -231,17 +224,8 @@ public class Renderer extends Cam {
         Texture upTex = assetManager.loadTexture(path + "/Top.bmp");
         Texture downTex = assetManager.loadTexture(path + "/Bottom.bmp");
 
-        mainScene.attachChild(SkyFactory.createSky(
-                assetManager,
-                westTex,
-                eastTex,
-                northTex,
-                southTex,
-                upTex,
-                downTex));
+        mainScene.attachChild(SkyFactory.createSky(assetManager, westTex, eastTex, northTex, southTex, upTex, downTex));
         rootNode.attachChild(mainScene);
-
-
     }
 
     /**
@@ -307,7 +291,7 @@ public class Renderer extends Cam {
         guiNode.attachChild(hudText);
 
     }
-    IBot bot;
+
     private void setupInitialBot(){
         bot = BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING);
         resetBotThread();
@@ -331,7 +315,7 @@ public class Renderer extends Cam {
     }
 
 
-    ChaseCamera chaseCam;
+
     @Override
     public void simpleInitApp() {
         //Disabling unnecessary information
@@ -349,7 +333,7 @@ public class Renderer extends Cam {
         setupInitialBot();
 
         //creating and attaching camera to ball
-        chaseCam = new ChaseCamera(cam, ballRender, inputManager);
+        ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
         InitCam(chaseCam);
         //flyCam.setMoveSpeed(100);
     }
