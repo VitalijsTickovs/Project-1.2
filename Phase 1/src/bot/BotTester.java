@@ -1,6 +1,8 @@
 package bot;
 
 import bot.botimplementations.*;
+import bot.heuristics.ClosestEuclidianDistanceHeuristic;
+import bot.heuristics.FinalClosestEuclidianDistanceHeuristic;
 import bot.heuristics.FinalEuclidianDistanceHeuristic;
 import bot.heuristics.Heuristic;
 import datastorage.GameState;
@@ -21,8 +23,11 @@ public class BotTester {
 
     public String testBot(IBot bot, GameState gameState, int numShots) {
         String data = "";
-        int numHolesInOne = 0;
-        // Test a bot multiplte times with the same shot
+        double percentHolesInOne = 0;
+        double averageDistance = 0;
+        double averageNumIterations = 0;
+        double averageNumSimulations = 0;
+        // Test a bot multiple times with the same shot
         for (int i=0; i<numShots; i++) {
             System.out.println("Iteration "+(i+1)+"...");
             Vector2 velocity = bot.findBestShot(gameState);
@@ -31,12 +36,15 @@ public class BotTester {
             double distance = finalPosition.distanceTo(gameState.getTerrain().target.position);
             boolean holeInOne = distance <= gameState.getTerrain().target.radius;
             if (holeInOne) {
-                numHolesInOne++;
+                percentHolesInOne++;
             }
-            data += distance+"\n";
+            averageDistance += distance;
+            averageNumIterations += bot.getNumIterations();
+            averageNumSimulations += bot.getNumSimulations();
+            data += bot.getNumIterations() + ", " + bot.getNumSimulations() + ", " + distance+"\n";
             System.out.println("Done!");
         }
-        data += numHolesInOne/(double) numShots;
+        data = (averageNumIterations/numShots) + ", " + (averageNumSimulations/numShots) +  ", " + (averageDistance/numShots) + ", " + (percentHolesInOne/numShots) + "\n" + data;
         return data;
     }
 
@@ -53,7 +61,7 @@ public class BotTester {
 
     public static void main(String[] args) {
         Terrain terrain = new Terrain(
-                "0.4*(0.9-e**(-(x*x+y*y)/8))",
+                "0",//"0.4*(0.9-e**(-(x*x+y*y)/8))",
                 0.2,
                 0.08,
                 new Vector2(-50, -50),
@@ -70,6 +78,29 @@ public class BotTester {
                         new SmallVelocityStoppingCondition(),
                         new StopCollisionSystem()
                 )
+        );
+
+        BotTester bt = new BotTester();
+        bt.storeData(
+                bt.testBot(
+                        /*new  HillClimbingBot(
+                                new FinalClosestEuclidianDistanceHeuristic(),
+                                0.01,
+                                16,
+                                new ParticleSwarmBot(
+                                        new FinalClosestEuclidianDistanceHeuristic(),
+                                        0.5,
+                                        0.5,
+                                        0.5,
+                                        100,
+                                        10
+                                )
+                        ),*/
+                        new RuleBasedBot(),
+                        gameState,
+                        100
+                ),
+                "Rule (terrain 0)"
         );
 
     }

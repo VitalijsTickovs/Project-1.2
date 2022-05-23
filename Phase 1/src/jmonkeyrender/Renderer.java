@@ -247,24 +247,23 @@ import java.util.ArrayList;
          * @param path specification to load different background for different maps
          */
         public void InitSky(String path){
-//            Texture westTex = assetManager.loadTexture(path+"/West.bmp");
-//            Texture eastTex = assetManager.loadTexture(path+"/East.bmp");
-//            Texture northTex = assetManager.loadTexture(path + "/North.bmp");
-//            Texture southTex = assetManager.loadTexture(path + "/South.bmp");
-//            Texture upTex = assetManager.loadTexture(path + "/Top.bmp");
-//            Texture downTex = assetManager.loadTexture(path + "/Bottom.bmp");
+            Texture westTex = assetManager.loadTexture(path+"/West.bmp");
+            Texture eastTex = assetManager.loadTexture(path+"/East.bmp");
+            Texture northTex = assetManager.loadTexture(path + "/North.bmp");
+            Texture southTex = assetManager.loadTexture(path + "/South.bmp");
+            Texture upTex = assetManager.loadTexture(path + "/Top.bmp");Texture downTex = assetManager.loadTexture(path + "/Bottom.bmp");
 
             //final Vector3f normalScale = new Vector3f(-1, 1, 1);
-//            mainScene.attachChild(SkyFactory.createSky(
-//                    assetManager,
-//                    westTex,
-//                    eastTex,
-//                    northTex,
-//                    southTex,
-//                    upTex,
-//                    downTex));
-            Texture sky = assetManager.loadTexture(path);
-            mainScene.attachChild(SkyFactory.createSky(assetManager, sky, SkyFactory.EnvMapType.SphereMap));
+            mainScene.attachChild(SkyFactory.createSky(
+                    assetManager,
+                    westTex,
+                    eastTex,
+                    northTex,
+                    southTex,
+                    upTex,
+                    downTex));
+            //Texture sky = assetManager.loadTexture(path);
+            //mainScene.attachChild(SkyFactory.createSky(assetManager, sky, SkyFactory.EnvMapType.SphereMap));
             rootNode.attachChild(mainScene);
 
 
@@ -366,7 +365,7 @@ import java.util.ArrayList;
             initPhysics();
             //setting sky background to Sky.jpg
             String path = "Sky/Skysphere.jpeg";
-            if(GameStateLoader.OS.contains("Windows")) path = "Sky/CubeSky.png";
+            if(GameStateLoader.OS.contains("Windows")) path = "Sky/BoxPieces";
             InitSky(path);
             InitWater();
             InitText();

@@ -28,7 +28,7 @@ public class BotFactory {
             return new RuleBasedBot();
         }
         if (implementation == BotImplementations.HILL_CLIMBING) {
-            return new HillClimbingBot(new FinalEuclidianDistanceHeuristic(), 0.01, 16,
+            return new HillClimbingBot(new FinalClosestEuclidianDistanceHeuristic(), 0.01, 16,
                     getBot(BotImplementations.PARTICLE_SWARM));
         }
         if (implementation == BotImplementations.GRADIENT_DESCENT) {

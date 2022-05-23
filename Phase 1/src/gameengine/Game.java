@@ -83,6 +83,8 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
                 System.out.println("Calculating shot...");
                 shotForce = bot.findBestShot(gameState);
                 System.out.println("Velocity: " + shotForce);
+                System.out.println("Number of simulations: "+bot.getNumSimulations());
+                System.out.println("Number of iterations: "+bot.getNumIterations());
             }
         });
     }

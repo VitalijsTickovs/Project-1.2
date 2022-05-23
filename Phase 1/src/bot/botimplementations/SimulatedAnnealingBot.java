@@ -13,6 +13,8 @@ public class SimulatedAnnealingBot implements IBot {
     private final double learningRate;
     private final int numIterations;
     private final IBot initialShotTaker;
+    private int numSimulations;
+    private int numIterations2;
 
     public SimulatedAnnealingBot(Heuristic heuristic, double learningRate, int numIterations, IBot initialShotTaker) {
         this.heuristic = heuristic;
@@ -23,6 +25,8 @@ public class SimulatedAnnealingBot implements IBot {
 
     @Override
     public Vector2 findBestShot(GameState gameState) {
+        numIterations2 = 0;
+        numSimulations = 0;
         gameState = gameState.copy();
 
         Random random = new Random();
@@ -33,13 +37,22 @@ public class SimulatedAnnealingBot implements IBot {
             shot.normalize().scale(Math.random()* Ball.maxSpeed);
         } else {
             shot = initialShotTaker.findBestShot(gameState);
+            numSimulations = initialShotTaker.getNumSimulations();
+            numIterations2 = initialShotTaker.getNumIterations();
         }
+
+        ArrayList<Vector2> positions = gameState.simulateShot(shot);
         double currentHeuristicVal = heuristic.getShotValue(
-                gameState.simulateShot(shot),
+                positions,
                 gameState
         );
 
-        for (int i=0; i<numIterations; i++) {
+        boolean holeInOne = false;
+        holeInOne = positions.get(positions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
+
+        for (int i=0; i<numIterations && !holeInOne; i++) {
+            numIterations2++;
+
             double temperature = 1 - (double) (i+1)/numIterations;
 
             // Select random neighbour
@@ -55,10 +68,14 @@ public class SimulatedAnnealingBot implements IBot {
                 neighbourShot.normalize().scale(Ball.maxSpeed);
             }
 
+            positions = gameState.simulateShot(neighbourShot);
             double heuristicVal = heuristic.getShotValue(
-                    gameState.simulateShot(neighbourShot),
+                    positions,
                     gameState
             );
+            numSimulations++;
+
+            holeInOne = positions.get(positions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
 
             double selectProbability; // Calculate the probability of selecting this neighbour
 
@@ -75,5 +92,15 @@ public class SimulatedAnnealingBot implements IBot {
         }
 
         return shot;
+    }
+
+    @Override
+    public int getNumSimulations() {
+        return numSimulations;
+    }
+
+    @Override
+    public int getNumIterations() {
+        return numIterations2;
     }
 }

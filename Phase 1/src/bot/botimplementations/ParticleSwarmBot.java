@@ -14,8 +14,8 @@ public class ParticleSwarmBot implements IBot {
     private final double w, c1, c2;
     private final Random random;
     private final int numParticles, numGenerations;
-
-    public int numSimulations = 0; // Used for testing
+    public int numSimulations, numIterations;
+    private boolean holeInOne;
 
     public ParticleSwarmBot(Heuristic heuristic, double w, double c1, double c2, int numParticles, int numGenerations) {
         this.heuristic = heuristic;
@@ -29,7 +29,9 @@ public class ParticleSwarmBot implements IBot {
 
     @Override
     public Vector2 findBestShot(GameState gameState) {
+        holeInOne = false;
         numSimulations = 0;
+        numIterations = 0;
         gameState = gameState.copy();
         Vector2 bestShot = null;
         double bestHeuristic = 0;
@@ -37,7 +39,6 @@ public class ParticleSwarmBot implements IBot {
         Particle[] particles = new Particle[numParticles];
         for (int i=0; i<particles.length; i++) {
             particles[i] = new Particle(gameState);
-
         }
         // Find the best shot
         for (Particle particle : particles) {
@@ -47,6 +48,7 @@ public class ParticleSwarmBot implements IBot {
             }
         }
         for (int generation=1; generation<=numGenerations; generation++) {
+            numIterations++;
             for (Particle particle : particles) {
                 particle.move(bestShot);
             }
@@ -57,8 +59,22 @@ public class ParticleSwarmBot implements IBot {
                     bestHeuristic = particle.bestHeuristicValue;
                 }
             }
+            // Check for hole in one
+            if (holeInOne) {
+                break;
+            }
         }
         return bestShot;
+    }
+
+    @Override
+    public int getNumSimulations() {
+        return numSimulations;
+    }
+
+    @Override
+    public int getNumIterations() {
+        return numIterations;
     }
 
     private class Particle {
@@ -84,6 +100,9 @@ public class ParticleSwarmBot implements IBot {
         void updateBestPosition() {
             ArrayList<Vector2> ballPositions = gameState.simulateShot(position);
             numSimulations++;
+            // Check for hole in one
+            if (!holeInOne)
+                holeInOne = ballPositions.get(ballPositions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
             double heuristicVal = heuristic.getShotValue(ballPositions, gameState);
             if (bestPosition == null || heuristic.firstBetterThanSecond(heuristicVal, bestHeuristicValue)) {
                 bestPosition = position.copy();
