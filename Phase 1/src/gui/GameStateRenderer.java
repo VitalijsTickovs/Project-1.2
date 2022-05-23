@@ -12,7 +12,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.Buffer;
 
 public class GameStateRenderer {
     /**
