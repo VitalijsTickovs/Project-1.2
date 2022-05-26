@@ -18,6 +18,8 @@ import bot.botimplementations.IBot;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+import bot.AStar;
 import bot.botimplementations.BotFactory;
 
 public class Game extends JPanel implements Runnable, GameObject, MouseListener {
@@ -56,6 +58,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         // setupInitialBot();
         FPS = fps;
         createGameState();
+        AStar aStar = new AStar(gameState.getTerrain());
         setManualInputType();
         createCamera();
         createRenderer();

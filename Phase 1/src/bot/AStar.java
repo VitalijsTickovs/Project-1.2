@@ -11,9 +11,9 @@ public class AStar {
      * Only call the {@code getDistanceToTarget} method for heuristic purposes
      */
     public AStar(Terrain terrain) {
+        this.terrain = terrain;
         checkForNullTerrain();
 
-        this.terrain = terrain;
         setMap(getMap());
         setTarget(terrain);
         checkForNullMapAndTarget();
@@ -253,8 +253,6 @@ public class AStar {
          */
         private double costToEnter;
 
-        
-
         // region Mutator methods
         public void setOrigin(Node origin) {
             distanceToOrigin = getDistanceToNode(origin);
@@ -338,16 +336,17 @@ public class AStar {
         }
     }
 
+    double HALF_TILE_OFFSET = (1d / (double) SQUARES_PER_GAME_UNIT) / 2d;
+
     // region Generate Grid from Terrain
     private double[][] getMap() {
         double[][] map = createEmptyMap();
         // We add half a tile, to get a height value at the center of each square
-        double halfTileOffset = (1d / (double) SQUARES_PER_GAME_UNIT) / 2d;
 
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
 
-                double value = terrain.getTerrainFunction().valueAt(x + halfTileOffset, y + halfTileOffset);
+                double value = terrain.getTerrainFunction().valueAt(translateGridPositionIntoGameUnits(x, y));
                 boolean cannotGoHere = value <= 0
                         || !terrain.isPointInObstacle(translateGridPositionIntoGameUnits(x, y));
                 if (cannotGoHere) {
@@ -368,8 +367,8 @@ public class AStar {
     }
 
     private Vector2 translateGridPositionIntoGameUnits(int xPos, int yPos) {
-        double newX = (double) xPos / (double) SQUARES_PER_GAME_UNIT;
-        double newY = (double) yPos / (double) SQUARES_PER_GAME_UNIT;
+        double newX = (double) xPos / (double) SQUARES_PER_GAME_UNIT + HALF_TILE_OFFSET;
+        double newY = (double) yPos / (double) SQUARES_PER_GAME_UNIT + HALF_TILE_OFFSET;
         return new Vector2(newX, newY);
     }
 
