@@ -368,9 +368,9 @@ public class Renderer extends Cam {
 
     private void handleInput() {
         if (isSimulationFinished() && !isInTarget(ball)) {
-                resetBotThread();
-                botThread.start();
-            }
+            resetBotThread();
+            botThread.start();
+        }
     }
 
 

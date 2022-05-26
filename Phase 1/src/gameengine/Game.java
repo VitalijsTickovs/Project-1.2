@@ -86,6 +86,8 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
                 System.out.println("Calculating shot...");
                 shotForce = bot.findBestShot(gameState);
                 System.out.println("Velocity: " + shotForce);
+                System.out.println("Number of simulations: "+bot.getNumSimulations());
+                System.out.println("Number of iterations: "+bot.getNumIterations());
             }
         });
     }
@@ -297,6 +299,12 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         }
         if (checkKeyPressed(Input.G)) {
             setBot(BotFactory.getBot(BotFactory.BotImplementations.GRADIENT_DESCENT));
+        }
+        if (checkKeyPressed(Input.S)) {
+            setBot(BotFactory.getBot(BotFactory.BotImplementations.RULE));
+        }
+        if (checkKeyPressed(Input.N)) {
+            setBot(BotFactory.getBot(BotFactory.BotImplementations.RANDOM));
         }
         if (checkKeyPressed(Input.M)) {
             setBot(null);

@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
-import bot.heuristics.Heuristic;
+import bot.heuristics.*;
 import datastorage.*;
+import physics.PhysicsEngine;
+import physics.collisionsystems.StopCollisionSystem;
+import physics.solvers.RungeKutta4Solver;
+import physics.stoppingconditions.SmallVelocityStoppingCondition;
 import utility.math.Vector2;
 
 public class HeuristicPlotter {
@@ -48,9 +52,19 @@ public class HeuristicPlotter {
         }
     }
 
-    /*public static void main(String[] args) {
-        PhysicsEngine engine = new RungeKutta();
-        Terrain terrain = new Terrain("0.4*(0.9-e**(-(x*x + y*y)/8))", 0.2, 0.08, new Vector2(-50, -50), new Vector2(50, 50));
+    public static void main(String[] args) {
+        PhysicsEngine engine = new PhysicsEngine(
+                new RungeKutta4Solver(0.01),
+                new SmallVelocityStoppingCondition(),
+                new StopCollisionSystem()
+        );
+        Terrain terrain = new Terrain(
+                "0",
+                0.2,
+                0.08,
+                new Vector2(-50, -50),
+                new Vector2(50, 50)
+        );
         terrain.target = new Target();
         terrain.target.setPosition(new Vector2(4, 1));
         terrain.target.setRadius(0.15);
@@ -58,5 +72,5 @@ public class HeuristicPlotter {
         GameState gameState = new GameState(terrain, ball, engine);
         HeuristicPlotter hp = new HeuristicPlotter(new ClosestEuclidianDistanceHeuristic(), gameState);
         hp.generateTestData();
-    }*/
+    }
 }

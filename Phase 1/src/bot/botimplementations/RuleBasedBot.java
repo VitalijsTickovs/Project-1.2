@@ -37,6 +37,7 @@ public class RuleBasedBot implements IBot{
     private double minSlopeX = Double.MAX_VALUE;
     private double minSlopeY = Double.MAX_VALUE;
     private Rectangle rec = new Rectangle();
+    private int numSimulations;
 
     private void setup(GameState gameState) {
         this.terrain = gameState.getTerrain();
@@ -59,8 +60,6 @@ public class RuleBasedBot implements IBot{
     public Vector2 computeDistance(){
         double distanceX = tarPosX - ballPosX;
         double distanceY = tarPosY - ballPosY;
-        System.out.println(" TARGET POSITION: x = "+ tarPosX+"; y = "+tarPosY);
-        System.out.println(" BALL POSITION: x = "+ ballPosX+"; y = "+ballPosY);
         return distance = new Vector2(distanceX, distanceY);
     }
 
@@ -116,6 +115,7 @@ public class RuleBasedBot implements IBot{
     }
 
     public Vector2 findBestShot(GameState gameState){
+        numSimulations = 0;
         gameState = gameState.copy();
         setup(gameState);
         findHill();
@@ -125,13 +125,10 @@ public class RuleBasedBot implements IBot{
         double speedMargin = 1;     // a constant by which the speed is conditionally increased
         double threshold = 0.1;
         double angle = 15.0;
-        System.out.println(" Distance vector: x = " + distance.x+"; y = "+distance.y);
         normX = getNormalizedDistance(distance).x;
         normY = getNormalizedDistance(distance).y;
-        System.out.println(" Normalized distance vector: x = "+ normX+"; y = "+normY);
 
         speed = new Vector2(normX * initalSpeed, normY * initalSpeed);
-        System.out.println("*** INITIAL velocity vector: x = "+ speed.x+"; y = "+speed.y+" ***");
         // if OBSTACLE is nearby (i.e. sandpit on the slope, consider correct friction in this case)
         Vector2 slope;
 
@@ -148,13 +145,12 @@ public class RuleBasedBot implements IBot{
                 // rotate speed vector by 15 degrees angle
                 // rotated as follows: x2 = cos (𝛽𝑥1) − sin(𝛽𝑦) and y2 = sin(𝛽𝑦) + cos (𝛽𝑥1)
                 speed = new Vector2(Math.cos(angle*speed.x) - Math.sin(angle*speed.y), Math.sin(angle*speed.x) + Math.cos(angle*speed.y));
-                System.out.println("*** ROTATION: Rotated the vector by " + angle + " degrees ***");
+
             }
             if (ball.state.getZCoordinate(terrain) < 0){     // checking for water
                 // rotate speed vector s.t. the new vector shoots around the water
             }
         }
-        System.out.println("*** Velocity vector after rotation: x = "+ speed.x+"; y = "+speed.y+" ***");
 
         for (double x = ballPosX,  y = ballPosY; x <= tarPosX && y <= tarPosY; x+=normX, y+=normY){
 
@@ -162,19 +158,13 @@ public class RuleBasedBot implements IBot{
             slope = new Vector2(terrain.terrainFunction.xDerivativeAt(x, y), terrain.terrainFunction.yDerivativeAt(x, y));
             dotProduct = Vector2.dotProduct(speed, slope);
 
-            System.out.println("*** DISTANCE: " + distance.length() + " ***");
             // if LONG distance
             if (distance.length() > 5){
                 //System.out.println("*** SLOPE-VALUES: x = "+ slope.x+"; y = "+slope.y+" ***");
                 if (hill){
                     if (dotProduct > 0){        // uphill       // !!! changed !!! was dotProduct < 0 before
-                        System.out.println("*** DOT PRODUCT: "+dotProduct+" ***");
-                        System.out.println("*** UPHILL ***");
                         // if easy slope ...
-                        System.out.println("*** SLOPE STEEPNESS: x = "+slope.length()+" ***");
                         if (slope.length() <= threshold){
-                            System.out.println("*** EASY SLOPE ***");
-                            System.out.println("+++ INCREASED BY: 0.5 * speedMargin +++");
                             if (speed.x <= maxSpeed-speedMargin && speed.y <= maxSpeed-speedMargin) {
                                 speed = new Vector2(speed.x + speedMargin, speed.y + speedMargin);
                                 //speed.scale(1.4);
@@ -182,8 +172,6 @@ public class RuleBasedBot implements IBot{
                         }
                         // if steep slope ...
                         if (slope.length() > threshold){
-                            System.out.println("*** STEEP SLOPE ***");
-                            System.out.println("+++ INCREASED BY: speedMargin +++");
                             // added IF statement here !!
                             if (speed.x <= maxSpeed-2*speedMargin && speed.y <= maxSpeed-2*speedMargin) {
                                 speed = new Vector2(speed.x + 2* speedMargin, speed.y + 2*speedMargin);
@@ -193,13 +181,8 @@ public class RuleBasedBot implements IBot{
                         }
                     }
                     if (dotProduct < 0){        // downhill
-                        System.out.println("*** DOT PRODUCT: "+dotProduct+" ***");
-                        System.out.println("*** DOWNHILL ***");
                         // if easy slope ...
-                        System.out.println("*** SLOPE STEEPNESS: x = "+slope.length()+" ***");
                         if (slope.length() <= threshold){
-                            System.out.println("*** EASY SLOPE ***");
-                            System.out.println("--- DECREASED BY: 0.5 * speedMargin ---");
                             if (speed.x >= -maxSpeed + 0.5 * speedMargin && speed.y >= -maxSpeed + 0.5 * speedMargin){
                                 speed = new Vector2(speed.x - 0.5 * speedMargin, speed.y - 0.5 * speedMargin);
                                 //speed.scale(1.4);
@@ -207,8 +190,6 @@ public class RuleBasedBot implements IBot{
                         }
                         // if steep slope ...
                         if (slope.length() > threshold){
-                            System.out.println("*** STEEP SLOPE ***");
-                            System.out.println("--- DECREASED BY: speedMargin ---");
                             if (speed.x >= -maxSpeed + speedMargin && speed.y >= -maxSpeed + speedMargin) {
                                 speed = new Vector2(initalSpeed - speedMargin, initalSpeed - speedMargin);
                                 //speed.scale(1.4);
@@ -221,13 +202,8 @@ public class RuleBasedBot implements IBot{
             if (distance.length() <= 5) {
                 if (hill){
                     if (dotProduct > 0){        // uphill      // !!! changed !!!
-                        System.out.println("*** DOT PRODUCT: "+dotProduct+" ***");
-                        System.out.println("*** UPHILL ***");
                         // if easy slope ...
-                        System.out.println("*** SLOPE STEEPNESS: x = "+slope.length()+" ***");
                         if (slope.length() <= threshold){
-                            System.out.println("*** EASY SLOPE ***");
-                            System.out.println("+++ INCREASED BY: 0.5 * speedMargin +++");
                             if (speed.x <= maxSpeed-speedMargin && speed.y <= maxSpeed-speedMargin) {
                                 speed = new Vector2(speed.x + speedMargin, speed.y + speedMargin);
                                 //speed.scale(1.4);
@@ -235,8 +211,6 @@ public class RuleBasedBot implements IBot{
                         }
                         // if steep slope ...
                         if (slope.length() > threshold){
-                            System.out.println("*** STEEP SLOPE ***");
-                            System.out.println("+++ INCREASED BY: speedMargin +++");
                             if (speed.x <= maxSpeed-2.2*speedMargin && speed.y <= maxSpeed-2.2*speedMargin) {
                                 speed = new Vector2(speed.x + 2.2 * speedMargin, speed.y + 2.2 * speedMargin);
                                 //speed.scale(1.4);
@@ -244,13 +218,8 @@ public class RuleBasedBot implements IBot{
                         }
                     }
                     if (dotProduct < 0){        // downhill
-                        System.out.println("*** DOT PRODUCT: "+dotProduct+" ***");
-                        System.out.println("*** DOWNHILL ***");
                         // if easy slope ...
-                        System.out.println("*** SLOPE STEEPNESS: x = "+slope.length()+" ***");
                         if (slope.length() <= threshold){
-                            System.out.println("*** EASY SLOPE ***");
-                            System.out.println("--- DECREASED BY: 0.5 * speedMargin ---");
                             if (speed.x >= -maxSpeed + speedMargin && speed.y >= -maxSpeed + speedMargin) {
                                 speed = new Vector2(speed.x - 0.5 * speedMargin, speed.y - 0.5 * speedMargin);
                                 //speed.scale(1.4);
@@ -258,8 +227,6 @@ public class RuleBasedBot implements IBot{
                         }
                         // if steep slope ...
                         if (slope.length() > threshold){
-                            System.out.println("*** STEEP SLOPE ***");
-                            System.out.println("--- DECREASED BY: speedMargin ---");
                             if (speed.x >= -maxSpeed + speedMargin && speed.y >= -maxSpeed + speedMargin) {
                                 speed = new Vector2(initalSpeed - speedMargin, initalSpeed - speedMargin);
                                 //speed.scale(1.4);
@@ -269,10 +236,17 @@ public class RuleBasedBot implements IBot{
                 }
             }
         }
-        System.out.println("*** FINAL Velocity vector: x = "+ speed.x+"; y = "+speed.y+" ***");
-        System.out.println();
-        System.out.println("========================================================");
         return speed;
+    }
+
+    @Override
+    public int getNumSimulations() {
+        return numSimulations;
+    }
+
+    @Override
+    public int getNumIterations() {
+        return 0;
     }
 
 }
