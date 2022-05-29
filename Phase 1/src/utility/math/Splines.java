@@ -9,8 +9,8 @@ public class Splines{
     public function.Function f;
 
     public Splines(String function){
-
         f = new Function(function);
+        function = "h(x,y) = " + f.toString();
 
         /*
         for(int i = 0; i < point.length; i++){
@@ -86,9 +86,6 @@ public class Splines{
 
 
     public String toString() {
-
-        function = "h(x,y) = " + f.toString();
-
         return function;
     }
 
