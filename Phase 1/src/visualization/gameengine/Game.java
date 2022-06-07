@@ -49,13 +49,14 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         game = this;
         running = false;
 
-        //setupInitialBot();
+
 
         FPS = fps;
         createGameState();
         updateLoop = new Update(gameState);
+        setupInitialBot();
         //AStar aStar = new AStar(gameState.getTerrain());
-        setManualInputType();
+        //setManualInputType();
         createCamera();
         createRenderer();
         createFrame();
