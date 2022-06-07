@@ -1,7 +1,7 @@
 package gui.shotinput;
 
 import datastorage.Ball;
-import gameengine.Game;
+import visualization.gameengine.Game;
 import gui.GameStateRenderer;
 import utility.UtilityClass;
 import utility.math.Vector2;

@@ -6,7 +6,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Scanner;
 
-import gameengine.Game;
+import visualization.gameengine.Game;
 import utility.math.Vector2;
 
 public class InputFileReader extends BallVelocityInput {

@@ -1,6 +1,6 @@
 package gui.shotinput;
 
-import gameengine.Game;
+import visualization.gameengine.Game;
 import gui.InputPanel;
 import gui.InterfaceFactory;
 import utility.math.Vector2;

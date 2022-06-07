@@ -2,8 +2,8 @@ package gui;
 
 import datastorage.*;
 import datastorage.obstacles.*;
-import gameengine.Camera;
-import gameengine.Game;
+import visualization.gameengine.Camera;
+import visualization.gameengine.Game;
 import utility.UtilityClass;
 import utility.math.*;
 

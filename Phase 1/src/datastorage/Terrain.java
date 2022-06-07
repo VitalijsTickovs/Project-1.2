@@ -46,6 +46,11 @@ public class Terrain {
     // This value seems to be the right number, so no need to provide it as input
     // everytime.
     private final int VERTECES_PER_SIDE = 1025;
+
+    public int getVERTECES_PER_SIDE() {
+        return VERTECES_PER_SIDE;
+    }
+
     public final double NORMAL_FACTOR = 50;
 
     public Terrain(String function, double staticFriction, double kineticFriction, Vector2 startingCorner,

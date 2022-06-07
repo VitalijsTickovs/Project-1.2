@@ -1,7 +1,7 @@
 package gui;//package crazyPutting;
 
-import gameengine.Game;
-import jmonkeyrender.Renderer;
+import visualization.gameengine.Game;
+import visualization.jmonkeyrender.Renderer;
 
 public class MenuGUI extends javax.swing.JFrame {
     static boolean gameBoolean =true;//false =player game; true =bot game

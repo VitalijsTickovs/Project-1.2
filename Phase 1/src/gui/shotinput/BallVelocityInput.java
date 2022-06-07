@@ -1,6 +1,6 @@
 package gui.shotinput;
 
-import gameengine.Game;
+import visualization.gameengine.Game;
 
 public abstract class BallVelocityInput {
     protected Game game;
