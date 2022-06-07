@@ -76,7 +76,7 @@ public class Update {
         ballPositions = new ArrayList<Vector2>();
     }
 
-    private void resetGame() {
+    public void resetGame() {
         gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
         if (bot != null && botThread.isAlive()) {
             // End the bot thread if it is still running
@@ -111,7 +111,7 @@ public class Update {
         return distance <= gameState.getTerrain().target.radius;
     }
 
-    private void resetBotThread() {
+    public void resetBotThread() {
         botThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -126,6 +126,10 @@ public class Update {
 
     private void handleInput() {
         if (isSimulationFinished() && !hasReachedTarget()) {
+            if(bot == null){
+                ballVelocityInput.readyForNextInput();
+            }
+            }else{
                 resetBotThread();
                 botThread.start();
         }

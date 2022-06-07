@@ -11,7 +11,6 @@ import datastorage.GameState;
 import utility.math.Vector2;
 import gui.GameStateRenderer;
 import gui.InterfaceFactory;
-import gui.shotinput.BallVelocityInput;
 import gui.shotinput.IClickListener;
 import gui.shotinput.MouseInputReader;
 import bot.botimplementations.IBot;
@@ -19,7 +18,6 @@ import bot.botimplementations.IBot;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import bot.AStar;
 import bot.botimplementations.BotFactory;
 import visualization.Update;
 
@@ -35,13 +33,8 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
     private final int FPS;
     private boolean running;
     private Thread gameThread;
-    //private Vector2 shotForce;
-    //private IBot bot = null;
-    //private Thread botThread;
     public Input input;
-    //private BallVelocityInput ballVelocityInput;
     private GameStateRenderer gameStateRenderer;
-    //private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
 
     public static void main(String[] args) {
         Game g = new Game(256);
@@ -56,7 +49,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         game = this;
         running = false;
 
-        setupInitialBot();
+        //setupInitialBot();
         FPS = fps;
         createGameState();
         //AStar aStar = new AStar(gameState.getTerrain());
@@ -69,7 +62,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
     private void setupInitialBot() {
         setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
-        resetBotThread();
+        updateLoop.resetBotThread();
     }
 
     private void createInput() {
@@ -80,34 +73,14 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         addMouseListener(this);
     }
 
-    private void resetBotThread() {
-        updateLoop.setBotThread(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Calculating shot...");
-                updateLoop.setShotForce(updateLoop.getBot().findBestShot(gameState));
-                System.out.println("Velocity: " + updateLoop.getShotForce());
-                System.out.println("Number of simulations: "+updateLoop.getBot().getNumSimulations());
-                System.out.println("Number of iterations: "+updateLoop.getBot().getNumIterations());
-            }
-        }));
-    }
-
     private void createGameState() {
         gameState = reader.GameStateLoader.readFile();
         BotFactory.setTerrain(gameState.getTerrain());
     }
 
     private void setManualInputType() {
-        // ballVelocityInput = new ShotInputWindow(this);
         updateLoop.setBallVelocityInput(new MouseInputReader(this));
     }
-
-//    private void resetStartingVariables() {
-//        numShots = 0;
-//        shotForce = null;
-//        ballPositions = new ArrayList<Vector2>();
-//    }
 
     private void createCamera() {
         camera = new Camera(15, 15);
@@ -191,80 +164,11 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
      * Updates the state of the game each step
      */
     public void update() {
-//        handleBallInWater();
-//        handleInput();
-//        simulateShot();
         updateLoop.updateLoop();
         moveBall();
         moveCamera();
         handleKeyInputs();
     }
-
-//    private void handleBallInWater() {
-//        if (isSimulationFinished()) {
-//            boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(
-//                    gameState.getBall().state.position.x,
-//                    gameState.getBall().state.position.y) < 0;
-//            if (isBallInWater) {
-//                resetGame();
-//            }
-//        }
-//    }
-
-//    private void resetGame() {
-//        gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
-//        if (bot != null && botThread.isAlive()) {
-//            // End the bot thread if it is still running
-//            try {
-//                botThread.join();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        resetStartingVariables();
-//    }
-
-//    private void handleInput() {
-//        if (isSimulationFinished() && !hasReachedTarget()) {
-//            if (bot == null) {
-//                ballVelocityInput.readyForNextInput();
-//            } else {
-//                resetBotThread();
-//                botThread.start();
-//            }
-//        }
-//    }
-
-    private boolean hasReachedTarget() {
-        double distance = gameState.getBall().state.position.copy()
-                .translate(gameState.getTerrain().target.position.copy().scale(-1)).length();
-        return distance <= gameState.getTerrain().target.radius;
-    }
-
-    /**
-     * @return true, if the ball has stopped and the input window should open
-     */
-//    private boolean isSimulationFinished() {
-//        boolean ballStopped = ballPositions.size() == 0;
-//        boolean notWaitingForBot = (bot == null || botThread == null) || (bot != null && !botThread.isAlive());
-//        boolean ballHasBeenPushed = shotForce == null;
-//        return ballHasBeenPushed && notWaitingForBot && ballStopped;
-//    }
-
-//    private void simulateShot() {
-//        if (shouldPushBall()) {
-//            ballPositions = gameState.simulateShot(shotForce);
-//            numShots++;
-//            shotForce = null;
-//            drawArrow = false;
-//        }
-//    }
-
-//    private boolean shouldPushBall() {
-//        boolean ballStopped = ballPositions.size() == 0;
-//        boolean ballHasNotBeenPushed = shotForce != null;
-//        return ballStopped && ballHasNotBeenPushed && !hasReachedTarget();
-//    }
 
     private void moveBall() {
         boolean ballMoving = updateLoop.getBallPositions().size() != 0;
@@ -290,7 +194,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
     private void checkResetGame() {
         if (checkKeyPressed(Input.R)) {
-            //resetGame();
+            updateLoop.resetGame();
         }
     }
 
