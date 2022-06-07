@@ -50,8 +50,10 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         running = false;
 
         //setupInitialBot();
+
         FPS = fps;
         createGameState();
+        updateLoop = new Update(gameState);
         //AStar aStar = new AStar(gameState.getTerrain());
         setManualInputType();
         createCamera();
@@ -120,7 +122,6 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
             timer += now - last;
 
             if (numUpdates >= 1) {
-                updateLoop =  new Update(gameState);
                 update();
                 render();
                 fps++;
