@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
 
+import bot.AStar;
 import datastorage.Ball;
 import datastorage.GameState;
 import utility.math.Vector2;
@@ -52,9 +53,11 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
         FPS = fps;
         createGameState();
+
         updateLoop = new Update(gameState);
+
         //setupInitialBot();
-        //AStar aStar = new AStar(gameState.getTerrain());
+        AStar aStar = new AStar(gameState.getTerrain());
         setManualInputType();
         createCamera();
         createRenderer();
@@ -196,22 +199,22 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
     private void changeBotImplementation() {
         if (checkKeyPressed(Input.H)) {
-            setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
+            updateLoop.setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
         }
         if (checkKeyPressed(Input.P)) {
-            setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
+            updateLoop.setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
         }
         if (checkKeyPressed(Input.G)) {
-            setBot(BotFactory.getBot(BotFactory.BotImplementations.GRADIENT_DESCENT));
+            updateLoop.setBot(BotFactory.getBot(BotFactory.BotImplementations.GRADIENT_DESCENT));
         }
         if (checkKeyPressed(Input.S)) {
-            setBot(BotFactory.getBot(BotFactory.BotImplementations.RULE));
+            updateLoop.setBot(BotFactory.getBot(BotFactory.BotImplementations.RULE));
         }
         if (checkKeyPressed(Input.N)) {
-            setBot(BotFactory.getBot(BotFactory.BotImplementations.RANDOM));
+            updateLoop.setBot(BotFactory.getBot(BotFactory.BotImplementations.RANDOM));
         }
         if (checkKeyPressed(Input.M)) {
-            setBot(null);
+            updateLoop.setBot(null);
         }
     }
     // endregion

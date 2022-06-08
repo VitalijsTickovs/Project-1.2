@@ -21,10 +21,12 @@ import visualization.Update;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+
 public class Renderer extends SimpleApplication {
     private MapGeneration mapGeneration;
     private ObjectGeneration objectGeneration;
     private UIGeneration uiGeneration;
+    private KeyinputGenerator keyinputGenerator;
     private final Cam camInit = new Cam();
 
     private Update updateLoop;
@@ -37,7 +39,7 @@ public class Renderer extends SimpleApplication {
 
     private Terrain terrain;
 
-    private Ball ball;
+    protected Ball ball;
 
     private BitmapText text;
     private static final DecimalFormat df = new DecimalFormat("0.00");
@@ -118,6 +120,13 @@ public class Renderer extends SimpleApplication {
         }
     }
 
+    public void InitPointers(){
+        mapGeneration = new MapGeneration(this);
+        objectGeneration = new ObjectGeneration(this);
+        uiGeneration = new UIGeneration(this);
+        keyinputGenerator = new KeyinputGenerator(this);
+        updateLoop = new Update(gameState);
+    }
     /**
      * Initializes physics for calculating the ball movement
      */
@@ -129,11 +138,6 @@ public class Renderer extends SimpleApplication {
         this.pixelScale = (float) terrain.getVERTECES_PER_SIDE()/100;
 
         this.ball = this.gameState.getBall();
-
-        mapGeneration = new MapGeneration(this);
-        objectGeneration = new ObjectGeneration(this);
-        uiGeneration = new UIGeneration(this);
-        updateLoop = new Update(gameState);
     }
 
     private void setupInitialBot(){
@@ -143,15 +147,20 @@ public class Renderer extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         //Disabling unnecessary information
+        inputManager.deleteMapping( SimpleApplication.INPUT_MAPPING_MEMORY );
         setDisplayStatView(false);
 
         InitPhysics();
+        InitPointers();
 
         mapGeneration.InitMap(MenuGUI.texPath);
         objectGeneration.InitTarBall();
         uiGeneration.InitText(guiFont);
         moveBall(this.ball.state.position);
-        setupInitialBot();
+
+        updateLoop.setManualInputType3d(this);
+
+        keyinputGenerator.initKeys();
 
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
@@ -181,6 +190,13 @@ public class Renderer extends SimpleApplication {
         settings.put("Samples", 4);
         this.setSettings(settings);
 
+
         this.start();
+    }
+
+    public Vector2 getMousePosition() {
+        Vector3f location = cam.getWorldCoordinates(inputManager.getCursorPosition(), 0);
+        System.out.println(location);
+        return new Vector2(location.x,location.z);
     }
 }
