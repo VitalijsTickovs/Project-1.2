@@ -12,7 +12,6 @@ import utility.math.Vector2;
 import gui.GameStateRenderer;
 import gui.InterfaceFactory;
 import gui.shotinput.IClickListener;
-import gui.shotinput.MouseInputReader;
 import bot.botimplementations.IBot;
 
 import java.awt.event.MouseEvent;
@@ -22,6 +21,8 @@ import bot.botimplementations.BotFactory;
 import visualization.Update;
 
 public class Game extends JPanel implements Runnable, GameObject, MouseListener {
+    private final Update updateLoop;
+
     public int numShots;
     public boolean drawArrow = false;
 
@@ -37,7 +38,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
     private GameStateRenderer gameStateRenderer;
 
     public static void main(String[] args) {
-        Game g = new Game(256);
+        Game g = new Game(40);
         g.start();
     }
 
@@ -49,23 +50,16 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         game = this;
         running = false;
 
-
-
         FPS = fps;
         createGameState();
         updateLoop = new Update(gameState);
-        setupInitialBot();
+        //setupInitialBot();
         //AStar aStar = new AStar(gameState.getTerrain());
-        //setManualInputType();
+        setManualInputType();
         createCamera();
         createRenderer();
         createFrame();
         createInput();
-    }
-
-    private void setupInitialBot() {
-        setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
-        updateLoop.resetBotThread();
     }
 
     private void createInput() {
@@ -82,7 +76,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
     }
 
     private void setManualInputType() {
-        updateLoop.setBallVelocityInput(new MouseInputReader(this));
+        updateLoop.setManualInputType(this);
     }
 
     private void createCamera() {
@@ -98,7 +92,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
     private void createFrame() {
         Vector2 frameSize = new Vector2((int) (camera.WIDTH * GameStateRenderer.PIXELS_PER_GAME_UNIT),
                 (int) (camera.HEIGHT * GameStateRenderer.PIXELS_PER_GAME_UNIT));
-        frame = InterfaceFactory.createFrame("Crazy Putting", frameSize, false, null, null);
+        frame = InterfaceFactory.createFrame("Crazy Putting", frameSize, true, null, null);
         frame.add(this);
         frame.setVisible(true);
     }
@@ -161,7 +155,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         return input.isDown(key);
     }
 
-    Update updateLoop;
+
     /**
      * Updates the state of the game each step
      */
@@ -232,7 +226,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
     private void drawImage(BufferedImage gameStateImage) {
         Graphics2D gameg2 = (Graphics2D) getGraphics();
-        gameg2.drawImage(gameStateImage, null, 0, 0);
+        gameg2.drawImage(gameStateImage, null,0, 0);
         gameg2.dispose();
     }
     // endregion

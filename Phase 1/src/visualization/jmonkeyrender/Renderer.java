@@ -5,6 +5,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.input.ChaseCamera;
 import gui.MenuGUI;
 
+import gui.shotinput.IClickListener;
 import reader.GameStateLoader;
 import utility.math.Vector2;
 import datastorage.*;
@@ -18,6 +19,7 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import visualization.Update;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class Renderer extends SimpleApplication {
     private MapGeneration mapGeneration;
@@ -25,7 +27,7 @@ public class Renderer extends SimpleApplication {
     private UIGeneration uiGeneration;
     private final Cam camInit = new Cam();
 
-    Update updateLoop;
+    private Update updateLoop;
 
     private TerrainQuad terrainQuad;
     private GameState gameState;
@@ -44,6 +46,12 @@ public class Renderer extends SimpleApplication {
     private final float terScale = 6;
     private float pixelScale;
 
+    public ArrayList<IClickListener> clickListeners = new ArrayList<>();
+    public boolean drawArrow = false;
+
+    public Update getUpdateLoop() {
+        return updateLoop;
+    }
 
     public GameState getGameState() {
         return gameState;

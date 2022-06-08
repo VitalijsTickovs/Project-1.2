@@ -32,10 +32,6 @@ public class Update {
         return ballPositions;
     }
 
-    public void setBallVelocityInput(BallVelocityInput ballVelocityInput) {
-        this.ballVelocityInput = ballVelocityInput;
-    }
-
     public void setBot(IBot bot) {
         this.bot = bot;
     }
@@ -46,18 +42,6 @@ public class Update {
 
     public IBot getBot() {
         return bot;
-    }
-
-    public void setBotThread(Thread botThread) {
-        this.botThread = botThread;
-    }
-
-    public int getNumShots() {
-        return numShots;
-    }
-
-    public Vector2 getShotForce() {
-        return shotForce;
     }
 
     /**
@@ -100,7 +84,7 @@ public class Update {
         }
     }
 
-    private void setManualInputType(Game game) {
+    public void setManualInputType(Game game) {
         ballVelocityInput = new MouseInputReader(game);
     }
 
@@ -126,12 +110,12 @@ public class Update {
 
     private void handleInput() {
         if (isSimulationFinished() && !hasReachedTarget()) {
-            if(bot == null){
+            if (bot == null) {
                 ballVelocityInput.readyForNextInput();
-            }
-            }else{
+            } else {
                 resetBotThread();
                 botThread.start();
+            }
         }
     }
 
@@ -142,7 +126,6 @@ public class Update {
     }
 
     private void simulateShot() {
-
         if (shouldPushBall()) {
             ballPositions = gameState.simulateShot(shotForce);
             numShots++;
