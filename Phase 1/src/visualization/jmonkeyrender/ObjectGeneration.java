@@ -32,7 +32,7 @@ public class ObjectGeneration {
     /**
      * Creates a white target object
      */
-    private void InitTarget(){
+    private void initTarget(){
         //Creating cylinder, which would represent target hole
         Cylinder tar = new Cylinder(120, 120, (float) terrain.target.radius*pixelScale, 0.1f, true);
         Geometry target = new Geometry("Target", tar);
@@ -58,7 +58,7 @@ public class ObjectGeneration {
     /**
      * Creates golf ball, with textures
      */
-    private void InitBall(){
+    private void initBall(){
         //Creates Sphere object and adds to Geometry object
         Sphere ball = new Sphere(120, 120, renderer.getBallRadius());
         TangentBinormalGenerator.generate(ball);
@@ -75,8 +75,8 @@ public class ObjectGeneration {
         renderer.setBallRender(ballRender);
     }
 
-    public void InitTarBall(){
-        InitTarget();
-        InitBall();
+    public void initTarBall(){
+        initTarget();
+        initBall();
     }
 }

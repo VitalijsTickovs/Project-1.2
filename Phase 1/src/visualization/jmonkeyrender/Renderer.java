@@ -3,6 +3,10 @@ package visualization.jmonkeyrender;
 import bot.botimplementations.BotFactory;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.ChaseCamera;
+import com.jme3.material.Material;
+import com.jme3.scene.debug.Arrow;
+import com.jme3.texture.Texture;
+import com.jme3.texture.Texture2D;
 import gui.MenuGUI;
 
 import gui.shotinput.IClickListener;
@@ -23,10 +27,13 @@ import java.util.ArrayList;
 
 
 public class Renderer extends SimpleApplication {
+    protected int WIDTH = 1280;
+    protected int HEIGHT = 720;
+
     private MapGeneration mapGeneration;
     private ObjectGeneration objectGeneration;
     private UIGeneration uiGeneration;
-    private KeyinputGenerator keyinputGenerator;
+    private InputsGenerator inputsGenerator;
     private final Cam camInit = new Cam();
 
     private Update updateLoop;
@@ -120,17 +127,31 @@ public class Renderer extends SimpleApplication {
         }
     }
 
-    public void InitPointers(){
+    public void drawArrow(Vector2f cursorPos) {
+        cursorPos = cursorPos.add(new Vector2f((float)ball.state.position.x,(float)ball.state.position.y));
+        Arrow arrow = new Arrow(new Vector3f(1,0,0));
+
+        Geometry arrowRender = new Geometry("Arrow", arrow);
+        Material redMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        redMat.setColor("Color", ColorRGBA.Red);
+        arrowRender.setMaterial(redMat);
+
+        arrowRender.setLocalTranslation((float)ball.state.position.x,terrain.HeightMapValueAt(ball.state.position)+2*terScale,(float)ball.state.position.y);
+        arrowRender.setLocalScale(100,1,1);
+        getRootNode().attachChild(arrowRender);
+    }
+
+    public void initPointers(){
         mapGeneration = new MapGeneration(this);
         objectGeneration = new ObjectGeneration(this);
         uiGeneration = new UIGeneration(this);
-        keyinputGenerator = new KeyinputGenerator(this);
+        inputsGenerator = new InputsGenerator(this);
         updateLoop = new Update(gameState);
     }
     /**
      * Initializes physics for calculating the ball movement
      */
-    public void InitPhysics(){
+    public void initPhysics(){
         //Attaches the input values to Terrain object
         this.gameState = GameStateLoader.readFile();
         this.terrain = gameState.getTerrain();
@@ -140,27 +161,24 @@ public class Renderer extends SimpleApplication {
         this.ball = this.gameState.getBall();
     }
 
-    private void setupInitialBot(){
-        updateLoop.setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
-    }
-
     @Override
     public void simpleInitApp() {
         //Disabling unnecessary information
         inputManager.deleteMapping( SimpleApplication.INPUT_MAPPING_MEMORY );
         setDisplayStatView(false);
 
-        InitPhysics();
-        InitPointers();
+        initPhysics();
+        initPointers();
 
-        mapGeneration.InitMap(MenuGUI.texPath);
-        objectGeneration.InitTarBall();
-        uiGeneration.InitText(guiFont);
+        mapGeneration.initMap(MenuGUI.texPath);
+        objectGeneration.initTarBall();
+        uiGeneration.initText(guiFont);
         moveBall(this.ball.state.position);
 
         updateLoop.setManualInputType3d(this);
 
-        keyinputGenerator.initKeys();
+        inputsGenerator.initKeys();
+        inputsGenerator.initMouse();
 
         //creating and attaching camera to ball
         ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
@@ -177,14 +195,18 @@ public class Renderer extends SimpleApplication {
             moveBall(ball.state.position);
             updateLoop.getBallPositions().remove(0);
         }
+        Vector2f cursorPos = getInputManager().getCursorPosition();
+        cursorPos.x -= (float)WIDTH/2; cursorPos.y -= (float) HEIGHT/2;
+        cursorPos = cursorPos.mult(0.3f);
+        drawArrow(cursorPos);
     }
 
     public void start3d(){
         this.setShowSettings(false);
         // Setting up renderer settings, so JME settings tab wouldn't pop out
         AppSettings settings = new AppSettings(true);
-        settings.put("Width", 1280);
-        settings.put("Height", 720);
+        settings.put("Width", WIDTH);
+        settings.put("Height", HEIGHT);
         settings.put("Title", "Golf Game");
         settings.put("VSync", true);
         settings.put("Samples", 4);
@@ -199,4 +221,6 @@ public class Renderer extends SimpleApplication {
         System.out.println(location);
         return new Vector2(location.x,location.z);
     }
+
+
 }

@@ -39,7 +39,7 @@ public class MapGeneration {
      * Initializes area terrain based on the function given in input file
      * with textures of grass as well as sand if it is specified
      */
-    private void InitTerrain(String texPath){
+    private void initTerrain(String texPath){
         //Creating heightmap representation of the terrain
         AlphaMapGenerator.generateAlphaMap(terrain);
 
@@ -78,7 +78,7 @@ public class MapGeneration {
      * Creates a sky background as cube shape from 6 distinct images
      * @param path specification to load different background for different maps
      */
-    private void InitSky(String path){
+    private void initSky(String path){
         Texture westTex = assetManager.loadTexture(path+"/West.bmp");
         Texture eastTex = assetManager.loadTexture(path+"/East.bmp");
         Texture northTex = assetManager.loadTexture(path + "/North.bmp");
@@ -93,7 +93,7 @@ public class MapGeneration {
     /**
      * Spawns water simulation around the terrain
      */
-    private void InitWater(){
+    private void initWater(){
         //Spawn water only if the terrain has points<0
         if(this.terrain.minScaledVal<normalFactor/2) {
             //Creates new water object reflection
@@ -121,9 +121,9 @@ public class MapGeneration {
         }
     }
 
-    public void InitMap(String terrainTexture){
-        InitTerrain(terrainTexture);
-        InitWater();
-        InitSky("Sky/BoxPieces");
+    public void initMap(String terrainTexture){
+        initTerrain(terrainTexture);
+        initWater();
+        initSky("Sky/BoxPieces");
     }
 }

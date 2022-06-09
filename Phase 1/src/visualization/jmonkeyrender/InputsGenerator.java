@@ -2,13 +2,15 @@ package visualization.jmonkeyrender;
 
 import bot.botimplementations.BotFactory;
 import com.jme3.input.KeyInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.MouseInput;
+import com.jme3.input.controls.*;
+import com.jme3.math.Vector2f;
+import com.jme3.scene.debug.Arrow;
 
-public class KeyinputGenerator {
+public class InputsGenerator {
     private Renderer renderer;
 
-    public KeyinputGenerator(Renderer renderer) {
+    public InputsGenerator(Renderer renderer) {
         this.renderer = renderer;
     }
 
@@ -20,18 +22,26 @@ public class KeyinputGenerator {
         renderer.getInputManager().addMapping("Rule Bot", new KeyTrigger(KeyInput.KEY_B));
         renderer.getInputManager().addMapping("Manual Input", new KeyTrigger(KeyInput.KEY_L));
         renderer.getInputManager().addMapping("Reset", new KeyTrigger(KeyInput.KEY_R));
-
         // Add the names to the action listener.
-        renderer.getInputManager().addListener(actionListener, "PS Bot");
-        renderer.getInputManager().addListener(actionListener, "HC Bot");
-        renderer.getInputManager().addListener(actionListener, "GD Bot");
-        renderer.getInputManager().addListener(actionListener, "Rule Bot");
-        renderer.getInputManager().addListener(actionListener, "Manual Input");
-        renderer.getInputManager().addListener(actionListener, "Reset");
-
+        renderer.getInputManager().addListener(keyListener, "PS Bot","HC Bot","GD Bot","Rule Bot","Manual Input","Reset");
     }
 
-    private final ActionListener actionListener = new ActionListener() {
+    protected void initMouse(){
+        renderer.getInputManager().addMapping("MiddleButton", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        renderer.getInputManager().addListener(mouseListener, "MiddleButton");
+    }
+
+    private final ActionListener mouseListener = new ActionListener() {
+        @Override
+        public void onAction(String name, boolean clicked, float v) {
+
+            if(name.equals("MiddleButton") && !clicked){
+
+            }
+        }
+    };
+
+    private final ActionListener keyListener = new ActionListener() {
         public void resetGame(){
             renderer.getUpdateLoop().resetGame();
             renderer.moveBall(renderer.ball.state.position);

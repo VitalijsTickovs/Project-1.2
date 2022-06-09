@@ -46,7 +46,7 @@ public class UIGeneration {
     /**
      * Displays text with current ball position
      */
-    public void InitText(BitmapFont guiFont){
+    public void initText(BitmapFont guiFont){
         BitmapText hudText = new BitmapText(guiFont);
         hudText.setSize(guiFont.getCharSet().getRenderedSize());
         hudText.setColor(ColorRGBA.White);
