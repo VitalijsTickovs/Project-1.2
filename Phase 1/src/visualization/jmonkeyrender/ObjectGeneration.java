@@ -2,16 +2,17 @@ package visualization.jmonkeyrender;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
+import com.jme3.math.*;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.debug.Arrow;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
+import datastorage.Ball;
+import datastorage.BallState;
 import datastorage.Terrain;
+import utility.math.Vector2;
 
 public class ObjectGeneration {
     private final Renderer renderer;
@@ -73,6 +74,27 @@ public class ObjectGeneration {
         //add the geometry object to the scene
         renderer.getRootNode().attachChild(ballRender);
         renderer.setBallRender(ballRender);
+    }
+
+    /**
+     * Generates an arrow Geometry object
+     * @param pos - vector, which distance is from ballPos to the mouse coordinates
+     * @return Geometry object of an arrow
+     */
+    public Geometry initArrow(Vector2f pos){
+        Arrow arrow = new Arrow(new Vector3f(-pos.x,0,pos.y));
+        Geometry arrowRender = new Geometry("Arrow", arrow);
+
+        Vector2 ballPos = renderer.getGameState().getBall().state.position;
+        arrowRender.setLocalTranslation((float)ballPos.x*pixelScale,
+                terrain.HeightMapValueAt(ballPos)*terScale+1,(float)ballPos.y*pixelScale);
+
+        //Textures for the arrow
+        Material redMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        redMat.setColor("Color", ColorRGBA.Red);
+        arrowRender.setMaterial(redMat);
+
+        return arrowRender;
     }
 
     public void initTarBall(){

@@ -1,16 +1,13 @@
 package gui.shotinput;
 
-import visualization.gameengine.Game;
-import visualization.jmonkeyrender.Renderer;
+import visualization.InputInt;
 
 public abstract class BallVelocityInput {
-    protected Game game;
-    protected Renderer renderer;
+    protected InputInt game;
 
-    public BallVelocityInput(Game game) {
-        this.game = game;
-    }
-    public BallVelocityInput(Renderer renderer){this.renderer = renderer;}
+    public BallVelocityInput(InputInt game){this.game = game;}
 
     public abstract void readyForNextInput();
+
+    public abstract void hideInputWindow();
 }

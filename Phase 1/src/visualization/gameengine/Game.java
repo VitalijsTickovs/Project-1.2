@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import bot.AStar;
 import datastorage.Ball;
 import datastorage.GameState;
+import gui.shotinput.MouseInputReader;
+import gui.shotinput.ShotInputWindow;
 import utility.math.Vector2;
 import gui.GameStateRenderer;
 import gui.InterfaceFactory;
@@ -19,13 +21,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import bot.botimplementations.BotFactory;
+import visualization.InputInt;
 import visualization.Update;
 
-public class Game extends JPanel implements Runnable, GameObject, MouseListener {
+public class Game extends JPanel implements Runnable, GameObject, MouseListener, InputInt {
     private final Update updateLoop;
 
     public int numShots;
-    public boolean drawArrow = false;
 
     public JFrame frame;
     public GameState gameState;
@@ -58,7 +60,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
         //setupInitialBot();
         AStar aStar = new AStar(gameState.getTerrain());
-        setManualInputType();
+        setMouseInput();
         createCamera();
         createRenderer();
         createFrame();
@@ -78,8 +80,12 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
         BotFactory.setTerrain(gameState.getTerrain());
     }
 
-    private void setManualInputType() {
-        updateLoop.setManualInputType(this);
+    private void setMouseInput() {
+        updateLoop.setManualInputType(new MouseInputReader(this));
+    }
+
+    private void setInputWindow(){
+        updateLoop.setManualInputType(new ShotInputWindow(this));
     }
 
     private void createCamera() {
@@ -222,14 +228,14 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
 
     // region Render
     public void render() {
-        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera, drawArrow, true);
+        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera, updateLoop.drawArrow, true);
         drawImage(gameStateImage);
         gameStateImage.flush();
     }
 
     private void drawImage(BufferedImage gameStateImage) {
         Graphics2D gameg2 = (Graphics2D) getGraphics();
-        gameg2.drawImage(gameStateImage, null,0, 0);
+        gameg2.drawImage(gameStateImage,null,0, 0);
         gameg2.dispose();
     }
     // endregion
@@ -333,6 +339,16 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener 
     public void mouseExited(MouseEvent e) {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public Update getUpdateLoop() {
+        return updateLoop;
+    }
+
+    @Override
+    public ArrayList<IClickListener> getClickListener() {
+        return clickListeners;
     }
     // endregion
 }

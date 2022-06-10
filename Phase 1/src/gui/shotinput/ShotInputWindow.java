@@ -1,6 +1,6 @@
 package gui.shotinput;
 
-import visualization.gameengine.Game;
+import visualization.InputInt;
 import gui.InputPanel;
 import gui.InterfaceFactory;
 import utility.math.Vector2;
@@ -21,17 +21,19 @@ public class ShotInputWindow extends BallVelocityInput {
     /**
      * Constructor. Creates a new ShotInput
      */
-    public ShotInputWindow(Game game) {
+    public ShotInputWindow(InputInt game) {
         super(game);
         isOpen = false;
         this.game = game;
     }
+
     // endregion
 
     /**
      * Creates a JFrame window with a velocity input option
      */
     public void readyForNextInput() {
+        game.getUpdateLoop().drawArrow = false;
         if (!wasCreated) {
             createWindow();
             wasCreated = true;
@@ -40,6 +42,10 @@ public class ShotInputWindow extends BallVelocityInput {
             frame.setVisible(true);
             isOpen = true;
         }
+    }
+    @Override
+    public void hideInputWindow(){
+        frame.dispose();
     }
 
     private void createWindow() {
@@ -64,8 +70,8 @@ public class ShotInputWindow extends BallVelocityInput {
 
     private JFrame createFrame() {
         Vector2 frameSize = new Vector2(300, 170);
-        Vector2 framePosition = new Vector2(frameSize.x * 2, game.frame.getY() + game.frame.getHeight());
-        JFrame frame = InterfaceFactory.createFrame("Input shot velocity", frameSize, false, framePosition, game);
+        Vector2 framePosition = new Vector2(frameSize.x * 2, 0);
+        JFrame frame = InterfaceFactory.createFrame("Input shot velocity", frameSize, false, framePosition, null);
         isOpen = true;
 
         return frame;
@@ -91,7 +97,7 @@ public class ShotInputWindow extends BallVelocityInput {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    game.setShotForce(readShotVector(xInputPanel, yInputPanel));
+                    game.getUpdateLoop().setShotForce(readShotVector(xInputPanel, yInputPanel));
                     frame.setVisible(false);
                     isOpen = false;
                 } catch (Exception e) {

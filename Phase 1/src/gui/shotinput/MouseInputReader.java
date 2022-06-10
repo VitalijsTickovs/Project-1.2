@@ -1,6 +1,7 @@
 package gui.shotinput;
 
 import datastorage.Ball;
+import visualization.InputInt;
 import visualization.gameengine.Game;
 import gui.GameStateRenderer;
 import utility.UtilityClass;
@@ -8,9 +9,9 @@ import utility.math.Vector2;
 
 public class MouseInputReader extends BallVelocityInput implements IClickListener {
 
-    public MouseInputReader(Game game) {
+    public MouseInputReader(InputInt game) {
         super(game);
-        game.clickListeners.add(this);
+        game.getClickListener().add(this);
     }
 
     private boolean isListening = false;
@@ -21,14 +22,17 @@ public class MouseInputReader extends BallVelocityInput implements IClickListene
             return;
         }
         isListening = true;
-        Game.game.drawArrow = true;
+        game.getUpdateLoop().drawArrow = true;
     }
+
+    @Override
+    public void hideInputWindow() {}
 
     public void mouseWasClicked(){
         if (!isListening) {
             return;
         }
-        Game.game.setShotForce(getForce(Game.getMiddleMousePosition()));
+        this.game.getUpdateLoop().setShotForce(getForce(Game.getMiddleMousePosition()));
         isListening = false;
     }
 

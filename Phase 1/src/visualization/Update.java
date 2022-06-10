@@ -3,11 +3,7 @@ package visualization;
 import bot.botimplementations.IBot;
 import datastorage.GameState;
 import gui.shotinput.BallVelocityInput;
-import gui.shotinput.MouseInputReader;
-import gui.shotinput.MouseInputReader3d;
 import utility.math.Vector2;
-import visualization.gameengine.Game;
-import visualization.jmonkeyrender.Renderer;
 
 import java.util.ArrayList;
 
@@ -44,6 +40,10 @@ public class Update {
 
     public IBot getBot() {
         return bot;
+    }
+
+    public BallVelocityInput getBallVelocityInput() {
+        return ballVelocityInput;
     }
 
     /**
@@ -86,13 +86,10 @@ public class Update {
         }
     }
 
-    public void setManualInputType(Game game) {
-        ballVelocityInput = new MouseInputReader(game);
+    public void setManualInputType(BallVelocityInput ballInput) {
+        ballVelocityInput = ballInput;
     }
 
-    public void setManualInputType3d(Renderer game) {
-        ballVelocityInput = new MouseInputReader3d(game);
-    }
 
 
     private boolean hasReachedTarget() {

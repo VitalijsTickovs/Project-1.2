@@ -1,12 +1,7 @@
 package visualization.jmonkeyrender;
 
-import bot.botimplementations.BotFactory;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.ChaseCamera;
-import com.jme3.material.Material;
-import com.jme3.scene.debug.Arrow;
-import com.jme3.texture.Texture;
-import com.jme3.texture.Texture2D;
 import gui.MenuGUI;
 
 import gui.shotinput.IClickListener;
@@ -20,13 +15,13 @@ import com.jme3.math.*;
 import com.jme3.scene.Geometry;
 import com.jme3.system.AppSettings;
 import com.jme3.terrain.geomipmap.TerrainQuad;
+import visualization.InputInt;
 import visualization.Update;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-
-public class Renderer extends SimpleApplication {
+public class Renderer extends SimpleApplication implements InputInt {
     protected int WIDTH = 1280;
     protected int HEIGHT = 720;
 
@@ -41,6 +36,10 @@ public class Renderer extends SimpleApplication {
     private TerrainQuad terrainQuad;
     private GameState gameState;
     private Geometry ballRender;
+    private Geometry arrowRender = new Geometry("Arrow");
+    private Vector2f shotInput = new Vector2f(0,0);
+
+    public ChaseCamera chaseCam;
 
     private final float ballRadius = 1f;
 
@@ -56,10 +55,14 @@ public class Renderer extends SimpleApplication {
     private float pixelScale;
 
     public ArrayList<IClickListener> clickListeners = new ArrayList<>();
-    public boolean drawArrow = false;
 
     public Update getUpdateLoop() {
         return updateLoop;
+    }
+
+    @Override
+    public ArrayList<IClickListener> getClickListener() {
+        return clickListeners;
     }
 
     public GameState getGameState() {
@@ -92,6 +95,10 @@ public class Renderer extends SimpleApplication {
 
     public void setBallRender(Geometry ballRender) {
         this.ballRender = ballRender;
+    }
+
+    public Vector2f getShotInput() {
+        return shotInput;
     }
 
     /**
@@ -127,20 +134,39 @@ public class Renderer extends SimpleApplication {
         }
     }
 
-    public void drawArrow(Vector2f cursorPos) {
-        cursorPos = cursorPos.add(new Vector2f((float)ball.state.position.x,(float)ball.state.position.y));
-        Arrow arrow = new Arrow(new Vector3f(1,0,0));
+    public void drawPoint(){
+        Vector3f cameraLocation = getCamera().getLocation();
+        Vector3f lookingVector = getCamera().getDirection();
+    }
 
-        Geometry arrowRender = new Geometry("Arrow", arrow);
-        Material redMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        redMat.setColor("Color", ColorRGBA.Red);
-        arrowRender.setMaterial(redMat);
+    public void drawArrow(){
+        shotInput = inputManager.getCursorPosition();
+        //Making vector around the center of the screen
+        shotInput = shotInput.add(new Vector2f(-WIDTH/2, -HEIGHT/2)).mult(0.1f);
+        //Rotating the vector based on the camera angle
+        shotInput.rotateAroundOrigin(getCamera().getRotation().toAngles(null)[1],false);
+        makeArrow(shotInput);
+    }
 
-        arrowRender.setLocalTranslation((float)ball.state.position.x,terrain.HeightMapValueAt(ball.state.position)+2*terScale,(float)ball.state.position.y);
-        arrowRender.setLocalScale(100,1,1);
+
+    public void makeArrow(Vector2f cursorPos) {
+        //Removing previous render of arrow from the scene
+        getRootNode().detachChild(arrowRender);
+        //Limiting the length of to 15 game units
+        if(cursorPos.length() > 15)cursorPos = cursorPos.normalize().mult(15);
+        arrowRender = objectGeneration.initArrow(cursorPos);
         getRootNode().attachChild(arrowRender);
     }
 
+    public void generateWorld(){
+        mapGeneration.initMap(MenuGUI.texPath);
+        objectGeneration.initTarBall();
+        uiGeneration.initText(guiFont);
+    }
+
+    /**
+     * Initializes objects that will generate world
+     */
     public void initPointers(){
         mapGeneration = new MapGeneration(this);
         objectGeneration = new ObjectGeneration(this);
@@ -167,21 +193,18 @@ public class Renderer extends SimpleApplication {
         inputManager.deleteMapping( SimpleApplication.INPUT_MAPPING_MEMORY );
         setDisplayStatView(false);
 
+        //Initializing simulation
         initPhysics();
         initPointers();
-
-        mapGeneration.initMap(MenuGUI.texPath);
-        objectGeneration.initTarBall();
-        uiGeneration.initText(guiFont);
+        generateWorld();
         moveBall(this.ball.state.position);
 
-        updateLoop.setManualInputType3d(this);
-
+        //Setting controls for the simulation
         inputsGenerator.initKeys();
         inputsGenerator.initMouse();
 
         //creating and attaching camera to ball
-        ChaseCamera chaseCam = new ChaseCamera(cam, ballRender, inputManager);
+        chaseCam = new ChaseCamera(cam, ballRender, inputManager);
         camInit.InitCam(chaseCam,this);
     }
 
@@ -190,15 +213,19 @@ public class Renderer extends SimpleApplication {
         //simulates from Vectors.csv file
         //moves the ball with calculated position
         updateLoop.updateLoop();
+        //While the user's input is through mouse, it will draw an arrow
+        if(inputsGenerator.isMouseInput() && !inputsGenerator.isTerrainEditor())drawArrow();
+        else getRootNode().detachChild(arrowRender);
+        if(inputsGenerator.isTerrainEditor()){
+            getRootNode().detachChild(arrowRender);
+            drawPoint();
+        }
         if(updateLoop.getBallPositions().size() != 0) {
             gameState.setBallPosition(updateLoop.getBallPositions().get(0));
             moveBall(ball.state.position);
             updateLoop.getBallPositions().remove(0);
         }
-        Vector2f cursorPos = getInputManager().getCursorPosition();
-        cursorPos.x -= (float)WIDTH/2; cursorPos.y -= (float) HEIGHT/2;
-        cursorPos = cursorPos.mult(0.3f);
-        drawArrow(cursorPos);
+
     }
 
     public void start3d(){
@@ -212,15 +239,6 @@ public class Renderer extends SimpleApplication {
         settings.put("Samples", 4);
         this.setSettings(settings);
 
-
         this.start();
     }
-
-    public Vector2 getMousePosition() {
-        Vector3f location = cam.getWorldCoordinates(inputManager.getCursorPosition(), 0);
-        System.out.println(location);
-        return new Vector2(location.x,location.z);
-    }
-
-
 }

@@ -6,12 +6,12 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Scanner;
 
-import visualization.gameengine.Game;
+import visualization.InputInt;
 import utility.math.Vector2;
 
 public class InputFileReader extends BallVelocityInput {
 
-    public InputFileReader(Game game){
+    public InputFileReader(InputInt game){
         super(game);
     }
     
@@ -28,8 +28,11 @@ public class InputFileReader extends BallVelocityInput {
 
     @Override
     public void readyForNextInput(){
-        game.setShotForce(getForce());
+        game.getUpdateLoop().setShotForce(getForce());
     }
+
+    @Override
+    public void hideInputWindow() {}
 
     private Vector2 getForce() {
         commandQueue = getShotQueue();
