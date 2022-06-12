@@ -19,7 +19,7 @@ public class FinalAStarDistanceHeuristic implements Heuristic {
     public double getShotValue(ArrayList<Vector2> shotPositions, GameState gameState) {
         Vector2 finalPosition = shotPositions.get(shotPositions.size() - 1);
 
-        return aStar.getDistanceToTarget(finalPosition);
+        return aStar.getDistanceToTarget(finalPosition,2);
     }
 
     @Override

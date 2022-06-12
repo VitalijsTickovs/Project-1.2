@@ -24,7 +24,7 @@ ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";
 targetRadius = 0.15;
-targetPosition = 4,1;
+targetPosition = -36,13;
 
 //To create sand zone "sandZoneBottomLeft", "sandZoneTopRight", "sandKineticFriction", "sandStaticFriction";
 //Make this a range Eg. variableX = -2<5;
