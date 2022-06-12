@@ -2,10 +2,28 @@ package bot;
 
 import java.util.LinkedList;
 
+import datastorage.GameState;
 import datastorage.Terrain;
+import reader.GameStateLoader;
 import utility.math.Vector2;
 
 public class AStar {
+    public static void main(String[] args) {
+        GameState gameState = GameStateLoader.readFile();
+        AStar aStar = new AStar(gameState.getTerrain());
+
+        double negatives = 0;
+        for (int i = 0; i < aStar.map.length; i++) {
+            for (int j = 0; j < aStar.map[i].length; j++) {
+                if (aStar.map[i][j] == -1) {
+                    negatives++;
+                }
+            }
+        }
+        double percentage = negatives / (double)(aStar.map.length * aStar.map[0].length) * 100;
+        System.out.println(negatives + " percentage: " + percentage);
+    }
+
     /**
      * Instantiate a new class for each new {@code Terrain}.
      * Only call the {@code getDistanceToTarget} method for heuristic purposes
@@ -118,7 +136,7 @@ public class AStar {
             currentNode = findNodeWithLowestValue(uncheckedNodes);
 
             if (doDebugMessages) {
-                //System.out.println(currentNode);
+                // System.out.println(currentNode);
             }
             if (currentNode == null) {
                 // This means that there exists no path to the target
@@ -325,10 +343,10 @@ public class AStar {
             for (int j = 0; j < map[i].length; j++) {
                 if (map[i][j] == -1) {
                     // Tile blocked
-                    //System.out.print("x");
+                    // System.out.print("x");
                 } else {
                     // Tile walkable
-                    //System.out.print("o");
+                    // System.out.print("o");
                 }
             }
             System.out.println();
@@ -344,10 +362,11 @@ public class AStar {
 
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
+                Vector2 positionInGameUnits = translateGridPositionIntoGameUnits(x, y);
+                double value = terrain.getTerrainFunction().valueAt(positionInGameUnits);
+                boolean tileIsObstacle = !terrain.isPointInObstacle(positionInGameUnits);
 
-                double value = terrain.getTerrainFunction().valueAt(translateGridPositionIntoGameUnits(x, y));
-                boolean cannotGoHere = value <= 0
-                        || !terrain.isPointInObstacle(translateGridPositionIntoGameUnits(x, y));
+                boolean cannotGoHere = value <= 0 || tileIsObstacle;
                 if (cannotGoHere) {
                     map[y][x] = -1; // This value signifies an unpassable obstacle
                     continue;

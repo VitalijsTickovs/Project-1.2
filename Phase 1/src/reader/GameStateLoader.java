@@ -37,15 +37,11 @@ public class GameStateLoader {
    private static double greenStaticFriction;
    private static String terrainFunction;
 
-   private static double ballStartPointX;
-   private static double ballStartPointY;
+   private static Vector2 ballStartPoint;
    private static double ballRadius;
 
    private static double targetRadius;
-   private static double targetX;
-   private static double targetY;
-
-   private static IBot bot;
+   private static Vector2 targetPosition;
 
    // ArrayList values
    private static ArrayList<Vector2> sandZoneBottomLeftCorner = new ArrayList<Vector2>();
@@ -53,8 +49,7 @@ public class GameStateLoader {
    private static ArrayList<Double> sandKineticFriction = new ArrayList<Double>();
    private static ArrayList<Double> sandStaticFriction = new ArrayList<Double>();
 
-   private static ArrayList<Double> treeX = new ArrayList<Double>();
-   private static ArrayList<Double> treeY = new ArrayList<Double>();
+   private static ArrayList<Vector2> treePosition = new ArrayList<Vector2>();
    private static ArrayList<Double> treeRadius = new ArrayList<Double>();
    private static ArrayList<Double> treeBounciness = new ArrayList<Double>();
 
@@ -79,23 +74,20 @@ public class GameStateLoader {
    private final static String defterrainFunction = "sin(x+y)"; // ask Niko for his implementation and leave it as a
                                                                 // String for now
 
-   private final static double defballStartPointX = 1;
-   private final static double defballStartPointY = 1;
+   private final static Vector2 defballStartPoint = Vector2.zeroVector();
 
    private final static double deftargetRadius = 0.1;
-   private final static double deftargetX = 4;
-   private final static double deftargetY = 4;
+   private final static Vector2 deftargetPosition = new Vector2(4, 4);
 
    private static final IBot defbot = BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM);
 
    // ArrayList values
-   private final static Vector2 defsandZoneTopRightCorner = new Vector2(-5,-10);
-   private final static Vector2 defsandZoneBottomLeftCorner = new Vector2(-10,-5);
+   private final static Vector2 defsandZoneTopRightCorner = new Vector2(-5, -10);
+   private final static Vector2 defsandZoneBottomLeftCorner = new Vector2(-10, -5);
    private final static double defsandKineticFriction = 0.25;
    private final static double defsandStaticFriction = 0.4;
 
-   private final static double deftreeX = 0.5;
-   private final static double deftreeY = 0.5;
+   private final static Vector2 deftreePosition = new Vector2(1,1);
    private final static double deftreeRadius = 0.5;
    private final static double deftreeBounciness = 1;
 
@@ -126,20 +118,17 @@ public class GameStateLoader {
       greenStaticFriction = 0;
       terrainFunction = null;
 
-      ballStartPointX = 0;
-      ballStartPointY = 0;
+      ballStartPoint = Vector2.zeroVector();
 
       targetRadius = 0;
-      targetX = 0;
-      targetY = 0;
+      targetPosition = new Vector2(4, 4);
 
       sandZoneBottomLeftCorner = new ArrayList<>();
       sandZoneTopRightCorner = new ArrayList<>();
       sandKineticFriction = new ArrayList<>();
       sandStaticFriction = new ArrayList<>();
 
-      treeX = new ArrayList<>();
-      treeY = new ArrayList<>();
+      treePosition = new ArrayList<>();
       treeBounciness = new ArrayList<>();
       treeRadius = new ArrayList<>();
 
@@ -181,7 +170,7 @@ public class GameStateLoader {
       String dir = System.getProperty("user.dir");
       String separator = System.getProperty("file.separator");
       OS = System.getProperty("os.name");
-      
+
       boolean stansLaptop = dir.contains("Phase 1");
       if (stansLaptop) {
          return dir + "\\reader\\UserInput.csv";
@@ -222,10 +211,6 @@ public class GameStateLoader {
       if (lineContainsKeywordAndEqualSign(line, "collisionSystem")) {
          collisionSystem = readCollisionSystem(line);
       }
-      // Bot
-      if (lineContainsKeywordAndEqualSign(line, "bot")) {
-         bot = readBotImplementation(line);
-      }
       // Green
       if (lineContainsKeywordAndEqualSign(line, "terrainBottomRight")) {
          terrainBottomRight = readPoint(line);
@@ -247,11 +232,8 @@ public class GameStateLoader {
          terrainFunction = readString(line);
       }
       // Ball
-      if (lineContainsKeywordAndEqualSign(line, "ballStartPointX")) {
-         ballStartPointX = readDouble(line);
-      }
-      if (lineContainsKeywordAndEqualSign(line, "ballStartPointY")) {
-         ballStartPointY = readDouble(line);
+      if (lineContainsKeywordAndEqualSign(line, "ballStartPoint")) {
+         ballStartPoint = readPoint(line);
       }
       if (lineContainsKeywordAndEqualSign(line, "ballRadius")) {
          ballRadius = readDouble(line);
@@ -260,11 +242,8 @@ public class GameStateLoader {
       if (lineContainsKeywordAndEqualSign(line, "targetRadius")) {
          targetRadius = readDouble(line);
       }
-      if (lineContainsKeywordAndEqualSign(line, "targetX")) {
-         targetX = readDouble(line);
-      }
-      if (lineContainsKeywordAndEqualSign(line, "targetY")) {
-         targetY = readDouble(line);
+      if (lineContainsKeywordAndEqualSign(line, "targetPosition")) {
+         targetPosition = readPoint(line);
       }
       // Sand zone
       if (lineContainsKeywordAndEqualSign(line, "sandZoneBottomLeft")) {
@@ -284,18 +263,15 @@ public class GameStateLoader {
          sandStaticFriction.add(friction);
       }
       // Tree
-      if (lineContainsKeywordAndEqualSign(line, "treeX")) {
-         treeX.add(readDouble(line));
-      }
-      if (lineContainsKeywordAndEqualSign(line, "treeY")) {
-         treeY.add(readDouble(line));
+      if (lineContainsKeywordAndEqualSign(line, "treePosition")) {
+         treePosition.add(readPoint(line));
       }
       if (lineContainsKeywordAndEqualSign(line, "treeRadius")) {
          treeRadius.add(readDouble(line));
       }
       if (lineContainsKeywordAndEqualSign(line, "treeBounciness")) {
          double bounciness = readDouble(line);
-         bounciness = UtilityClass.clamp(bounciness,0.01, 2);
+         bounciness = UtilityClass.clamp(bounciness, 0.01, 2);
          treeBounciness.add(bounciness);
       }
       // Box
@@ -383,7 +359,7 @@ public class GameStateLoader {
          return defcollisionSystem;
       }
    }
-   
+
    private static IBot readBotImplementation(String line) {
       try {
          String name = line.substring(line.lastIndexOf("=") + 1);
@@ -533,19 +509,19 @@ public class GameStateLoader {
       } else {
          target.radius = targetRadius;
       }
-      if (targetX == 0 && targetY == 0) {
-         target.position = new Vector2(deftargetX, deftargetY);
+      if (targetPosition == null) {
+         target.position = deftargetPosition;
       } else {
-         target.position = new Vector2(targetX, targetY);
+         target.position = targetPosition;
       }
       terrain.target = target;
    }
 
    private static void defineStartingPoint() {
-      if (ballStartPointX == 0 && ballStartPointY == 0) {
-         terrain.ballStartingPosition = new Vector2(defballStartPointX, defballStartPointY);
+      if (ballStartPoint == null) {
+         terrain.ballStartingPosition = defballStartPoint;
       } else {
-         terrain.ballStartingPosition = new Vector2(ballStartPointX, ballStartPointY);
+         terrain.ballStartingPosition = ballStartPoint;
       }
    }
 
@@ -568,23 +544,17 @@ public class GameStateLoader {
    }
 
    private static boolean hasTree() {
-      return treeX.size() > 0 || treeY.size() > 0 || treeRadius.size() > 0 || treeBounciness.size() > 0;
+      return treePosition.size() > 0 || treeRadius.size() > 0 || treeBounciness.size() > 0;
    }
 
    private static IObstacle createTree() {
       ObstacleTree tree = new ObstacleTree();
       Vector2 position = new Vector2();
-      if (treeX.size() > 0) {
-         position.x = treeX.get(0);
-         treeX.remove(0);
+      if (treePosition.size() > 0) {
+         position = treePosition.get(0);
+         treePosition.remove(0);
       } else {
-         position.x = deftreeX;
-      }
-      if (treeY.size() > 0) {
-         position.y = treeY.get(0);
-         treeY.remove(0);
-      } else {
-         position.y = deftreeY;
+         position = deftreePosition;
       }
       if (treeRadius.size() > 0) {
          tree.radius = treeRadius.get(0);
@@ -662,7 +632,7 @@ public class GameStateLoader {
 
    private static boolean hasSandZone() {
       return sandKineticFriction.size() > 0 || sandStaticFriction.size() > 0 || sandZoneBottomLeftCorner.size() > 0
-         || sandZoneTopRightCorner.size() > 0;
+            || sandZoneTopRightCorner.size() > 0;
    }
 
    private static Zone createSandZone() {
@@ -681,7 +651,7 @@ public class GameStateLoader {
       } else {
          topRightCorner = defsandZoneTopRightCorner.copy();
       }
-      Zone zone = new Zone(bottomLeftCorner,topRightCorner);
+      Zone zone = new Zone(bottomLeftCorner, topRightCorner);
       // Friction
       if (sandKineticFriction.size() > 0) {
          zone.kineticFriction = sandKineticFriction.get(0);
@@ -730,18 +700,5 @@ public class GameStateLoader {
       newBall.radius = ballRadius;
       return newBall;
    }
-
-   public static double getTargetRadius() {
-      return targetRadius;
-   }
-
-   public static double getTargetX() {
-      return targetX;
-   }
-
-   public static double getTargetY() {
-      return targetY;
-   }
-
    // endregion
 }

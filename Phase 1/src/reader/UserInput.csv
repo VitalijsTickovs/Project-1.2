@@ -18,32 +18,27 @@ greenKineticFriction = 0.08;
 greenStaticFriction = 0.2;
 terrainFunction = 0.4*(0.9-e**(-(x*x + y*y)/8));
 
-//To create ball "ballStartPointX", "ballStartPointY", "ballRadius";
-ballStartPointX = -3;
-ballStartPointY = 0;
+//To create ball "ballStartPoint", "ballRadius";
+ballStartPoint = -3,0;
 ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";
 targetRadius = 0.15;
-targetX = 4;
-targetY = 1;
+targetPosition = 4,1;
 
 //To create sand zone "sandZoneBottomLeft", "sandZoneTopRight", "sandKineticFriction", "sandStaticFriction";
 //Make this a range Eg. variableX = -2<5;
 
 //To create tree "treeX", "treeY", "treeRadius", "treeBounciness";
-//treeX = -7.5;
-//treeY = 10;
+//treePosition = -7.5,10;
 //treeRadius = 2;
 //treeBounciness = 0.5;
 
-//treeX = -10;
-//treeY = -10;
+//treePosition = -10,-10;
 //treeRadius = 2;
 //treeBounciness = 0.85;
 
-//treeX = -35;
-//treeY = -3;
+//treePosition = -35,-3;
 //treeRadius = 2;
 //treeBounciness = 0.85;
 

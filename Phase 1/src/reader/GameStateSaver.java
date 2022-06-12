@@ -58,7 +58,7 @@ public class GameStateSaver {
 
    private static void savePhysicsEngine(PhysicsEngine physicsEngine) {
       printWriter.println("solverStep = " + physicsEngine.odeSolver.getStepSize() + delimiter);
-      printWriter.println("solver = " + physicsEngine.odeSolver.getSolverName() + delimiter);
+      printWriter.println("ODEsolver = " + physicsEngine.odeSolver.getSolverName() + delimiter);
       printWriter.println("stoppingCondition = " + physicsEngine.stoppingCondition.getConditionName() + delimiter);
       printWriter.println("collisionSystem = " + physicsEngine.collisionSystem.getName() + delimiter);
       printWriter.println("");
@@ -66,18 +66,15 @@ public class GameStateSaver {
 
    private static void saveBall(Ball ball) {
       printWriter.println("ballRadius = " + ball.radius + delimiter);
-      printWriter.println("ballStartPointX = " + ball.state.position.x + delimiter);
-      printWriter.println("ballStartPointY = " + ball.state.position.y + delimiter);
+      printWriter.println("ballStartPoint = " + ball.state.position.x + "," + ball.state.position.y + delimiter);
 
       printWriter.println("");
    }
 
    private static void saveTerrain(Terrain terrain) {
 
-      printWriter.println("terrainX0 = " + terrain.topLeftCorner.x + delimiter);
-      printWriter.println("terrainY0 = " + terrain.topLeftCorner.y + delimiter);
-      printWriter.println("terrainX1 = " + terrain.bottomRightCorner.x + delimiter);
-      printWriter.println("terrainY1 = " + terrain.bottomRightCorner.y + delimiter);
+      printWriter.println("terrainTopLeft = " + terrain.topLeftCorner.x + "," + terrain.topLeftCorner.y + delimiter);
+      printWriter.println("terrainBottomRight = " + terrain.bottomRightCorner.x + "," + terrain.bottomRightCorner.y + delimiter);
       printWriter.println("");
       
       printWriter.println("greenStaticFriction = " + terrain.staticFriction + delimiter);
@@ -86,8 +83,7 @@ public class GameStateSaver {
       printWriter.println("");
 
       printWriter.println("targetRadius = " + terrain.target.radius + delimiter);
-      printWriter.println("targetX = " + terrain.target.position.x + delimiter);
-      printWriter.println("targetY = " + terrain.target.position.y + delimiter);
+      printWriter.println("targetPosition = " + terrain.target.position.x + "," + terrain.target.position.y + delimiter);
       printWriter.println("");
 
       addSandZones(terrain);
@@ -96,8 +92,8 @@ public class GameStateSaver {
    }
    private static void addSandZones(Terrain terrain){
       for (Zone zone : terrain.zones) {
-         printWriter.println("sandZoneX = " + zone.bottomLeftCorner.x + "<" + zone.topRightCorner.x + delimiter);
-         printWriter.println("sandZoneY = " + zone.bottomLeftCorner.y + "<" + zone.topRightCorner.y + delimiter);
+         printWriter.println("sandZoneBottomLeft = " + zone.bottomLeftCorner.x + "," + zone.bottomLeftCorner.y + delimiter);
+         printWriter.println("sandZoneTopRight = " + zone.topRightCorner.x + "," + zone.topRightCorner.y + delimiter);
          printWriter.println("sandKineticFriction = " + zone.kineticFriction + delimiter);
          printWriter.println("sandStaticFriction = " + zone.staticFriction + delimiter);
    
@@ -110,8 +106,7 @@ public class GameStateSaver {
       for (IObstacle obstacle : terrain.obstacles) {
          if (obstacle instanceof ObstacleTree) {
             ObstacleTree tree = (ObstacleTree) obstacle;
-            printWriter.println("treeX = " + tree.originPosition.x + delimiter);
-            printWriter.println("treeY = " + tree.originPosition.x + delimiter);
+            printWriter.println("treePosition = " + tree.originPosition.x + "," + tree.originPosition.y + delimiter);
             printWriter.println("treeRadius = " + tree.radius + delimiter);
             printWriter.println("treeBounciness = " + tree.bounciness + delimiter);
             printWriter.println("");
@@ -123,8 +118,8 @@ public class GameStateSaver {
       for (IObstacle obstacle : terrain.obstacles) {
          if (obstacle instanceof ObstacleBox) {
             ObstacleBox box = (ObstacleBox) obstacle;
-            printWriter.println("boxX = " + box.bottomLeftCorner.x + "<" + box.topRightCorner.x + delimiter);
-            printWriter.println("boxY = " + box.bottomLeftCorner.y + "<" + box.topRightCorner.y + delimiter);
+            printWriter.println("boxBottomLeft = " + box.bottomLeftCorner.x + "," + box.bottomLeftCorner.y + delimiter);
+            printWriter.println("boxTopRight = " + box.topRightCorner.x + "," + box.topRightCorner.y + delimiter);
             printWriter.println("boxBounciness = " + box.bounciness + delimiter);
             printWriter.println("");
 

@@ -41,7 +41,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
     private GameStateRenderer gameStateRenderer;
 
     public static void main(String[] args) {
-        Game g = new Game(40);
+        Game g = new Game(60);
         g.start();
     }
 
