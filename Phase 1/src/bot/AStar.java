@@ -2,10 +2,31 @@ package bot;
 
 import java.util.LinkedList;
 
+import datastorage.GameState;
 import datastorage.Terrain;
+import reader.GameStateLoader;
 import utility.math.Vector2;
 
 public class AStar {
+    public static void main(String[] args) {
+        GameState gameState = GameStateLoader.readFile();
+        AStar aStar = new AStar(gameState.getTerrain());
+
+        double distance = aStar.getDistanceToTarget(gameState.getTerrain().ballStartingPosition, 1);
+        System.out.println("Distance: " + distance);
+
+        double negatives = 0;
+        for (int i = 0; i < aStar.map.length; i++) {
+            for (int j = 0; j < aStar.map[i].length; j++) {
+                if (aStar.map[i][j] == -1) {
+                    negatives++;
+                }
+            }
+        }
+        double percentage = negatives / (double) (aStar.map.length * aStar.map[0].length) * 100;
+        System.out.println("Obstacles take up this percentage of map: " + percentage);
+    }
+
     /**
      * Instantiate a new class for each new {@code Terrain}.
      * Only call the {@code getDistanceToTarget} method for heuristic purposes
@@ -13,38 +34,25 @@ public class AStar {
     public AStar(Terrain terrain) {
         this.terrain = terrain;
         checkForNullTerrain();
-        setMap(getMap());
-        setTarget(terrain);
-        checkForNullMapAndTarget();
+        mapCreator = new PathfindingMapCreator(terrain);
     }
 
     private double[][] map;
+    private Node[][] createdNodes;
 
     private Node originNode;
     private Node targetNode;
+    private Vector2 topLeftPos;
 
     private boolean doDebugMessages = true;
     private Terrain terrain;
+    private PathfindingMapCreator mapCreator;
 
-    public final int SQUARES_PER_GAME_UNIT = 4; // How many squares will the map used by AStar pathfinding generate per
-                                                // game unit.
+    public int SQUARES_PER_GAME_UNIT = -1; // How many squares will the map used by AStar pathfinding generate per
+                                           // game unit.
     // A game unit is a distance between two vectors (0,0) and (0,1);
     // The map's size is calculated the "topLeftCorner" and "bottomRightCorner"
     // vectors
-
-    private void setMap(double[][] newMap) {
-        map = newMap;
-    }
-
-    private void setTarget(Terrain terrain) {
-        if (terrain.target == null) {
-            throw new NullPointerException("Target was null");
-        }
-
-        int gridXPosition = translateToGridPosition(terrain.target.position.x);
-        int gridYPosition = translateToGridPosition(terrain.target.position.y);
-        targetNode = new Node(gridXPosition, gridYPosition);
-    }
 
     /**
      * @param ball the ball to check its distance from the target
@@ -52,14 +60,59 @@ public class AStar {
      *         while avoiding water and obstacles.
      *         Returns {@code -1} if an unobstructed path does not exist
      */
-    public double getDistanceToTarget(Vector2 position) {
+    public double getDistanceToTarget(Vector2 position, int squaresPerGameUnit) {
+        checkSquares(squaresPerGameUnit);
         checkForNullPosition(position);
+
+        setupSearch(position);
         checkForNullMapAndTarget();
 
-        int originXPosition = translateToGridPosition(position.x);
-        int originYPosition = translateToGridPosition(position.y);
-        setupSearch(originXPosition, originYPosition);
         return aStarPathfinding();
+    }
+
+    // region Startup
+    private void checkSquares(int squaresPerGameUnit) {
+        if (squaresPerGameUnit <= 0) {
+            throw new IndexOutOfBoundsException("squaresPerGameUnit was not in the correct range");
+        }
+        if (SQUARES_PER_GAME_UNIT != squaresPerGameUnit) {
+            SQUARES_PER_GAME_UNIT = squaresPerGameUnit;
+            updateMaps();
+            return;
+        }
+        SQUARES_PER_GAME_UNIT = squaresPerGameUnit;
+        createNodeMap();
+    }
+
+    private void updateMaps() {
+        setMapCorners();
+        setMap(mapCreator.getMap(SQUARES_PER_GAME_UNIT));
+        createNodeMap();
+        setTarget(terrain);
+    }
+
+    private void setMapCorners() {
+        int topLeftX = ((int) (terrain.topLeftCorner.x * SQUARES_PER_GAME_UNIT) / SQUARES_PER_GAME_UNIT);
+        int topLeftY = ((int) (terrain.topLeftCorner.y * SQUARES_PER_GAME_UNIT) / SQUARES_PER_GAME_UNIT);
+        topLeftPos = new Vector2(topLeftX, topLeftY);
+    }
+
+    private void setMap(double[][] newMap) {
+        map = newMap;
+    }
+
+    private void createNodeMap() {
+        createdNodes = new Node[map.length][map[0].length];
+    }
+
+    private void setTarget(Terrain terrain) {
+        if (terrain.target == null) {
+            throw new NullPointerException("Target was null");
+        }
+
+        int gridXPosition = translateToGridXPosition(terrain.target.position.x);
+        int gridYPosition = translateToGridYPosition(terrain.target.position.y);
+        targetNode = new Node(gridXPosition, gridYPosition);
     }
 
     private void checkForNullPosition(Vector2 position) {
@@ -81,24 +134,18 @@ public class AStar {
         if (targetNode == null) {
             throw new NullPointerException("Target instance was null");
         }
-
     }
 
-    private void setupSearch(int originXPosition, int originYPosition) {
+    private void setupSearch(Vector2 position) {
+        int originXPosition = translateToGridXPosition(position.x);
+        int originYPosition = translateToGridYPosition(position.y);
         originNode = new Node(originXPosition, originYPosition);
         originNode.setTarget(targetNode);
         originNode.setOrigin(originNode);
         targetNode.setTarget(targetNode);
         targetNode.setOrigin(originNode);
     }
-
-    /**
-     * @return a game unit position translated into a grid position used by the
-     *         pathfinding algorithm
-     */
-    private int translateToGridPosition(double axisPosition) {
-        return (int) (terrain.target.position.x * SQUARES_PER_GAME_UNIT);
-    }
+    // endregion
 
     /**
      * @return the {@code length} of the shortest path from the ball to the target
@@ -106,19 +153,18 @@ public class AStar {
      *         Returns {@code -1} if an unobstructed path does not exist.
      */
     private double aStarPathfinding() {
-        LinkedList<Node> createdNodes = new LinkedList<>();
         LinkedList<Node> uncheckedNodes = new LinkedList<>();
-        createdNodes.add(originNode);
+        addCreatedNode(originNode);
 
         boolean foundPath = false;
         Node currentNode = originNode;
 
         while (!foundPath) {
-            createSorroundingNodes(currentNode, createdNodes, uncheckedNodes);
+            createSorroundingNodes(currentNode, uncheckedNodes);
             currentNode = findNodeWithLowestValue(uncheckedNodes);
 
             if (doDebugMessages) {
-                //System.out.println(currentNode);
+                // System.out.println(currentNode);
             }
             if (currentNode == null) {
                 // This means that there exists no path to the target
@@ -133,26 +179,25 @@ public class AStar {
         return currentNode.distanceToOrigin;
     }
 
-    private void createSorroundingNodes(Node origin, LinkedList<Node> createdNodes, LinkedList<Node> uncheckedNodes) {
+    private void createSorroundingNodes(Node origin, LinkedList<Node> uncheckedNodes) {
         // All 8 sorrounding tiles are checked
-        tryCreateNodeAtDeltaPosition(origin, createdNodes, uncheckedNodes, 1, 0);
-        tryCreateNodeAtDeltaPosition(origin, createdNodes, uncheckedNodes, 1, 1);
-        tryCreateNodeAtDeltaPosition(origin, createdNodes, uncheckedNodes, 0, 1);
-        tryCreateNodeAtDeltaPosition(origin, createdNodes, uncheckedNodes, -1, 1);
-        tryCreateNodeAtDeltaPosition(origin, createdNodes, uncheckedNodes, -1, 0);
-        tryCreateNodeAtDeltaPosition(origin, createdNodes, uncheckedNodes, -1, -1);
-        tryCreateNodeAtDeltaPosition(origin, createdNodes, uncheckedNodes, 0, -1);
-        tryCreateNodeAtDeltaPosition(origin, createdNodes, uncheckedNodes, 1, -1);
+        tryCreateNodeAtDeltaPosition(origin, uncheckedNodes, 1, 0);
+        tryCreateNodeAtDeltaPosition(origin, uncheckedNodes, 1, 1);
+        tryCreateNodeAtDeltaPosition(origin, uncheckedNodes, 0, 1);
+        tryCreateNodeAtDeltaPosition(origin, uncheckedNodes, -1, 1);
+        tryCreateNodeAtDeltaPosition(origin, uncheckedNodes, -1, 0);
+        tryCreateNodeAtDeltaPosition(origin, uncheckedNodes, -1, -1);
+        tryCreateNodeAtDeltaPosition(origin, uncheckedNodes, 0, -1);
+        tryCreateNodeAtDeltaPosition(origin, uncheckedNodes, 1, -1);
     }
 
-    private void tryCreateNodeAtDeltaPosition(Node connectedTo, LinkedList<Node> createdNodes,
-            LinkedList<Node> uncheckedNodes, int deltaX, int deltaY) {
+    private void tryCreateNodeAtDeltaPosition(Node connectedTo, LinkedList<Node> uncheckedNodes, int deltaX,
+            int deltaY) {
         int newXPos = connectedTo.xPosition + deltaX;
         int newYPos = connectedTo.yPosition + deltaY;
 
-        Node nodeAtPosition = getNodeAtPosition(newXPos, newYPos, createdNodes);
-        boolean nodeExistsAtPosition = nodeAtPosition != null;
-        if (nodeExistsAtPosition) {
+        if (nodeExistsAtPosition(newXPos, newYPos)) {
+            Node nodeAtPosition = createdNodes[newYPos][newXPos];
             // If the distance from this node to the origin is closer, updates the distance
             // to be shorter
             nodeAtPosition.updateDistanceToOrigin(connectedTo);
@@ -162,15 +207,37 @@ public class AStar {
             // Creates node at position
             double costToEnter = map[newYPos][newXPos];
             Node newNode = new Node(newXPos, newYPos, connectedTo, costToEnter);
-            createdNodes.add(newNode);
-            uncheckedNodes.add(newNode);
+            addCreatedNode(newNode);
+            int insertSpot = findInsertSpot(newNode, uncheckedNodes);
+            uncheckedNodes.add(insertSpot, newNode);
         }
     }
 
+    private boolean nodeExistsAtPosition(int x, int y) {
+        if (!isPositionInRange(x, y)) {
+            return false;
+        }
+        return createdNodes[y][x] != null;
+    }
+
+    private int findInsertSpot(Node newNode, LinkedList<Node> uncheckedNodes) {
+        for (int i = 0; i < uncheckedNodes.size(); i++) {
+            Node checkedNode = uncheckedNodes.get(i);
+            if (checkedNode.nodeValue >= newNode.nodeValue
+                    && checkedNode.distanceToTarget >= newNode.distanceToTarget) {
+                return i;
+            }
+        }
+        return uncheckedNodes.size();
+    }
+
+    private void addCreatedNode(Node node) {
+        createdNodes[node.yPosition][node.xPosition] = node;
+    }
+
     private boolean canCreateNodeAt(int xPos, int yPos) {
-        boolean xPositionInRange = xPos >= 0 && xPos < map[0].length;
-        boolean yPositionInRange = yPos >= 0 && yPos < map.length;
-        if (!(xPositionInRange && yPositionInRange)) {
+        // Position in game units
+        if (!isPositionInRange(xPos, yPos)) {
             return false;
         }
         boolean spotIsBlocked = map[yPos][xPos] == -1; // There is an unpassable obstacle on this spot
@@ -180,13 +247,10 @@ public class AStar {
         return true;
     }
 
-    private Node getNodeAtPosition(int xPos, int yPos, LinkedList<Node> createdNodes) {
-        for (Node node : createdNodes) {
-            if (node.xPosition == xPos && node.yPosition == yPos) {
-                return node;
-            }
-        }
-        return null;
+    private boolean isPositionInRange(int xPos, int yPos) {
+        boolean xPositionInRange = xPos > 0 && xPos < createdNodes[0].length;
+        boolean yPositionInRange = yPos > 0 && yPos < createdNodes.length;
+        return xPositionInRange && yPositionInRange;
     }
 
     /**
@@ -202,20 +266,7 @@ public class AStar {
         if (uncheckedNodes.size() == 0) {
             return null;
         }
-
-        Node nodeWithLowestValue = uncheckedNodes.getFirst();
-        for (Node node : uncheckedNodes) {
-            if (node.nodeValue < nodeWithLowestValue.nodeValue) {
-                nodeWithLowestValue = node;
-                continue;
-            }
-            if (node.nodeValue == nodeWithLowestValue.nodeValue) {
-                if (node.distanceToTarget < nodeWithLowestValue.distanceToTarget) {
-                    nodeWithLowestValue = node;
-                }
-            }
-        }
-        return nodeWithLowestValue;
+        return uncheckedNodes.getFirst();
     }
 
     public class Node {
@@ -325,10 +376,10 @@ public class AStar {
             for (int j = 0; j < map[i].length; j++) {
                 if (map[i][j] == -1) {
                     // Tile blocked
-                    //System.out.print("x");
+                    // System.out.print("x");
                 } else {
                     // Tile walkable
-                    //System.out.print("o");
+                    // System.out.print("o");
                 }
             }
             System.out.println();
@@ -338,51 +389,20 @@ public class AStar {
     double HALF_TILE_OFFSET = (1d / (double) SQUARES_PER_GAME_UNIT) / 2d;
 
     // region Generate Grid from Terrain
-    private double[][] getMap() {
-        double[][] map = createEmptyMap();
-        // We add half a tile, to get a height value at the center of each square
-
-        for (int y = 0; y < map.length; y++) {
-            for (int x = 0; x < map[y].length; x++) {
-
-                double value = terrain.getTerrainFunction().valueAt(translateGridPositionIntoGameUnits(x, y));
-                boolean cannotGoHere = value <= 0
-                        || !terrain.isPointInObstacle(translateGridPositionIntoGameUnits(x, y));
-                if (cannotGoHere) {
-                    map[y][x] = -1; // This value signifies an unpassable obstacle
-                    continue;
-                }
-                map[y][x] = 1;
-            }
-        }
-        return map;
-    }
-
-    private double[][] createEmptyMap() {
-        int xSquares = (int) getTerrainWidth() * SQUARES_PER_GAME_UNIT;
-        int ySquares = (int) getTerrainHeight() * SQUARES_PER_GAME_UNIT;
-        double[][] map = new double[ySquares][xSquares];
-        return map;
-    }
-
-    private Vector2 translateGridPositionIntoGameUnits(int xPos, int yPos) {
-        double newX = (double) xPos / (double) SQUARES_PER_GAME_UNIT + HALF_TILE_OFFSET;
-        double newY = (double) yPos / (double) SQUARES_PER_GAME_UNIT + HALF_TILE_OFFSET;
-        return new Vector2(newX, newY);
+    /**
+     * @return a game unit position translated into a grid position used by the
+     *         pathfinding algorithm
+     */
+    private int translateToGridXPosition(double axisPosition) {
+        return (int) ((axisPosition - topLeftPos.x) * SQUARES_PER_GAME_UNIT);
     }
 
     /**
-     * @return terrain width in game units
+     * @return a game unit position translated into a grid position used by the
+     *         pathfinding algorithm
      */
-    public double getTerrainWidth() {
-        return Math.abs(terrain.bottomRightCorner.x - terrain.topLeftCorner.x);
-    }
-
-    /**
-     * @return terrain height in game units
-     */
-    public double getTerrainHeight() {
-        return Math.abs(terrain.bottomRightCorner.y - terrain.topLeftCorner.y);
+    private int translateToGridYPosition(double axisPosition) {
+        return (int) ((axisPosition - topLeftPos.y) * SQUARES_PER_GAME_UNIT);
     }
     // endregion
 }

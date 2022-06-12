@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
 
-import bot.AStar;
 import datastorage.Ball;
 import datastorage.GameState;
 import gui.shotinput.MouseInputReader;
@@ -20,6 +19,7 @@ import bot.botimplementations.IBot;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import bot.AStar;
 import bot.botimplementations.BotFactory;
 import visualization.InputInt;
 import visualization.Update;
@@ -41,7 +41,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
     private GameStateRenderer gameStateRenderer;
 
     public static void main(String[] args) {
-        Game g = new Game(40);
+        Game g = new Game(60);
         g.start();
     }
 
