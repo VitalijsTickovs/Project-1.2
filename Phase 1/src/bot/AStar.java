@@ -16,7 +16,7 @@ public class AStar {
         GameState gameState = GameStateLoader.readFile();
         AStar aStar = new AStar(gameState.getTerrain());
 
-        double distance = aStar.getDistanceToTarget(gameState.getTerrain().ballStartingPosition, 1);
+        double distance = aStar.getDistanceToTarget(gameState.getTerrain().ballStartingPosition, 2);
         System.out.println("Distance: " + distance);
         distance = aStar.getDistanceToTarget(gameState.getTerrain().ballStartingPosition.translated(2,2), 1);
         System.out.println("Distance: " + distance);
@@ -73,7 +73,8 @@ public class AStar {
         setupSearch(position);
         checkForNullMapAndTarget();
 
-        return aStarPathfinding();
+        double distanceInGridUnits = aStarPathfinding();
+        return translateResultToGameUnits(distanceInGridUnits);
     }
 
     // region Startup
@@ -411,4 +412,8 @@ public class AStar {
         return (int) ((axisPosition - topLeftPos.y) * SQUARES_PER_GAME_UNIT);
     }
     // endregion
+
+    private double translateResultToGameUnits(double gridDistance){
+        return (gridDistance / 10) / (double) SQUARES_PER_GAME_UNIT;
+    }
 }

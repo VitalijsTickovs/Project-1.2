@@ -8,6 +8,20 @@ public class Rectangle extends Shape {
     public Rectangle(Vector2 bottomLeftCorner, Vector2 topRightCorner){
         this.bottomLeftCorner = bottomLeftCorner;
         this.topRightCorner = topRightCorner;
+        ensureCornersAreCorrect();
+    }
+
+    private void ensureCornersAreCorrect(){
+        if(bottomLeftCorner.y > topRightCorner.y){
+            double holdY = bottomLeftCorner.y;
+            topRightCorner.y = bottomLeftCorner.y;
+            bottomLeftCorner.y = holdY;
+        }
+        if(bottomLeftCorner.x > topRightCorner.x){
+            double holdX = bottomLeftCorner.x;
+            topRightCorner.x = bottomLeftCorner.x;
+            bottomLeftCorner.x = holdX;
+        }
     }
 
     public Vector2 bottomLeftCorner;
