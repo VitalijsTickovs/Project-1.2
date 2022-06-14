@@ -23,7 +23,7 @@ public class EngineTester {
         Ball ball = new Ball(p0, Vector2.zeroVector());
 
         // Test all the other engines
-        for (int n=numStepSizes; n>0; n--) {
+        for (int n=numStepSizes; n>1; n--) {
             double h = stopT/n;
             engine.odeSolver.setStepSize(h);
             ArrayList<Vector2> shotPositions = engine.simulateShot(v0, ball, terrain);
@@ -81,8 +81,10 @@ public class EngineTester {
             i++;
         }
         Vector2 actualPosition = actualPositions.get(i);
+
         System.out.println(actualPosition);
         System.out.println(actualPositions.get(actualPositions.size()-1));
+        System.out.println("Time to stop: "+actualPositions.size()*actualH);
 
         String eulerData = testStepSizeAccuracy(
                 euler,
@@ -171,9 +173,9 @@ public class EngineTester {
                 ),
                 new Vector2(3, 0),
                 new Vector2(-1, 0.5),
-                0.2,
-                10
+                1,
+                1000
         );
-        //et.saveTestData(data, "solvers-"+System.nanoTime());
+        et.saveTestData(data, "solvers-"+System.nanoTime());
     }
 }

@@ -65,7 +65,7 @@ public class PathfindingMapCreator {
         Vector2 positionInGameUnits = translateGridPositionIntoGameUnits(x, y);
         double value = terrain.getTerrainFunction().valueAt(positionInGameUnits);
         boolean tileIsObstacle = terrain.isPointInObstacle(positionInGameUnits);
-        boolean cannotGoHere = value <= 0 || tileIsObstacle;
+        boolean cannotGoHere = value < 0 || tileIsObstacle;
 
         if (y == 120 && x == 34) {
             System.out.println("got it!");

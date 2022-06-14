@@ -9,10 +9,16 @@ import utility.math.Vector2;
 
 public class AStar {
     public static void main(String[] args) {
+        lol();
+    }
+
+    private static void lol() {
         GameState gameState = GameStateLoader.readFile();
         AStar aStar = new AStar(gameState.getTerrain());
 
         double distance = aStar.getDistanceToTarget(gameState.getTerrain().ballStartingPosition, 1);
+        System.out.println("Distance: " + distance);
+        distance = aStar.getDistanceToTarget(gameState.getTerrain().ballStartingPosition.translated(2,2), 1);
         System.out.println("Distance: " + distance);
 
         double negatives = 0;

@@ -70,7 +70,8 @@ public class HeuristicPlotter {
         terrain.target.setRadius(0.15);
         Ball ball = new Ball(new Vector2(-3, 0), Vector2.zeroVector());
         GameState gameState = new GameState(terrain, ball, engine);
-        HeuristicPlotter hp = new HeuristicPlotter(new ClosestEuclidianDistanceHeuristic(), gameState);
+
+        HeuristicPlotter hp = new HeuristicPlotter(new FinalAStarDistanceHeuristic(terrain), gameState);
         hp.generateTestData();
     }
 }

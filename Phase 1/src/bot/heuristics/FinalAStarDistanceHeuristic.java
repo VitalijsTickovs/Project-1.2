@@ -10,6 +10,7 @@ import utility.math.Vector2;
 public class FinalAStarDistanceHeuristic implements Heuristic {
 
     AStar aStar;
+    private final Heuristic finalHeuristic = new FinalEuclidianDistanceHeuristic();
 
     public FinalAStarDistanceHeuristic(Terrain terrain) {
         aStar = new AStar(terrain);
@@ -19,7 +20,7 @@ public class FinalAStarDistanceHeuristic implements Heuristic {
     public double getShotValue(ArrayList<Vector2> shotPositions, GameState gameState) {
         Vector2 finalPosition = shotPositions.get(shotPositions.size() - 1);
 
-        return aStar.getDistanceToTarget(finalPosition,2);
+        return aStar.getDistanceToTarget(finalPosition,2) + finalHeuristic.getShotValue(shotPositions, gameState);
     }
 
     @Override
