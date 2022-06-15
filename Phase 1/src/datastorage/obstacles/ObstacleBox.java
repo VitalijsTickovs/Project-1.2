@@ -11,6 +11,7 @@ import utility.math.Vector2;
 public class ObstacleBox extends Rectangle implements IObstacle {
     public ObstacleBox(Vector2 bottomLeftCorner, Vector2 topRightCorner){
         super(bottomLeftCorner, topRightCorner);
+        bounciness = 0.75;
     }
 
     // This is basically friction for bounces

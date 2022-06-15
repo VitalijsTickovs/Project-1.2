@@ -2,6 +2,9 @@ package visualization.jmonkeyrender;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.ChaseCamera;
+import com.jme3.material.Material;
+import com.jme3.scene.Node;
+import com.jme3.scene.shape.Sphere;
 import gui.MenuGUI;
 
 import gui.shotinput.IClickListener;
@@ -22,11 +25,12 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Renderer extends SimpleApplication implements InputInt {
+    protected Node obstacles = new Node("Obstacles");
     protected int WIDTH = 1280;
     protected int HEIGHT = 720;
 
     private MapGeneration mapGeneration;
-    private ObjectGeneration objectGeneration;
+    protected ObjectGeneration objectGeneration;
     private UIGeneration uiGeneration;
     private InputsGenerator inputsGenerator;
     private final Cam camInit = new Cam();
@@ -39,9 +43,11 @@ public class Renderer extends SimpleApplication implements InputInt {
     private Geometry arrowRender = new Geometry("Arrow");
     private Vector2f shotInput = new Vector2f(0,0);
 
+    ArrayList<Geometry> pointRenders = new ArrayList<>();
+
     public ChaseCamera chaseCam;
 
-    private final float ballRadius = 1f;
+    protected static final float ballRadius = 1f;
 
     private Terrain terrain;
 
@@ -101,6 +107,10 @@ public class Renderer extends SimpleApplication implements InputInt {
         return shotInput;
     }
 
+    public ArrayList<Geometry> getPointRenders() {
+        return pointRenders;
+    }
+
     /**
      * Moves the by finding the normal tangent by radius of the ball
      * so it would not be that ball is in the terrain
@@ -134,9 +144,24 @@ public class Renderer extends SimpleApplication implements InputInt {
         }
     }
 
-    public void drawPoint(){
-        Vector3f cameraLocation = getCamera().getLocation();
-        Vector3f lookingVector = getCamera().getDirection();
+    public void drawPoint(Vector3f pointLoc){
+        Sphere lookingPoint = new Sphere(120, 120, 0.5f);
+        Geometry pointRender = new Geometry("Point" + pointRenders.size(), lookingPoint);
+
+        //Adding textures to the ball
+        Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", ColorRGBA.Blue);
+        pointRender.setMaterial(mat);
+
+        pointRender.setLocalTranslation(pointLoc.x, pointLoc.y, pointLoc.z);
+
+        pointRenders.add(pointRender);
+
+        //add the geometry object to the scene
+        for(Geometry point: pointRenders){
+            obstacles.attachChild(point);
+        }
+        getRootNode().attachChild(obstacles);
     }
 
     public void drawArrow(){
@@ -159,6 +184,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     }
 
     public void generateWorld(){
+        getRootNode().attachChild(obstacles);
         mapGeneration.initMap(MenuGUI.texPath);
         objectGeneration.initTarBall();
         uiGeneration.initText(guiFont);
@@ -201,7 +227,7 @@ public class Renderer extends SimpleApplication implements InputInt {
 
         //Setting controls for the simulation
         inputsGenerator.initKeys();
-        inputsGenerator.initMouse();
+        inputsGenerator.mouseInput();
 
         //creating and attaching camera to ball
         chaseCam = new ChaseCamera(cam, ballRender, inputManager);
@@ -218,7 +244,6 @@ public class Renderer extends SimpleApplication implements InputInt {
         else getRootNode().detachChild(arrowRender);
         if(inputsGenerator.isTerrainEditor()){
             getRootNode().detachChild(arrowRender);
-            drawPoint();
         }
         if(updateLoop.getBallPositions().size() != 0) {
             gameState.setBallPosition(updateLoop.getBallPositions().get(0));
@@ -240,5 +265,22 @@ public class Renderer extends SimpleApplication implements InputInt {
         this.setSettings(settings);
 
         this.start();
+    }
+
+    public void clearPoint() {
+        for(Geometry point: pointRenders){
+            obstacles.detachChild(point);
+        }
+        pointRenders = new ArrayList<>();
+    }
+
+    public void removeObject(Geometry geometry) {
+        if(!geometry.getName().contains("Course")){
+            obstacles.detachChild(geometry);
+        }
+    }
+
+    public void drawObstacle(String obstacleType){
+        obstacles.attachChild(objectGeneration.drawObstacle(obstacleType));
     }
 }

@@ -2,20 +2,24 @@ package visualization.jmonkeyrender;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.math.*;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.Arrow;
+import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
-import datastorage.Ball;
-import datastorage.BallState;
+import datastorage.GameState;
 import datastorage.Terrain;
+import datastorage.obstacles.ObstacleBox;
 import utility.math.Vector2;
 
 public class ObjectGeneration {
     private final Renderer renderer;
+    private final GameState gameState;
     private final Terrain terrain;
     private final AssetManager assetManager;
     private final float terScale;
@@ -23,7 +27,8 @@ public class ObjectGeneration {
 
     public ObjectGeneration(Renderer renderer) {
         this.renderer = renderer;
-        this.terrain = renderer.getGameState().getTerrain();
+        this.gameState = renderer.getGameState();
+        this.terrain = gameState.getTerrain();
         this.pixelScale = renderer.getPixelScale();
         this.terScale = renderer.getTerScale();
 
@@ -52,16 +57,17 @@ public class ObjectGeneration {
         //Moving the cylinder to the calculated position
         target.setLocalTranslation((float) (terrain.target.position.x *pixelScale), val, (float) (terrain.target.position.y*pixelScale));
 
-        //Adding it to the scene
         renderer.getRootNode().attachChild(target);
     }
+
+
 
     /**
      * Creates golf ball, with textures
      */
     private void initBall(){
         //Creates Sphere object and adds to Geometry object
-        Sphere ball = new Sphere(120, 120, renderer.getBallRadius());
+        Sphere ball = new Sphere(120, 120, Renderer.ballRadius);
         TangentBinormalGenerator.generate(ball);
         Geometry ballRender = new Geometry("Ball", ball);
 
@@ -72,8 +78,8 @@ public class ObjectGeneration {
         ballRender.setMaterial(mat);
 
         //add the geometry object to the scene
-        renderer.getRootNode().attachChild(ballRender);
         renderer.setBallRender(ballRender);
+        renderer.getRootNode().attachChild(ballRender);
     }
 
     /**
@@ -85,7 +91,7 @@ public class ObjectGeneration {
         Arrow arrow = new Arrow(new Vector3f(-pos.x,0,pos.y));
         Geometry arrowRender = new Geometry("Arrow", arrow);
 
-        Vector2 ballPos = renderer.getGameState().getBall().state.position;
+        Vector2 ballPos = gameState.getBall().state.position;
         arrowRender.setLocalTranslation((float)ballPos.x*pixelScale,
                 terrain.HeightMapValueAt(ballPos)*terScale+1,(float)ballPos.y*pixelScale);
 
@@ -97,8 +103,43 @@ public class ObjectGeneration {
         return arrowRender;
     }
 
+    /**
+     * Generates ball and target geometries for the terrain
+     * @return
+     */
     public void initTarBall(){
-        initTarget();
         initBall();
+        initTarget();
+    }
+
+    public Geometry drawObstacle(String obstacleType) {
+        Geometry obstacle = new Geometry();
+        if(obstacleType.equals("Box")){
+            Vector3f start = renderer.getPointRenders().get(0).getLocalTranslation();
+            Vector3f end = renderer.getPointRenders().get(1).getLocalTranslation();
+            end.y+=5;
+            Box box = new Box(start, end);
+            obstacle = new Geometry("Obstacle", box);
+
+            Texture crateTex = assetManager.loadTexture("ObjectTexture/Crate.png");
+            Material redMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            redMat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+
+            redMat.setTexture("ColorMap", crateTex);
+            obstacle.setMaterial(redMat);
+
+            double scale = 8.7;
+            Vector2 vector1 = new Vector2(start.x/scale,
+                    start.z/scale);
+            Vector2 vector2 = new Vector2(end.x/scale,
+                    end.z/scale);
+
+            renderer.getGameState().getTerrain().addObstacle(new ObstacleBox(vector1, vector2));
+
+        }
+        if(obstacleType.equals("Tree")){
+
+        }
+        return obstacle;
     }
 }

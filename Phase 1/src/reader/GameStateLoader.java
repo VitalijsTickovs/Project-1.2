@@ -532,7 +532,7 @@ public class GameStateLoader {
       obstacles.addAll(createTrees());
       obstacles.addAll(createBoxes());
 
-      terrain.obstacles = obstacles.toArray(new IObstacle[0]);
+      terrain.obstacles = obstacles;
    }
 
    private static ArrayList<IObstacle> createTrees() {
