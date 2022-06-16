@@ -3,7 +3,6 @@ package datastorage;
 import datastorage.obstacles.IObstacle;
 // import org.mariuszgromada.math.mxparser.Expression;
 import function.Function;
-import utility.Print;
 import utility.math.Vector2;
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class Terrain {
 
     // All of the data below should be included, when Terrain is created
     public Zone[] zones = new Zone[0];
-    public ArrayList<IObstacle> obstacles = new ArrayList<>();
+    public ArrayList<IObstacle> obstacles;
     public Target target;
     public Vector2 ballStartingPosition;
 

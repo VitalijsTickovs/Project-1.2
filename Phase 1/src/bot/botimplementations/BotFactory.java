@@ -20,7 +20,7 @@ public class BotFactory {
 
     public static IBot getBot(BotImplementations implementation) {
         if (implementation == BotImplementations.PARTICLE_SWARM) {
-            return new ParticleSwarmBot(new FinalClosestEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10);
+            return new ParticleSwarmBot(new FinalAStarDistanceHeuristic(terrain), 0.5, 0.5, 0.5, 100, 10);
         }
         if (implementation == BotImplementations.RULE) {
             return new RuleBasedBot();

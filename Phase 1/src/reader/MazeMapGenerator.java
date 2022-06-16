@@ -1,5 +1,6 @@
 package reader;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import datastorage.Terrain;
@@ -47,17 +48,17 @@ public class MazeMapGenerator {
         return limitingCorner;
     }
 
-    private static IObstacle[] createObstacles(boolean[][] mazeGrid) {
-        LinkedList<IObstacle> obstacles = new LinkedList<IObstacle>();
+    private static ArrayList<IObstacle> createObstacles(boolean[][] mazeGrid) {
+        ArrayList<IObstacle> obstacles = new ArrayList<IObstacle>();
         for (int y = 0; y < mazeGrid.length; y++) {
             for (int x = 0; x < mazeGrid[y].length; x++) {
                 handleTile(x, y, mazeGrid, obstacles);
             }
         }
-        return obstacles.toArray(new IObstacle[obstacles.size()]);
+        return obstacles;
     }
 
-    private static void handleTile(int x, int y, boolean[][] mazeGrid, LinkedList<IObstacle> obstacles) {
+    private static void handleTile(int x, int y, boolean[][] mazeGrid, ArrayList<IObstacle> obstacles) {
         boolean tileIsObstacle = mazeGrid[y][x] == false;
         if (tileIsObstacle) {
             IObstacle obstacle = createObstacle(x, y);

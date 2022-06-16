@@ -79,7 +79,8 @@ public class GameStateLoader {
    private final static double deftargetRadius = 0.1;
    private final static Vector2 deftargetPosition = new Vector2(4, 4);
 
-   private static final IBot defbot = BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM);
+   // private static final IBot defbot = BotFactory.getBot(BotFactory.BotImplementations.GRADIENT_DESCENT);
+   private static final IBot defbot = null;
 
    // ArrayList values
    private final static Vector2 defsandZoneTopRightCorner = new Vector2(-5, -10);
@@ -173,7 +174,7 @@ public class GameStateLoader {
 
       boolean stansLaptop = dir.contains("Phase 1");
       if (stansLaptop) {
-         return dir + "\\reader\\UserInput.csv";
+         return dir + "\\src\\reader\\UserInput.csv";
       }
       if (OS.contains("Windows")) {
          return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput.csv";
