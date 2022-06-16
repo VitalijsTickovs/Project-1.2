@@ -19,10 +19,4 @@ public class TerrainEditor {
 
         flyCam = !flyCam;
     }
-
-    public void editor(){
-
-    }
-
-
 }

@@ -49,7 +49,7 @@ public class Update {
     /**
      * @return true, if the ball has stopped and the input window should open
      */
-    private boolean isSimulationFinished() {
+    public boolean isSimulationFinished() {
         boolean ballStopped = ballPositions.size() == 0;
         boolean notWaitingForBot = (bot == null || botThread == null) || (bot != null && !botThread.isAlive());
         boolean ballHasBeenPushed = shotForce == null;

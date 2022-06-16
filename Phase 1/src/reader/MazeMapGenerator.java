@@ -1,7 +1,6 @@
 package reader;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import datastorage.Terrain;
 import datastorage.obstacles.IObstacle;
@@ -31,7 +30,7 @@ public class MazeMapGenerator {
     public static Terrain getMazeTerrain(boolean[][] mazeGrid, Vector2 mapSize) {
         Terrain terrain = new Terrain(defaultFunction, staticFriction, kineticFriction, startingCorner,
                 countLimitingCorner(mazeGrid, mapSize));
-        terrain.obstacles = createObstacles(mazeGrid);
+        terrain.obstacles = (ArrayList<IObstacle>) createObstacles(mazeGrid);
         return terrain;
     }
 

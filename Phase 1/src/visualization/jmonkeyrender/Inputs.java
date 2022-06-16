@@ -1,7 +1,6 @@
 package visualization.jmonkeyrender;
 
 import bot.botimplementations.BotFactory;
-import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -11,18 +10,17 @@ import gui.shotinput.MouseInputReader;
 import gui.shotinput.ShotInputWindow;
 import utility.math.Vector2;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class InputsGenerator {
+public class Inputs {
     private final Renderer renderer;
     private boolean isMouseInput= true;
-    private boolean isTerrainEditor = false;
+    protected static boolean isTerrainEditor = false;
     private String obstacleType = "Box";
     private TerrainEditor terrainEditor;
     private ArrayList<CollisionResults> collisions = new ArrayList<>();
 
-    public InputsGenerator(Renderer renderer) {
+    public Inputs(Renderer renderer) {
         this.renderer = renderer;
     }
 
@@ -137,7 +135,7 @@ public class InputsGenerator {
 
         @Override
         public void onAction(String name, boolean clicked, float v) {
-            if(name.equals("Left Click") && !clicked && isMouseInput){
+            if(name.equals("Left Click") && !clicked && isMouseInput && renderer.getUpdateLoop().isSimulationFinished()){
                 renderer.getUpdateLoop().setShotForce(new Vector2(-renderer.getShotInput().getX()/15*5,renderer.getShotInput().getY()/15*5));
             }
             if(name.equals("Left Click") && !clicked && isTerrainEditor){
@@ -145,10 +143,12 @@ public class InputsGenerator {
                 renderer.drawPoint(collisions.get(collisions.size() - 1).getCollision(0).getContactPoint());
 
                 //The box would be made if the size is bigger than 2
-                if (collisions.size() == 2) {
-                    collisions = new ArrayList<>();
-                    renderer.drawObstacle(obstacleType);
+                if (collisions.size() == 2 || (collisions.size()==1 && obstacleType.equals("Tree"))) {
+                    if(obstacleType.equals("Box")) renderer.drawObstacle(obstacleType, collisions.get(0).getCollision(0).getContactPoint(),
+                            collisions.get(1).getCollision(0).getContactPoint());
+                    else renderer.drawObstacle(obstacleType, collisions.get(0).getCollision(0).getContactPoint(), null);
                     renderer.clearPoint();
+                    collisions = new ArrayList<>();
                 }
             }
             if(name.equals("Remove Object") && !clicked && isTerrainEditor){

@@ -32,7 +32,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     private MapGeneration mapGeneration;
     protected ObjectGeneration objectGeneration;
     private UIGeneration uiGeneration;
-    private InputsGenerator inputsGenerator;
+    private Inputs inputsGenerator;
     private final Cam camInit = new Cam();
 
     private Update updateLoop;
@@ -47,7 +47,7 @@ public class Renderer extends SimpleApplication implements InputInt {
 
     public ChaseCamera chaseCam;
 
-    protected static final float ballRadius = 1f;
+    protected static final float ballRadius = 2.56f;
 
     private Terrain terrain;
 
@@ -107,9 +107,6 @@ public class Renderer extends SimpleApplication implements InputInt {
         return shotInput;
     }
 
-    public ArrayList<Geometry> getPointRenders() {
-        return pointRenders;
-    }
 
     /**
      * Moves the by finding the normal tangent by radius of the ball
@@ -131,8 +128,7 @@ public class Renderer extends SimpleApplication implements InputInt {
             float val = terrain.HeightMapValueAt(ballState)*terScale;
 
             //Moving the ball object to specified position
-            ballRender.setLocalTranslation((float) (ballState.x)*pixelScale, val, (float) (ballState.y*pixelScale));
-
+            ballRender.setLocalTranslation((float) (ballState.x)*pixelScale, val, (float) (ballState.y)*pixelScale);
             //Adjusting the ball not to be in the ground
             findTangent(ballState);
 
@@ -186,7 +182,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     public void generateWorld(){
         getRootNode().attachChild(obstacles);
         mapGeneration.initMap(MenuGUI.texPath);
-        objectGeneration.initTarBall();
+        objectGeneration.initObjects();
         uiGeneration.initText(guiFont);
     }
 
@@ -197,7 +193,7 @@ public class Renderer extends SimpleApplication implements InputInt {
         mapGeneration = new MapGeneration(this);
         objectGeneration = new ObjectGeneration(this);
         uiGeneration = new UIGeneration(this);
-        inputsGenerator = new InputsGenerator(this);
+        inputsGenerator = new Inputs(this);
         updateLoop = new Update(gameState);
     }
     /**
@@ -242,10 +238,8 @@ public class Renderer extends SimpleApplication implements InputInt {
         //While the user's input is through mouse, it will draw an arrow
         if(inputsGenerator.isMouseInput() && !inputsGenerator.isTerrainEditor())drawArrow();
         else getRootNode().detachChild(arrowRender);
-        if(inputsGenerator.isTerrainEditor()){
-            getRootNode().detachChild(arrowRender);
-        }
         if(updateLoop.getBallPositions().size() != 0) {
+            getRootNode().detachChild(arrowRender);
             gameState.setBallPosition(updateLoop.getBallPositions().get(0));
             moveBall(ball.state.position);
             updateLoop.getBallPositions().remove(0);
@@ -276,11 +270,24 @@ public class Renderer extends SimpleApplication implements InputInt {
 
     public void removeObject(Geometry geometry) {
         if(!geometry.getName().contains("Course")){
+            Vector3f obstaclePos = geometry.getLocalTranslation();
+            Vector2 obstaclePos2d = new Vector2(obstaclePos.x/8.7,obstaclePos.z/8.7);
+            terrain.removeObstacleAt(obstaclePos2d);
             obstacles.detachChild(geometry);
         }
     }
 
-    public void drawObstacle(String obstacleType){
-        obstacles.attachChild(objectGeneration.drawObstacle(obstacleType));
+    public void drawObstacle(String obstacleType, Vector3f start, Vector3f end){
+        if(start.x<end.x && start.z>end.z){
+            Vector3f hold = start.clone();
+            start.z = end.z;
+            end.z = hold.z;
+        }
+        if(start.x>end.x && start.z<end.z){
+            Vector3f hold = start.clone();
+            start.z = end.z;
+            end.z = hold.z;
+        }
+        obstacles.attachChild(objectGeneration.drawObstacle(obstacleType, start, end));
     }
 }
