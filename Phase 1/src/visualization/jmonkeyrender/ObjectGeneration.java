@@ -14,8 +14,12 @@ import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
 import datastorage.GameState;
 import datastorage.Terrain;
+import datastorage.obstacles.IObstacle;
 import datastorage.obstacles.ObstacleBox;
+import datastorage.obstacles.ObstacleTree;
 import utility.math.Vector2;
+
+import java.util.ArrayList;
 
 public class ObjectGeneration {
     private final Renderer renderer;
@@ -103,20 +107,41 @@ public class ObjectGeneration {
         return arrowRender;
     }
 
-    /**
-     * Generates ball and target geometries for the terrain
-     * @return
-     */
-    public void initTarBall(){
-        initBall();
-        initTarget();
+    private void initObstacles(){
+        ArrayList<IObstacle> obstacles = terrain.obstacles;
+        for(IObstacle obstacle: obstacles){
+            if(obstacle instanceof ObstacleBox){
+                float startY = terrain.HeightMapValueAt(((ObstacleBox) obstacle).bottomLeftCorner);
+
+                Vector3f start = new Vector3f((float)((ObstacleBox) obstacle).bottomLeftCorner.x*renderer.getPixelScale(), startY,
+                        (float)((ObstacleBox) obstacle).bottomLeftCorner.y*renderer.getPixelScale());
+
+                float endY = terrain.HeightMapValueAt(((ObstacleBox) obstacle).topRightCorner);
+
+                Vector3f end = new Vector3f((float)(((ObstacleBox) obstacle).bottomLeftCorner.x)*renderer.getPixelScale(),endY,
+                        (float)(((ObstacleBox) obstacle).bottomLeftCorner.y)* renderer.getPixelScale());
+                drawObstacle("Box", start,end);
+            } else if(obstacle instanceof ObstacleTree){
+                float startY = terrain.HeightMapValueAt(((ObstacleTree) obstacle).originPosition);
+                Vector3f start = new Vector3f((float)((ObstacleTree) obstacle).originPosition.x* renderer.getPixelScale(), startY,
+                        (float)((ObstacleTree) obstacle).originPosition.y* renderer.getPixelScale());
+                drawObstacle("Tree", start,null);
+            }
+        }
     }
 
-    public Geometry drawObstacle(String obstacleType) {
-        Geometry obstacle = new Geometry();
+    /**
+     * Generates ball and target geometries for the terrain
+     */
+    public void initObjects(){
+        initBall();
+        initTarget();
+        //initObstacles();
+    }
+
+    public Spatial drawObstacle(String obstacleType, Vector3f start, Vector3f end) {
+        Spatial obstacle = new Geometry();
         if(obstacleType.equals("Box")){
-            Vector3f start = renderer.getPointRenders().get(0).getLocalTranslation();
-            Vector3f end = renderer.getPointRenders().get(1).getLocalTranslation();
             end.y+=5;
             Box box = new Box(start, end);
             obstacle = new Geometry("Obstacle", box);
@@ -127,18 +152,36 @@ public class ObjectGeneration {
 
             redMat.setTexture("ColorMap", crateTex);
             obstacle.setMaterial(redMat);
-
-            double scale = 8.7;
-            Vector2 vector1 = new Vector2(start.x/scale,
-                    start.z/scale);
-            Vector2 vector2 = new Vector2(end.x/scale,
-                    end.z/scale);
-
-            renderer.getGameState().getTerrain().addObstacle(new ObstacleBox(vector1, vector2));
-
+            //Adding the obstacle to the physics, if the its added through terrain editor
+            if(Inputs.isTerrainEditor) {
+                double scale = 8.7;
+                Vector2 vector1 = new Vector2(start.x / scale,
+                        start.z / scale);
+                Vector2 vector2 = new Vector2(end.x / scale,
+                        end.z / scale);
+                terrain.addObstacle(new ObstacleBox(vector1, vector2));
+            }
         }
         if(obstacleType.equals("Tree")){
+            obstacle = assetManager.loadModel("ObjectTexture/Tree.j3o");
+            Texture crateTex = assetManager.loadTexture("ObjectTexture/Leaves.png");
+            Material redMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            redMat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+            redMat.setTexture("ColorMap", crateTex);
 
+            obstacle.setMaterial(redMat);
+            obstacle.scale(10);
+            obstacle.setLocalTranslation(start);
+            if(Inputs.isTerrainEditor) {
+                double scale = 8.7;
+                Vector2 vector1 = new Vector2(start.x / scale,
+                        start.z / scale);
+                ObstacleTree tree = new ObstacleTree();
+                tree.originPosition = vector1;
+                tree.bounciness = 0.75;
+                tree.radius = 1;
+                terrain.addObstacle(tree);
+            }
         }
         return obstacle;
     }

@@ -32,7 +32,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     private MapGeneration mapGeneration;
     protected ObjectGeneration objectGeneration;
     private UIGeneration uiGeneration;
-    private InputsGenerator inputsGenerator;
+    private Inputs inputsGenerator;
     private final Cam camInit = new Cam();
 
     private Update updateLoop;
@@ -186,7 +186,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     public void generateWorld(){
         getRootNode().attachChild(obstacles);
         mapGeneration.initMap(MenuGUI.texPath);
-        objectGeneration.initTarBall();
+        objectGeneration.initObjects();
         uiGeneration.initText(guiFont);
     }
 
@@ -197,7 +197,7 @@ public class Renderer extends SimpleApplication implements InputInt {
         mapGeneration = new MapGeneration(this);
         objectGeneration = new ObjectGeneration(this);
         uiGeneration = new UIGeneration(this);
-        inputsGenerator = new InputsGenerator(this);
+        inputsGenerator = new Inputs(this);
         updateLoop = new Update(gameState);
     }
     /**
@@ -276,11 +276,14 @@ public class Renderer extends SimpleApplication implements InputInt {
 
     public void removeObject(Geometry geometry) {
         if(!geometry.getName().contains("Course")){
+            Vector3f obstaclePos = geometry.getLocalTranslation();
+            Vector2 obstaclePos2d = new Vector2(obstaclePos.x/8.7,obstaclePos.z/8.7);
+            terrain.removeObstacleAt(obstaclePos2d);
             obstacles.detachChild(geometry);
         }
     }
 
-    public void drawObstacle(String obstacleType){
-        obstacles.attachChild(objectGeneration.drawObstacle(obstacleType));
+    public void drawObstacle(String obstacleType, Vector3f start, Vector3f end){
+        obstacles.attachChild(objectGeneration.drawObstacle(obstacleType, start, end));
     }
 }

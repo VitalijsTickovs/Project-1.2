@@ -30,31 +30,5 @@ targetPosition = -36,13;
 //Make this a range Eg. variableX = -2<5;
 
 //To create tree "treeX", "treeY", "treeRadius", "treeBounciness";
-//treePosition = -7.5,10;
-//treeRadius = 2;
-//treeBounciness = 0.5;
-
-//treePosition = -10,-10;
-//treeRadius = 2;
-//treeBounciness = 0.85;
-
-//treePosition = -35,-3;
-//treeRadius = 2;
-//treeBounciness = 0.85;
 
 //To create box "boxBottomLeft", "boxTopRight", "boxBounciness";
-//boxBottomLeft = -10,5;
-//boxTopRight = -5,-5;
-//boxBounciness = 0.9;
-
-//boxBottomLeft = -25,-2;
-//boxTopRight = -13,-8;
-//boxBounciness = 0.8;
-
-//boxBottomLeft = -20,8;
-//boxTopRight = -13,3;
-//boxBounciness = 0.75;
-
-//boxBottomLeft = -35,12;
-//boxTopRight = -24,6;
-//boxBounciness = 0.75;
