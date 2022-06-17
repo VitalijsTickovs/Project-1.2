@@ -278,7 +278,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     }
 
     public void drawObstacle(String obstacleType, Vector3f start, Vector3f end){
-        if(start.x<end.x && start.z>end.z){
+        if(start.x<end.x && start.z<end.z){
             Vector3f hold = start.clone();
             start.z = end.z;
             end.z = hold.z;

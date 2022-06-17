@@ -141,10 +141,8 @@ public class ObjectGeneration {
     }
 
     public Spatial drawObstacle(String obstacleType, Vector3f start, Vector3f end) {
-        start.y+=0.5f;
         Spatial obstacle = new Geometry();
         if(obstacleType.equals("Box")){
-            end.y+=5;
             Box box = new Box(start, end);
             obstacle = new Geometry("Obstacle", box);
 
