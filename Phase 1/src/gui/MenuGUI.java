@@ -168,6 +168,10 @@ public class MenuGUI extends javax.swing.JFrame {
         /////FETCH LEVEL INDEX
         /////OPEN PUTTING RENDER
         //render.start3d();
+        
+        //open settings
+        new settingsGUI().setVisible(true);
+        
         Game game = new Game(60);
         game.start();
         this.setVisible(false);
@@ -178,6 +182,10 @@ public class MenuGUI extends javax.swing.JFrame {
         /////FETCH LEVEL INDEX
         ////FETCH PLAYER/BOT BOOLEAN
         /////OPEN PUTTING RENDER
+        
+        //open settings
+        new settingsGUI().setVisible(true);
+        
         Renderer render = new Renderer();
         render.start3d();
         this.dispose();
