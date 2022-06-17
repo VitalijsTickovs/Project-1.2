@@ -692,7 +692,7 @@ public class GameStateLoader {
          savedCollisionSystem = collisionSystem;
       }
 
-      return new PhysicsEngine(savedSolver, savedCondition, savedCollisionSystem);
+      return new PhysicsEngine2(savedSolver, savedCondition, savedCollisionSystem);
    }
 
    private static Ball createBall() {

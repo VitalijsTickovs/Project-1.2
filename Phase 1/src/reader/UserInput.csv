@@ -14,12 +14,12 @@ collisionSystem = bounce;
 // "greenKineticFriction", "greenStaticFriction", "terrainFunction";
 terrainTopLeft = -50,-50;
 terrainBottomRight = 50,50;
-greenKineticFriction = 0.08;
+greenKineticFriction = 0.1;
 greenStaticFriction = 0.2;
-terrainFunction = 0.4*(0.9-e**(-(x*x + y*y)/8));
+terrainFunction = 0.1*x + 5;
 
 //To create ball "ballStartPoint", "ballRadius";
-ballStartPoint = -3,0;
+ballStartPoint = 0,0;
 ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";

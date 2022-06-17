@@ -46,10 +46,9 @@ public class HillClimbingBot implements IBot {
         double bestHeuristicVal = heuristic.getShotValue(positions, gameState);
         numSimulations++;
 
-        boolean holeInOne = false;
-        holeInOne = positions.get(positions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
+        //boolean holeInOne = positions.get(positions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
 
-        while (bestShotUpdated && !holeInOne) {
+        while (bestShotUpdated) {
             numIterations++;
 
             bestShotUpdated = false;
@@ -69,8 +68,8 @@ public class HillClimbingBot implements IBot {
                 positions = gameState.simulateShot(velocity);
                 numSimulations++;
 
-                if (!holeInOne)
-                    holeInOne = positions.get(positions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
+                //if (!holeInOne)
+                //    holeInOne = positions.get(positions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
 
                 double heuristicVal = heuristic.getShotValue(positions, gameState);
 

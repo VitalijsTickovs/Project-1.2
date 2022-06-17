@@ -61,7 +61,7 @@ public class BotTester {
 
     public static void main(String[] args) {
         Terrain terrain = new Terrain(
-                "0",//"0.4*(0.9-e**(-(x*x+y*y)/8))",
+                "0.4*(0.9-e**(-(x*x+y*y)/8))",
                 0.2,
                 0.08,
                 new Vector2(-50, -50),
@@ -96,11 +96,11 @@ public class BotTester {
                                         10
                                 )
                         ),*/
-                        new RuleBasedBot(),
+                        BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING),
                         gameState,
                         100
                 ),
-                "Rule (terrain 0)"
+                "AdaptiveHillClimbing (terrain 1)"
         );
 
     }

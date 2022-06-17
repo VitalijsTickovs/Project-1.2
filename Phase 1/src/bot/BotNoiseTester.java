@@ -1,8 +1,6 @@
 package bot;
 
-import bot.botimplementations.AdaptiveHillClimbingBot;
-import bot.botimplementations.IBot;
-import bot.botimplementations.RuleBasedBot;
+import bot.botimplementations.*;
 import bot.heuristics.FinalClosestEuclidianDistanceHeuristic;
 import datastorage.Ball;
 import datastorage.GameState;
@@ -31,10 +29,14 @@ public class BotNoiseTester {
     }
 
     public String testBotForNoise(IBot bot, GameState gameState, double minNoise, double maxNoise, int numTests) {
+        ArrayList<Vector2> shots = new ArrayList<Vector2>();
+        for (int i=0; i<100; i++) {
+            shots.add(bot.findBestShot(gameState));
+        }
         String data = "";
         for (int i=0; i<numTests; i++) {
             double noise = minNoise + (maxNoise-minNoise)/numTests*i;
-            Vector2 dataVect = testBotOneNoise(bot, gameState, numTests, noise);
+            Vector2 dataVect = testBotOneNoise(bot, gameState, 100, noise, shots);
             double averageHolesInOne = dataVect.x;
             double averageDistance = dataVect.y;
             data += noise+", "+averageHolesInOne+", "+averageDistance+"\n";
@@ -42,13 +44,14 @@ public class BotNoiseTester {
         return data;
     }
 
-    public Vector2 testBotOneNoise(IBot bot, GameState gameState, int numShots, double maxNoise) {
+    public Vector2 testBotOneNoise(IBot bot, GameState gameState, int numShots, double maxNoise, ArrayList<Vector2> shots) {
         ShotNoiseGenerator noiseGenerator = new ShotNoiseGenerator();
         double holesInOne = 0;
         double totalDistance = 0;
         for (int i=0; i<numShots; i++) {
+            Vector2 shot = shots.get(i);
             ArrayList<Vector2> positions = gameState.simulateShot(
-                    noiseGenerator.addNoiseToShot(bot.findBestShot(gameState), maxNoise)
+                    noiseGenerator.addNoiseToShot(shot, maxNoise)
             );
             double distance = gameState.getTerrain().target.position.distanceTo(positions.get(positions.size()-1));
             boolean holeInOne = distance <= gameState.getTerrain().target.radius;
@@ -67,7 +70,10 @@ public class BotNoiseTester {
     }
 
     public static void main(String[] args) {
-        IBot bot = new AdaptiveHillClimbingBot(new FinalClosestEuclidianDistanceHeuristic(), new RuleBasedBot());
+        IBot bot = new RandomBot(
+                new FinalClosestEuclidianDistanceHeuristic(),
+                1000
+        );
         Terrain terrain = new Terrain(
                 "0",
                 0.2,
@@ -95,6 +101,6 @@ public class BotNoiseTester {
 
         BotNoiseTester bnt = new BotNoiseTester();
 
-        bnt.saveData(bnt.testBotForNoise(bot, gameState, 0.001, 1, 100), "AdaptiveHC");
+        bnt.saveData(bnt.testBotForNoise(bot, gameState, 0.001, 0.5, 100), "RandomNoise");
     }
 }

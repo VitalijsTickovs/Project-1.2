@@ -1,4 +1,6 @@
-file_name = "solvers-84978135457000.csv";
+clear variables;
+
+file_name = "solvers-3840328294400.csv";
 
 path = erase(mfilename('fullpath'), "ode_solver_plot");
 path = erase(path, "plot");

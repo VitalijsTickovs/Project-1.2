@@ -7,15 +7,19 @@ import utility.math.Vector2;
 
 public class AdaptiveHillClimbingBot implements IBot {
 
-    private int numIterations, numSimulations;
+    private int numIterations, numSimulations, numNeighbours;
     private final Heuristic heuristic;
     private final IBot initialShotTaker;
+    private final double maxLearningRate, minLearningRate, decayRate;
 
-    public AdaptiveHillClimbingBot(Heuristic heuristic, IBot initialShotTaker) {
+    public AdaptiveHillClimbingBot(Heuristic heuristic, double maxLearningRate, double minLearningRate, double decayRate, int numNeighbours, IBot initialShotTaker) {
         numIterations = 0;
         numSimulations = 0;
         this.heuristic = heuristic;
         this.initialShotTaker = initialShotTaker;
+        this.maxLearningRate = maxLearningRate;
+        this.minLearningRate = minLearningRate;
+        this.decayRate = decayRate;
     }
 
     @Override
@@ -41,12 +45,14 @@ public class AdaptiveHillClimbingBot implements IBot {
         );
         numSimulations++;
 
-        double learningRate = 1;
+        double learningRate = maxLearningRate;
         boolean converged = false;
         while (!converged) {
             numIterations++;
             Vector2 tempBestShot = null;
-            for (double dir=0; dir<360; dir+=90) {
+            //for (double dir=0; dir<360; dir+=90) {
+            for (int neighbour=0; neighbour<numNeighbours; neighbour++) {
+                double dir = 360.0*neighbour/numNeighbours;
                 Vector2 newShot = bestShot.copy();
                 Vector2 updateVector = new Vector2(
                         Math.sin(dir/180*Math.PI),
@@ -72,10 +78,10 @@ public class AdaptiveHillClimbingBot implements IBot {
             if (tempBestShot != null) {
                 bestShot = tempBestShot;
             } else {
-                if (learningRate < 0.01) {
+                if (learningRate < minLearningRate) {
                     converged = true;
                 }
-                learningRate /= 2;
+                learningRate /= decayRate;
             }
         }
         return bestShot;
