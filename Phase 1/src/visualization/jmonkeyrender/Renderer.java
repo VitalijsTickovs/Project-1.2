@@ -125,7 +125,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     public void moveBall(Vector2 ballState){
         if(ballState.x*pixelScale<(float)(terrain.getVERTECES_PER_SIDE()-1)/2 && ballState.y*pixelScale < (float)(terrain.getVERTECES_PER_SIDE())/2) {
             //Getting height value corresponding to x and y values
-            float val = terrain.HeightMapValueAt(ballState)*terScale;
+            float val = terrain.heightMapValueAt(ballState)*terScale;
 
             //Moving the ball object to specified position
             ballRender.setLocalTranslation((float) (ballState.x)*pixelScale, val, (float) (ballState.y)*pixelScale);
@@ -278,12 +278,12 @@ public class Renderer extends SimpleApplication implements InputInt {
     }
 
     public void drawObstacle(String obstacleType, Vector3f start, Vector3f end){
-        if(start.x<end.x && start.z<end.z){
+        if(start.x<end.x && start.z>end.z){
             Vector3f hold = start.clone();
             start.z = end.z;
             end.z = hold.z;
         }
-        if(start.x>end.x && start.z>end.z){
+        if(start.x>end.x && start.z<end.z){
             Vector3f hold = start.clone();
             start.z = end.z;
             end.z = hold.z;
