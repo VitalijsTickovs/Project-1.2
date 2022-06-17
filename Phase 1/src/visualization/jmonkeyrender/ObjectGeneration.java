@@ -150,7 +150,7 @@ public class ObjectGeneration {
 
             Texture crateTex = assetManager.loadTexture("ObjectTexture/Crate.png");
             Material redMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            //redMat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Front);
+            redMat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Front);
 
             redMat.setTexture("ColorMap", crateTex);
             obstacle.setMaterial(redMat);

@@ -188,8 +188,8 @@ public class Terrain {
         int pos = 0;
         this.xOff = (bottomRightCorner.x - topLeftCorner.x) / numVerteces;
         this.yOff = (bottomRightCorner.y - topLeftCorner.y) / numVerteces;
-        for (int x = 0; x < numVerteces; x++) {
-            for (int y = 0; y < numVerteces; y++) {
+        for (int y = 0; y < numVerteces; y++) {
+            for (int x = 0; x < numVerteces; x++) {
 
                 double xx = topLeftCorner.x + x * this.xOff;
                 double yy = topLeftCorner.y + y * this.yOff;
