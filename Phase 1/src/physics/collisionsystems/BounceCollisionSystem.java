@@ -9,7 +9,7 @@ import utility.UtilityClass;
 import utility.math.Vector2;
 
 public class BounceCollisionSystem implements ICollisionSystem {
-    public IObstacle[] obstacles;
+    public ArrayList<IObstacle> obstacles;
 
     public BallState modifyStateDueToCollisions(BallState state, BallState previousState, double ballRadius, Terrain terrain) {
         Vector2 previousPosition = previousState.position;

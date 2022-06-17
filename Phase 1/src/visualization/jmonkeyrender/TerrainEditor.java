@@ -17,12 +17,6 @@ public class TerrainEditor {
         renderer.getFlyByCamera().setDragToRotate(!flyCam);
         renderer.getFlyByCamera().setMoveSpeed(50);
 
-        flyCam = false;
+        flyCam = !flyCam;
     }
-
-    public void editor(){
-
-    }
-
-
 }

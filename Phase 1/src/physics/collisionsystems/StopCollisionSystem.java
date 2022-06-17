@@ -1,6 +1,5 @@
 package physics.collisionsystems;
 
-import datastorage.Ball;
 import datastorage.BallState;
 import datastorage.Terrain;
 import datastorage.obstacles.IObstacle;

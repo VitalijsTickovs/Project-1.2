@@ -12,13 +12,13 @@ public class Rectangle extends Shape {
     }
 
     private void ensureCornersAreCorrect(){
-        if(bottomLeftCorner.y > topRightCorner.y){
+        if(bottomLeftCorner.y < topRightCorner.y){
             double holdY = bottomLeftCorner.y;
-            topRightCorner.y = bottomLeftCorner.y;
-            bottomLeftCorner.y = holdY;
+            bottomLeftCorner.y = topRightCorner.y;
+            topRightCorner.y = holdY;
         }
         if(bottomLeftCorner.x > topRightCorner.x){
-            double holdX = bottomLeftCorner.x;
+            double holdX = topRightCorner.x;
             topRightCorner.x = bottomLeftCorner.x;
             bottomLeftCorner.x = holdX;
         }

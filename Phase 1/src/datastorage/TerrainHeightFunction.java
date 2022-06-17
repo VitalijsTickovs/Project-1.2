@@ -5,12 +5,6 @@ import function.Function;
 import utility.math.Vector2;
 
 public class TerrainHeightFunction extends TerrainHeight {
-    /*
-     * private Function f;
-     * private Function dfx;
-     * private Function dfy;
-     */
-
     public function.Function f;
     public function.Function dfx;
     public function.Function dfy;

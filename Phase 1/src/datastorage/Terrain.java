@@ -2,9 +2,12 @@ package datastorage;
 
 import datastorage.obstacles.IObstacle;
 // import org.mariuszgromada.math.mxparser.Expression;
+import datastorage.obstacles.ObstacleBox;
+import datastorage.obstacles.ObstacleTree;
 import function.Function;
-import utility.Print;
 import utility.math.Vector2;
+
+import java.util.ArrayList;
 
 public class Terrain {
     // This is generated after Terrain is created
@@ -15,7 +18,7 @@ public class Terrain {
 
     // All of the data below should be included, when Terrain is created
     public Zone[] zones = new Zone[0];
-    public IObstacle[] obstacles = new IObstacle[0];
+    public ArrayList<IObstacle> obstacles;
     public Target target;
     public Vector2 ballStartingPosition;
 
@@ -41,6 +44,22 @@ public class Terrain {
     public double yOff;
 
     public Terrain() {
+    }
+
+    public void addObstacle(IObstacle obstacle){
+        obstacles.add(obstacle);
+    }
+    public void removeObstacleAt(Vector2 obstaclePos){
+        for(IObstacle obstacle: obstacles)
+            if(obstacle instanceof ObstacleBox){
+                if(((ObstacleBox) obstacle).bottomLeftCorner == obstaclePos || ((ObstacleBox) obstacle).topRightCorner == obstaclePos){
+                    obstacles.remove(obstacle);
+                }
+            }else if(obstacle instanceof ObstacleTree){
+                if(((ObstacleTree) obstacle).originPosition == obstaclePos){
+                    obstacles.remove(obstacle);
+                }
+            }
     }
 
     // This value seems to be the right number, so no need to provide it as input
@@ -242,7 +261,7 @@ public class Terrain {
         System.out.print("Static friction: ");
         System.out.println(staticFriction);
 
-        Print.printSquare(meshGrid);
+        //Print.printSquare(meshGrid);
         for (Zone zone : zones) {
             zone.print();
         }

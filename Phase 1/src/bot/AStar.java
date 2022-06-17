@@ -66,15 +66,18 @@ public class AStar {
      *         while avoiding water and obstacles.
      *         Returns {@code -1} if an unobstructed path does not exist
      */
-    public double getDistanceToTarget(Vector2 position, int squaresPerGameUnit) {
+    public double getDistanceToTarget(Vector2 ballPosition, int squaresPerGameUnit) {
         checkSquares(squaresPerGameUnit);
-        checkForNullPosition(position);
+        checkForNullPosition(ballPosition);
 
-        setupSearch(position);
+        setupSearch(ballPosition);
         checkForNullMapAndTarget();
 
         double distanceInGridUnits = aStarPathfinding();
-        return translateResultToGameUnits(distanceInGridUnits);
+        double distanceInGameUnits = translateResultToGameUnits(distanceInGridUnits);
+        double ballOffset = ballPosition.distanceTo(terrain.target.position);
+        System.out.println(ballOffset);
+        return distanceInGameUnits + ballOffset;
     }
 
     // region Startup
@@ -413,7 +416,7 @@ public class AStar {
     }
     // endregion
 
-    private double translateResultToGameUnits(double gridDistance){
+    private double translateResultToGameUnits(double gridDistance) {
         return (gridDistance / 10) / (double) SQUARES_PER_GAME_UNIT;
     }
 }

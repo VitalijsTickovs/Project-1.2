@@ -420,13 +420,4 @@ public class Function {
     public String getString(){
         return root.toString();
     }
-
-    public static void main(String[] args) {
-        Function f = new Function("ln(2*x+1)");
-        System.out.println(f);
-        for (int i=0; i<1000; i++) {
-            System.out.println(f.evaluate(new String[]{"x"}, new double[]{1}));
-        }
-        System.out.println(f.getDerivative("x"));
-    }
 }

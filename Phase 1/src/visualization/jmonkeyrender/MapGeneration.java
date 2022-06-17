@@ -16,7 +16,6 @@ import datastorage.Terrain;
 
 public class MapGeneration {
     private final Renderer renderer;
-    private TerrainQuad terrainQuad;
     private final Terrain terrain;
 
     private final AssetManager assetManager;
@@ -44,7 +43,7 @@ public class MapGeneration {
         AlphaMapGenerator.generateAlphaMap(terrain);
 
         //Setting terrain using heightmap
-        this.terrainQuad = new TerrainQuad("Course", 128, terrain.getVERTECES_PER_SIDE(), this.terrain.heightmap);
+        TerrainQuad terrainQuad = new TerrainQuad("Course", 128, terrain.getVERTECES_PER_SIDE(), this.terrain.heightmap);
 
         //Grass Texture
         Material matTerrain = new Material(assetManager,"Common/MatDefs/Terrain/Terrain.j3md");
@@ -118,6 +117,7 @@ public class MapGeneration {
             water.move(0, (normalFactor/2-this.terrain.minScaledVal) * terScale, 0);
             //Attaching water object to the scene
             renderer.getRootNode().attachChild(water);
+
         }
     }
 
