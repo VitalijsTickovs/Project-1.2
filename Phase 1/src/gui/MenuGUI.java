@@ -164,20 +164,6 @@ public class MenuGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void singleBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_singleBActionPerformed
-  
-        /////FETCH LEVEL INDEX
-        /////OPEN PUTTING RENDER
-        //render.start3d();
-        
-        //open settings
-        new settingsGUI().setVisible(true);
-        
-        Game game = new Game(60);
-        game.start();
-        this.setVisible(false);
-    }//GEN-LAST:event_singleBActionPerformed
-
-    private void multiBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiBActionPerformed
         
         /////FETCH LEVEL INDEX
         ////FETCH PLAYER/BOT BOOLEAN
@@ -189,6 +175,22 @@ public class MenuGUI extends javax.swing.JFrame {
         Renderer render = new Renderer();
         render.start3d();
         this.dispose();
+        
+    }//GEN-LAST:event_singleBActionPerformed
+
+    private void multiBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiBActionPerformed
+        
+        /////FETCH LEVEL INDEX
+        /////OPEN PUTTING RENDER
+        //render.start3d();
+        
+        //open settings
+        new settingsGUI().setVisible(true);
+        
+        Game game = new Game(60);
+        game.start();
+        this.setVisible(false);
+        
     }//GEN-LAST:event_multiBActionPerformed
 
     private void exitBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitBActionPerformed
