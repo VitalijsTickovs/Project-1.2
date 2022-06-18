@@ -1,5 +1,5 @@
 package gui;
-
+/*
 import bot.botimplementations.BotFactory;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
@@ -9,7 +9,7 @@ import com.jme3.math.Ray;
 import gui.shotinput.MouseInputReader;
 import gui.shotinput.ShotInputWindow;
 import utility.math.Vector2;
-
+*/
 import java.util.ArrayList;
 
 public class SettingsGUI extends javax.swing.JFrame {
@@ -22,10 +22,10 @@ public class SettingsGUI extends javax.swing.JFrame {
     private ArrayList<CollisionResults> collisions = new ArrayList<>();
     */
 
-    public Settings(Renderer renderer) {
+    public Settings() {
         initComponents();
 
-        this.renderer = renderer;
+        //this.renderer = renderer;
         
         ////default game state
         manualTB.setSelected(true);
