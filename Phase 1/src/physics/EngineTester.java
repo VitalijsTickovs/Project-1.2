@@ -24,33 +24,42 @@ public class EngineTester {
 
         // Test all the other engines
         for (int n=numStepSizes; n>0; n--) {
-            double h = stopT/n;
+        //for (int n=0; n<numStepSizes; n++) {
+            System.out.print("#");
+            double h = stopT / n;//(10000 - 10000 / numStepSizes * n);
             engine.odeSolver.setStepSize(h);
             ArrayList<Vector2> shotPositions = engine.simulateShot(v0, ball, terrain);
             double t = 0;
             Vector2 position = null;
             Vector2 actualPosition = null;
             // Find the simulated value
-            for (int i=0; i<shotPositions.size(); i++) {
-                t = i*h;
-                if (t >= stopT) {
-                    position = shotPositions.get(i);
+            double diff = stopT;
+            for (int i = 0; i < shotPositions.size(); i++) {
+                t = i * h;
+                double diffNew = Math.abs(stopT - t);
+                if (diffNew > diff) {//if (t >= stopT) {
+                    position = shotPositions.get(i - 1);
                     break;
                 }
+                diff = diffNew;
             }
             // Find the actual value
-            for (int i=0; i<actualPositions.size(); i++) {
-                double tActual = i*actualH;
-                if (tActual >= t) {
-                    actualPosition = actualPositions.get(i);
+            diff = stopT;
+            for (int i = 0; i < actualPositions.size(); i++) {
+                double tActual = i * actualH;
+                double diffNew = Math.abs(stopT - tActual);
+                if (diffNew > diff) {//if (tActual >= t) {
+                    actualPosition = actualPositions.get(i-1);
                     break;
                 }
+                diff = diffNew;
             }
             // Calculate the error
             double error = actualPosition.distanceTo(position);
             // Store the error
-            data += h+", "+Math.log10(h)+", "+error+", "+Math.log10(error)+"\n";
+            data += h + ", " + Math.log10(h) + ", " + error + ", " + Math.log10(error) + "\n";
         }
+        System.out.println("\n");
         return data;
     }
 
@@ -81,8 +90,10 @@ public class EngineTester {
             i++;
         }
         Vector2 actualPosition = actualPositions.get(i);
+
         System.out.println(actualPosition);
         System.out.println(actualPositions.get(actualPositions.size()-1));
+        System.out.println("Time to stop: "+actualPositions.size()*actualH);
 
         String eulerData = testStepSizeAccuracy(
                 euler,
@@ -171,9 +182,9 @@ public class EngineTester {
                 ),
                 new Vector2(3, 0),
                 new Vector2(-1, 0.5),
-                0.2,
-                10
+                0.1,
+                100
         );
-        //et.saveTestData(data, "solvers-"+System.nanoTime());
+        et.saveTestData(data, "solvers-"+System.nanoTime());
     }
 }

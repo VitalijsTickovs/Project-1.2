@@ -1,4 +1,4 @@
-file_name = "bot.heuristics.FinalEuclidianDistanceHeuristic-92321451670500.csv";
+file_name = "bot.heuristics.FinalAStarDistanceHeuristic-420453914642600.csv";
 
 path = erase(mfilename('fullpath'), "heuristic_plot");
 path = erase(path, "plot\");

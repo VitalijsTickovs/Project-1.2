@@ -8,6 +8,7 @@ import function.Function;
 import utility.math.Vector2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Terrain {
     // This is generated after Terrain is created
@@ -15,6 +16,7 @@ public class Terrain {
     public float[] meshGrid;
 
     public float[] heightmap;
+    public float[] reversedHeightmap;
 
     // All of the data below should be included, when Terrain is created
     public Zone[] zones = new Zone[0];
@@ -180,7 +182,6 @@ public class Terrain {
 
     /**
      * Recalculates the heightmap that is used for
-     * 
      * @param numVerteces
      */
     private void calculateHeightMap(int numVerteces) {
@@ -190,7 +191,6 @@ public class Terrain {
         this.yOff = (bottomRightCorner.y - topLeftCorner.y) / numVerteces;
         for (int x = 0; x < numVerteces; x++) {
             for (int y = 0; y < numVerteces; y++) {
-
                 double xx = topLeftCorner.x + x * this.xOff;
                 double yy = topLeftCorner.y + y * this.yOff;
                 float val = (float) terrainFunction.valueAt(xx, yy);
@@ -206,15 +206,7 @@ public class Terrain {
         }
         for (int i = 0; i < heightmap.length; i++) {
             float val = heightmap[i];
-            val += Math.abs(minVal);
-            val /= maxVal - minVal;
-            if (val < 0) {
-                val = 0;
-            }
-            if (val > 1) {
-                val = 1;
-            }
-            val *= NORMAL_FACTOR;
+            val = normalizeHeight(val);
             if (val > maxScaledVal) {
                 maxScaledVal = val;
             }
@@ -223,10 +215,25 @@ public class Terrain {
             }
             heightmap[i] = val;
         }
+        flipAxis();
     }
 
-    public float HeightMapValueAt(Vector2 targetPos){
+    private void flipAxis(){
+        reversedHeightmap = new float[VERTECES_PER_SIDE * VERTECES_PER_SIDE];
+        for(int y=0; y<VERTECES_PER_SIDE;y++){
+            for(int x=0; x<VERTECES_PER_SIDE; x++){
+                reversedHeightmap[y*VERTECES_PER_SIDE+x]= heightmap[x*VERTECES_PER_SIDE+y];
+            }
+        }
+    }
+
+    public float heightMapValueAt(Vector2 targetPos){
         float val = (float) getTerrainFunction().valueAt(targetPos.x,targetPos.y);
+        val = normalizeHeight(val);
+        return val;
+    }
+
+    private float normalizeHeight(float val) {
         val += Math.abs(minVal);
         val /= maxVal - minVal;
         if (val < 0) {

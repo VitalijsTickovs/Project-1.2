@@ -15,7 +15,6 @@ public class ParticleSwarmBot implements IBot {
     private final Random random;
     private final int numParticles, numGenerations;
     public int numSimulations, numIterations;
-    private boolean holeInOne;
 
     public ParticleSwarmBot(Heuristic heuristic, double w, double c1, double c2, int numParticles, int numGenerations) {
         this.heuristic = heuristic;
@@ -29,7 +28,6 @@ public class ParticleSwarmBot implements IBot {
 
     @Override
     public Vector2 findBestShot(GameState gameState) {
-        holeInOne = false;
         numSimulations = 0;
         numIterations = 0;
         gameState = gameState.copy();
@@ -59,10 +57,6 @@ public class ParticleSwarmBot implements IBot {
                     bestHeuristic = particle.bestHeuristicValue;
                     System.out.println("New best: " + bestHeuristic);
                 }
-            }
-            // Check for hole in one
-            if (holeInOne) {
-                break;
             }
         }
         System.out.println("Best heuristic: " + bestHeuristic + " with shot: " + bestShot);
@@ -100,10 +94,6 @@ public class ParticleSwarmBot implements IBot {
         void updateBestPosition() {
             ArrayList<Vector2> ballPositions = gameState.simulateShot(position);
             numSimulations++;
-            // Check for hole in one
-            if (!holeInOne)
-                holeInOne = ballPositions.get(ballPositions.size() - 1)
-                        .distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
             double heuristicVal = heuristic.getShotValue(ballPositions, gameState);
             if (bestPosition == null || heuristic.firstBetterThanSecond(heuristicVal, bestHeuristicValue)) {
                 bestPosition = position.copy();

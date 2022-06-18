@@ -56,7 +56,7 @@ public class ObjectGeneration {
         target.setMaterial(mat);
 
         //Finding the position for the target
-        float val = terrain.HeightMapValueAt(terrain.target.position)*terScale;
+        float val = terrain.heightMapValueAt(terrain.target.position)*terScale;
 
         //Moving the cylinder to the calculated position
         target.setLocalTranslation((float) (terrain.target.position.x *pixelScale), val, (float) (terrain.target.position.y*pixelScale));
@@ -97,7 +97,7 @@ public class ObjectGeneration {
 
         Vector2 ballPos = gameState.getBall().state.position;
         arrowRender.setLocalTranslation((float)ballPos.x*pixelScale,
-                terrain.HeightMapValueAt(ballPos)*terScale+2.56f,(float)ballPos.y*pixelScale);
+                terrain.heightMapValueAt(ballPos)*terScale+2.56f,(float)ballPos.y*pixelScale);
 
         //Textures for the arrow
         Material redMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -111,19 +111,19 @@ public class ObjectGeneration {
         ArrayList<IObstacle> obstacles = terrain.obstacles;
         for(IObstacle obstacle: obstacles){
             if(obstacle instanceof ObstacleBox){
-                float startY = terrain.HeightMapValueAt(((ObstacleBox) obstacle).bottomLeftCorner)*terScale;
+                float startY = terrain.heightMapValueAt(((ObstacleBox) obstacle).bottomLeftCorner)*terScale;
 
                 Vector3f start = new Vector3f((float)((ObstacleBox) obstacle).bottomLeftCorner.x*renderer.getPixelScale(), startY,
                         (float)((ObstacleBox) obstacle).bottomLeftCorner.y*renderer.getPixelScale());
 
 
-                float endY = terrain.HeightMapValueAt(((ObstacleBox) obstacle).topRightCorner)*terScale;
+                float endY = terrain.heightMapValueAt(((ObstacleBox) obstacle).topRightCorner)*terScale;
 
                 Vector3f end = new Vector3f((float)(((ObstacleBox) obstacle).topRightCorner.x)*renderer.getPixelScale(),endY,
                         (float)(((ObstacleBox) obstacle).topRightCorner.y)* renderer.getPixelScale());
                 renderer.obstacles.attachChild(drawObstacle("Box", start,end));
             } else if(obstacle instanceof ObstacleTree){
-                float startY = terrain.HeightMapValueAt(((ObstacleTree) obstacle).originPosition);
+                float startY = terrain.heightMapValueAt(((ObstacleTree) obstacle).originPosition);
                 Vector3f start = new Vector3f((float)((ObstacleTree) obstacle).originPosition.x* renderer.getPixelScale(), startY,
                         (float)((ObstacleTree) obstacle).originPosition.y* renderer.getPixelScale());
                 drawObstacle("Tree", start,null);
@@ -141,16 +141,14 @@ public class ObjectGeneration {
     }
 
     public Spatial drawObstacle(String obstacleType, Vector3f start, Vector3f end) {
-        start.y+=0.5f;
         Spatial obstacle = new Geometry();
         if(obstacleType.equals("Box")){
-            end.y+=5;
             Box box = new Box(start, end);
             obstacle = new Geometry("Obstacle", box);
 
             Texture crateTex = assetManager.loadTexture("ObjectTexture/Crate.png");
             Material redMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            //redMat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Front);
+            redMat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Front);
 
             redMat.setTexture("ColorMap", crateTex);
             obstacle.setMaterial(redMat);

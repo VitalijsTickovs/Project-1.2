@@ -26,7 +26,6 @@ public class RandomBot implements IBot {
         Vector2 bestShot = null;
         double bestHeuristic = 0;
         gameState = gameState.copy();
-        boolean holeInOne = false;
         // Take random shots and return the best one
         Random random = new Random();
         for (int i=0; i<numShots; i++) {
@@ -44,12 +43,6 @@ public class RandomBot implements IBot {
             if (bestShot == null || heuristic.firstBetterThanSecond(heuristicVal, bestHeuristic)) {
                 bestHeuristic = heuristicVal;
                 bestShot = shot;
-                // Check if hole in one
-                holeInOne = shotPositions.get(shotPositions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
-            }
-
-            if (holeInOne) {
-                break;
             }
         }
         return bestShot;

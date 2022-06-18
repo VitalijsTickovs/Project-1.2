@@ -43,7 +43,7 @@ public class MapGeneration {
         AlphaMapGenerator.generateAlphaMap(terrain);
 
         //Setting terrain using heightmap
-        TerrainQuad terrainQuad = new TerrainQuad("Course", 128, terrain.getVERTECES_PER_SIDE(), this.terrain.heightmap);
+        TerrainQuad terrainQuad = new TerrainQuad("Course", 128, terrain.getVERTECES_PER_SIDE(), terrain.reversedHeightmap);
 
         //Grass Texture
         Material matTerrain = new Material(assetManager,"Common/MatDefs/Terrain/Terrain.j3md");
