@@ -334,7 +334,7 @@ public class GameStateRenderer {
     }
 
     private void drawNumberOfShots(Graphics2D g2) {
-        g2.drawString("Shots: " + Game.game.numShots, PIXELS_PER_GAME_UNIT, PIXELS_PER_GAME_UNIT);
+        g2.drawString("Shots: " + Game.game.getNumShots(), PIXELS_PER_GAME_UNIT, PIXELS_PER_GAME_UNIT);
     }
 
     private void drawBallPosition(Graphics2D g2) {

@@ -206,15 +206,15 @@ public class UtilityClass {
      * If the corners are not actually representing the bottomLeft and topRight positions, switch the coordinates to make them so
      */
     public static void ensureCornersAreRight(Vector2 bottomLeft, Vector2 topRight){
-        if (bottomLeft.x > topRight.x) {
-            double x = bottomLeft.x;
-            bottomLeft.x = topRight.x;
-            topRight.x = x;
-        }
         if (bottomLeft.y < topRight.y) {
             double y = bottomLeft.y;
             bottomLeft.y = topRight.y;
             topRight.y = y;
+        }
+        if (bottomLeft.x > topRight.x) {
+            double x = bottomLeft.x;
+            bottomLeft.x = topRight.x;
+            topRight.x = x;
         }
     }
 }

@@ -44,7 +44,6 @@ public class AStar {
     private Node targetNode;
     private Vector2 topLeftPos;
 
-    private boolean doDebugMessages = true;
     private Terrain terrain;
     private PathfindingMapCreator mapCreator;
 
@@ -67,11 +66,8 @@ public class AStar {
         setupSearch(ballPosition);
         checkForNullMapAndTarget();
 
-        double distanceInGridUnits = aStarPathfinding();
-        double distanceInGameUnits = translateResultToGameUnits(distanceInGridUnits);
-        double ballOffset = ballPosition.distanceTo(terrain.target.position);
-        System.out.println(ballOffset);
-        return distanceInGameUnits + ballOffset;
+        double distanceInGridUnits = aStarPathfinding(ballPosition);
+        return translateDistanceToGameUnits(distanceInGridUnits);
     }
 
     // region Startup
@@ -114,9 +110,9 @@ public class AStar {
             throw new NullPointerException("Target was null");
         }
 
-        int gridXPosition = translateToGridXPosition(terrain.target.position.x);
-        int gridYPosition = translateToGridYPosition(terrain.target.position.y);
-        targetNode = new Node(gridXPosition, gridYPosition);
+        int targetXPosition = translateToGridXPosition(terrain.target.position.x);
+        int targetYPosition = translateToGridYPosition(terrain.target.position.y);
+        targetNode = new Node(targetXPosition, targetYPosition);
     }
 
     private void checkForNullPosition(Vector2 position) {
@@ -156,31 +152,31 @@ public class AStar {
      *         while avoiding water and obstacles.
      *         Returns {@code -1} if an unobstructed path does not exist.
      */
-    private double aStarPathfinding() {
+    private double aStarPathfinding(Vector2 ballPosition) {
         LinkedList<Node> uncheckedNodes = new LinkedList<>();
         addCreatedNode(originNode);
 
+        double ballOffset = ballPosition.distanceTo(terrain.target.position);
+        if (originNode.getDistanceToNode(targetNode) == 0) {
+            return ballOffset;
+        }
+
         boolean foundPath = false;
         Node currentNode = originNode;
-
         while (!foundPath) {
             createSorroundingNodes(currentNode, uncheckedNodes);
             currentNode = findNodeWithLowestValue(uncheckedNodes);
 
-            if (doDebugMessages) {
-                // System.out.println(currentNode);
-            }
             if (currentNode == null) {
                 // This means that there exists no path to the target
                 return -1;
             }
             uncheckedNodes.remove(currentNode);
-
             if (currentNode.equals(targetNode)) {
                 foundPath = true;
             }
         }
-        return currentNode.distanceToOrigin;
+        return currentNode.distanceToOrigin + ballOffset;
     }
 
     private void createSorroundingNodes(Node origin, LinkedList<Node> uncheckedNodes) {
@@ -380,10 +376,10 @@ public class AStar {
             for (int j = 0; j < map[i].length; j++) {
                 if (map[i][j] == -1) {
                     // Tile blocked
-                    // System.out.print("x");
+                    System.out.print("x");
                 } else {
                     // Tile walkable
-                    // System.out.print("o");
+                    System.out.print("o");
                 }
             }
             System.out.println();
@@ -398,6 +394,7 @@ public class AStar {
      *         pathfinding algorithm
      */
     private int translateToGridXPosition(double axisPosition) {
+        axisPosition -= axisPosition % (1 / (double) SQUARES_PER_GAME_UNIT);
         return (int) ((axisPosition - topLeftPos.x) * SQUARES_PER_GAME_UNIT);
     }
 
@@ -406,11 +403,22 @@ public class AStar {
      *         pathfinding algorithm
      */
     private int translateToGridYPosition(double axisPosition) {
+        axisPosition -= axisPosition % (1 / (double) SQUARES_PER_GAME_UNIT);
         return (int) ((axisPosition - topLeftPos.y) * SQUARES_PER_GAME_UNIT);
+    }
+
+    private Vector2 translatePositionToGameUnits(Vector2 gridPosition) {
+        return gridPosition.scaled(1 / (double) SQUARES_PER_GAME_UNIT).translate(topLeftPos);
     }
     // endregion
 
-    private double translateResultToGameUnits(double gridDistance) {
+    private double translateDistanceToGameUnits(double gridDistance) {
         return (gridDistance / 10) / (double) SQUARES_PER_GAME_UNIT;
+    }
+
+    private double distanceFromLastNodeToTarget() {
+        Vector2 targetNodePosition = new Vector2(targetNode.xPosition, targetNode.yPosition);
+        Vector2 targetNodePositionInGameUnits = translatePositionToGameUnits(targetNodePosition);
+        return terrain.target.position.distanceTo(targetNodePositionInGameUnits);
     }
 }

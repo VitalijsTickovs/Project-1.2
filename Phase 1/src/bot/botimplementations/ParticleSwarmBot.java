@@ -37,7 +37,7 @@ public class ParticleSwarmBot implements IBot {
         double bestHeuristic = 0;
         // Initialize the population
         Particle[] particles = new Particle[numParticles];
-        for (int i=0; i<particles.length; i++) {
+        for (int i = 0; i < particles.length; i++) {
             particles[i] = new Particle(gameState);
         }
         // Find the best shot
@@ -47,7 +47,7 @@ public class ParticleSwarmBot implements IBot {
                 bestHeuristic = particle.bestHeuristicValue;
             }
         }
-        for (int generation=1; generation<=numGenerations; generation++) {
+        for (int generation = 1; generation <= numGenerations; generation++) {
             numIterations++;
             for (Particle particle : particles) {
                 particle.move(bestShot);
@@ -57,6 +57,7 @@ public class ParticleSwarmBot implements IBot {
                 if (heuristic.firstBetterThanSecond(particle.bestHeuristicValue, bestHeuristic)) {
                     bestShot = particle.bestPosition.copy();
                     bestHeuristic = particle.bestHeuristicValue;
+                    System.out.println("New best: " + bestHeuristic);
                 }
             }
             // Check for hole in one
@@ -64,6 +65,7 @@ public class ParticleSwarmBot implements IBot {
                 break;
             }
         }
+        System.out.println("Best heuristic: " + bestHeuristic + " with shot: " + bestShot);
         return bestShot;
     }
 
@@ -87,13 +89,11 @@ public class ParticleSwarmBot implements IBot {
         Particle(GameState gameState) {
             this.gameState = gameState;
             position = new Vector2(
-                    random.nextDouble()*2-1,
-                    random.nextDouble()*2-1
-            ).normalize().scale(random.nextDouble()* Ball.maxSpeed);
+                    random.nextDouble() * 2 - 1,
+                    random.nextDouble() * 2 - 1).normalize().scale(random.nextDouble() * Ball.maxSpeed);
             velocity = new Vector2(
-                    random.nextDouble()*2-1,
-                    random.nextDouble()*2-1
-            ).normalize();
+                    random.nextDouble() * 2 - 1,
+                    random.nextDouble() * 2 - 1).normalize();
             updateBestPosition();
         }
 
@@ -102,7 +102,8 @@ public class ParticleSwarmBot implements IBot {
             numSimulations++;
             // Check for hole in one
             if (!holeInOne)
-                holeInOne = ballPositions.get(ballPositions.size()-1).distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
+                holeInOne = ballPositions.get(ballPositions.size() - 1)
+                        .distanceTo(gameState.getTerrain().target.position) <= gameState.getTerrain().target.radius;
             double heuristicVal = heuristic.getShotValue(ballPositions, gameState);
             if (bestPosition == null || heuristic.firstBetterThanSecond(heuristicVal, bestHeuristicValue)) {
                 bestPosition = position.copy();
@@ -118,8 +119,8 @@ public class ParticleSwarmBot implements IBot {
             }
             // Update velocity
             velocity.translate(velocity.scaled(w));
-            velocity.translate(bestPosition.translated(position.reversed()).scaled(c1*random.nextDouble()));
-            velocity.translate(globalBest.translated(position.reversed()).scaled(c2*random.nextDouble()));
+            velocity.translate(bestPosition.translated(position.reversed()).scaled(c1 * random.nextDouble()));
+            velocity.translate(globalBest.translated(position.reversed()).scaled(c2 * random.nextDouble()));
 
             updateBestPosition();
         }

@@ -19,15 +19,12 @@ import bot.botimplementations.IBot;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import bot.AStar;
 import bot.botimplementations.BotFactory;
 import visualization.InputInt;
 import visualization.Update;
 
 public class Game extends JPanel implements Runnable, GameObject, MouseListener, InputInt {
     private final Update updateLoop;
-
-    public int numShots;
 
     public JFrame frame;
     public GameState gameState;
@@ -59,7 +56,6 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
         updateLoop = new Update(gameState);
 
         //setupInitialBot();
-        AStar aStar = new AStar(gameState.getTerrain());
         setMouseInput();
         createCamera();
         createRenderer();
@@ -256,6 +252,10 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
 
     public void setBot(IBot bot) {
         updateLoop.setBot(bot);
+    }
+
+    public int getNumShots(){
+        return updateLoop.numShots;
     }
 
     // region Static accessor methods

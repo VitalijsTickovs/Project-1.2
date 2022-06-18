@@ -23,13 +23,20 @@ ballStartPoint = -3,0;
 ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";
-targetRadius = 0.15;
-targetPosition = -36,13;
+targetRadius = 0.35;
+targetPosition = -22,10;
 
 //To create sand zone "sandZoneBottomLeft", "sandZoneTopRight", "sandKineticFriction", "sandStaticFriction";
 //Make this a range Eg. variableX = -2<5;
 
-//To create tree "treeX", "treeY", "treeRadius", "treeBounciness";
+//To create tree "treePosition", "treeRadius", "treeBounciness";
+treePosition = -22,2;
+treeRadius = 1.5;
+treeBounciness = 0.9;
+
+treePosition = -2,-6;
+treeRadius = 1.5;
+treeBounciness = 0.9;
 
 //To create box "boxBottomLeft", "boxTopRight", "boxBounciness";
 //boxBottomLeft = -10,-5;
@@ -40,10 +47,22 @@ targetPosition = -36,13;
 //boxTopRight = -13,-2;
 //boxBounciness = 0.8;
 
-//boxBottomLeft = -20,3;
-//boxTopRight = -13,8;
+//boxBottomLeft = -20,8;
+//boxTopRight = -13,3;
 //boxBounciness = 0.75;
 
 //boxBottomLeft = -35,12;
 //boxTopRight = -24,6;
 //boxBounciness = 0.75;
+
+//boxBottomLeft = 2,2;
+//boxTopRight = 4,-5;
+//boxBounciness = 0.75;
+
+//boxBottomLeft = 8,-10;
+//boxTopRight = -15,-8;
+//boxBounciness = 0.95;
+
+//boxBottomLeft = 8,4;
+//boxTopRight = -15,10;
+//boxBounciness = 0.95;

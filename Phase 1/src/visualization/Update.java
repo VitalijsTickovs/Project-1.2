@@ -13,7 +13,7 @@ public class Update {
     private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
     private BallVelocityInput ballVelocityInput;
 
-    private int numShots;
+    public int numShots;
     private Vector2 shotForce;
 
     private IBot bot = null;
@@ -90,11 +90,8 @@ public class Update {
         ballVelocityInput = ballInput;
     }
 
-
-
     private boolean hasReachedTarget() {
-        double distance = gameState.getBall().state.position.copy()
-                .translate(gameState.getTerrain().target.position.copy().scale(-1)).length();
+        double distance = gameState.getBall().state.position.distanceTo(gameState.getTerrain().target.position);
         return distance <= gameState.getTerrain().target.radius;
     }
 
@@ -105,8 +102,8 @@ public class Update {
                 System.out.println("Calculating shot...");
                 shotForce = bot.findBestShot(gameState);
                 System.out.println("Velocity: " + shotForce);
-                System.out.println("Number of simulations: "+bot.getNumSimulations());
-                System.out.println("Number of iterations: "+bot.getNumIterations());
+                System.out.println("Number of simulations: " + bot.getNumSimulations());
+                System.out.println("Number of iterations: " + bot.getNumIterations());
             }
         });
     }
@@ -137,7 +134,7 @@ public class Update {
         }
     }
 
-    public void updateLoop(){
+    public void updateLoop() {
         handleBallInWater();
         handleInput();
         simulateShot();

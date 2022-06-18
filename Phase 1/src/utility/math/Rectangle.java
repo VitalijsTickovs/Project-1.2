@@ -1,27 +1,15 @@
 package utility.math;
 
+import utility.UtilityClass;
+
 public class Rectangle extends Shape {
     public Rectangle(){
-
     }
 
     public Rectangle(Vector2 bottomLeftCorner, Vector2 topRightCorner){
         this.bottomLeftCorner = bottomLeftCorner;
         this.topRightCorner = topRightCorner;
-        ensureCornersAreCorrect();
-    }
-
-    private void ensureCornersAreCorrect(){
-        if(bottomLeftCorner.y < topRightCorner.y){
-            double holdY = bottomLeftCorner.y;
-            bottomLeftCorner.y = topRightCorner.y;
-            topRightCorner.y = holdY;
-        }
-        if(bottomLeftCorner.x > topRightCorner.x){
-            double holdX = topRightCorner.x;
-            topRightCorner.x = bottomLeftCorner.x;
-            bottomLeftCorner.x = holdX;
-        }
+        UtilityClass.ensureCornersAreRight(this.bottomLeftCorner, this.topRightCorner);
     }
 
     public Vector2 bottomLeftCorner;
