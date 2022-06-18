@@ -69,9 +69,9 @@ public class Update {
         if (isSimulationFinished() && !hasReachedTarget()) {
             if (bot == null) {
                 ballVelocityInput.readyForNextInput();
+                drawArrow = true;
             } else {
                 ballVelocityInput.stopListening();
-                drawArrow = true;
                 resetBotThread();
                 botThread.start();
             }
@@ -149,6 +149,9 @@ public class Update {
 
     public void setBot(IBot bot) {
         this.bot = bot;
+        if (bot != null) {
+            drawArrow = false;
+        }
     }
     // endregion
 }
