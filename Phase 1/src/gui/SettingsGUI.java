@@ -1,5 +1,5 @@
 package gui;
-
+/*
 import bot.botimplementations.BotFactory;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
@@ -9,7 +9,7 @@ import com.jme3.math.Ray;
 import gui.shotinput.MouseInputReader;
 import gui.shotinput.ShotInputWindow;
 import utility.math.Vector2;
-
+*/
 import java.util.ArrayList;
 
 public class SettingsGUI extends javax.swing.JFrame {
@@ -22,10 +22,10 @@ public class SettingsGUI extends javax.swing.JFrame {
     private ArrayList<CollisionResults> collisions = new ArrayList<>();
     */
 
-    public Settings(Renderer renderer) {
+    public SettingsGUI() {
         initComponents();
 
-        this.renderer = renderer;
+        //this.renderer = renderer;
         
         ////default game state
         manualTB.setSelected(true);
@@ -340,18 +340,18 @@ public class SettingsGUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Settings.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SettingsGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Settings.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SettingsGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Settings.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SettingsGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Settings.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SettingsGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Settings().setVisible(true);
+                new SettingsGUI().setVisible(true);
             }
         });
     }
