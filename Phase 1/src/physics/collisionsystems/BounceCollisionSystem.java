@@ -19,7 +19,6 @@ public class BounceCollisionSystem implements ICollisionSystem {
         CollisionData collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition,
                 ballRadius);
         if (collisionData != null) {
-            collisionData = getClosestCollisionData(collidesWith, state.position, previousPosition, ballRadius);
             bounceBall(state, collisionData);
         }
 

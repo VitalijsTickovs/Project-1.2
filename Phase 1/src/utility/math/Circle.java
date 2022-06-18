@@ -1,6 +1,14 @@
 package utility.math;
 
 public class Circle extends Shape {
+    public Circle(){
+        
+    }
+    public Circle(Vector2 originPosition, double radius) {
+        this.originPosition = originPosition;
+        this.radius = radius;
+    }
+
     public Vector2 originPosition;
     public double radius;
 

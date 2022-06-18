@@ -122,11 +122,6 @@ public class ObstacleBox extends Rectangle implements IObstacle {
         if (listHasNonNullValues(allCrossPoints)) {
             return allCrossPoints.toArray(new Vector2[0]);
         }
-        // addCrossPointsWithWalls(allCrossPoints, firstPosition, secondPosition, 1);
-        // //External lines
-        // if (listHasNonNullValues(allCrossPoints)) {
-        //     return allCrossPoints.toArray(new Vector2[0]);
-        // }
         //Last position check
         addCrossPointsAtPosition(allCrossPoints, secondPosition);
         return allCrossPoints.toArray(new Vector2[0]);

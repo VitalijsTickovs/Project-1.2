@@ -10,6 +10,7 @@ import datastorage.*;
 import datastorage.obstacles.IObstacle;
 import datastorage.obstacles.ObstacleBox;
 import datastorage.obstacles.ObstacleTree;
+import datastorage.obstacles.ObstacleWall;
 import physics.collisionsystems.*;
 import physics.*;
 import physics.solvers.*;
@@ -56,6 +57,10 @@ public class GameStateLoader {
    private static ArrayList<Vector2> boxBottomLeftCorner = new ArrayList<Vector2>();
    private static ArrayList<Vector2> boxTopRightCorner = new ArrayList<Vector2>();
    private static ArrayList<Double> boxBounciness = new ArrayList<Double>();
+   
+   private static ArrayList<Vector2> wallFirstPosition = new ArrayList<Vector2>();
+   private static ArrayList<Vector2> wallSecondPosition = new ArrayList<Vector2>();
+   private static ArrayList<Double> wallBounciness = new ArrayList<Double>();
 
    private static Terrain terrain; // The generated terrain that will be returned
    // endregion
@@ -95,6 +100,10 @@ public class GameStateLoader {
    private final static Vector2 defboxTopRightCorner = new Vector2(5, 0);
    private final static Vector2 defboxBottomLeftCorner = new Vector2(0, 5);
    private final static double defBoxBounciness = 1;
+   
+   private final static Vector2 defwallFirst = new Vector2(1, 1);
+   private final static Vector2 defwallSecond = new Vector2(3, 3);
+   private final static double defWallBounciness = 1;
 
    public static GameState readFile() {
       createScanner();
@@ -286,6 +295,18 @@ public class GameStateLoader {
          double bounciness = readDouble(line);
          bounciness = UtilityClass.clamp(bounciness, 0.01, 2);
          boxBounciness.add(bounciness);
+      }
+      // Wall
+      if (lineContainsKeywordAndEqualSign(line, "wallFirst")) {
+         wallFirstPosition.add(readPoint(line));
+      }
+      if (lineContainsKeywordAndEqualSign(line, "wallSecond")) {
+         wallSecondPosition.add(readPoint(line));
+      }
+      if (lineContainsKeywordAndEqualSign(line, "wallBounciness")) {
+         double bounciness = readDouble(line);
+         bounciness = UtilityClass.clamp(bounciness, 0.01, 2);
+         wallBounciness.add(bounciness);
       }
    }
 
@@ -532,10 +553,12 @@ public class GameStateLoader {
 
       obstacles.addAll(createTrees());
       obstacles.addAll(createBoxes());
+      obstacles.addAll(createWalls());
 
       terrain.obstacles = obstacles;
    }
 
+   //region Trees
    private static ArrayList<IObstacle> createTrees() {
       ArrayList<IObstacle> trees = new ArrayList<>();
       while (hasTree()) {
@@ -667,6 +690,48 @@ public class GameStateLoader {
          zone.staticFriction = defsandStaticFriction;
       }
       return zone;
+   }
+   // endregion
+   
+   //region Walls
+   private static ArrayList<IObstacle> createWalls() {
+      ArrayList<IObstacle> walls = new ArrayList<>();
+      while (hasWall()) {
+         walls.add(createWall());
+      }
+      return walls;
+   }
+
+   private static boolean hasWall() {
+      return wallFirstPosition.size() > 0 || wallSecondPosition.size() > 0 || wallBounciness.size() > 0;
+   }
+
+   private static IObstacle createWall() {
+      // Position
+      Vector2 firstPosition = new Vector2();
+      Vector2 secondPosition = new Vector2();
+      if (wallFirstPosition.size() > 0) {
+         firstPosition = wallFirstPosition.get(0);
+         wallFirstPosition.remove(0);
+      } else {
+         firstPosition = defwallFirst.copy();
+      }
+      if (wallSecondPosition.size() > 0) {
+         secondPosition = wallSecondPosition.get(0);
+         wallSecondPosition.remove(0);
+      } else {
+         secondPosition = defwallSecond.copy();
+      }
+      ObstacleWall wall = new ObstacleWall(firstPosition, secondPosition);
+      // Bounciness
+      if (wallBounciness.size() > 0) {
+         wall.setBounciness(wallBounciness.get(0));
+         wallBounciness.remove(0);
+      } else {
+         wall.setBounciness(defWallBounciness);
+      }
+
+      return wall;
    }
    // endregion
    // endregion

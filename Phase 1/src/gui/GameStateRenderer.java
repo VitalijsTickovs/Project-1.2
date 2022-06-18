@@ -6,9 +6,11 @@ import visualization.gameengine.Camera;
 import visualization.gameengine.Game;
 import utility.UtilityClass;
 import utility.math.*;
+import utility.math.Rectangle;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -48,7 +50,7 @@ public class GameStateRenderer {
     // region getGreenWithObstacles helper methods
     private void drawTarget(Graphics2D g2, double heightRange) {
         double radius = terrain.target.radius;
-        drawCircle(g2, terrain.target.position.x, terrain.target.position.y, radius, Color.BLACK, false);
+        drawCircle(g2, terrain.target.position, radius, Color.BLACK, false);
 
     }
 
@@ -57,17 +59,21 @@ public class GameStateRenderer {
         Color treeOutlineColor = new Color(16, 87, 3);
         Color boxColor = new Color(125, 111, 79);
         Color boxOutlineColor = new Color(79, 70, 51);
+        Color wallColor = new Color(20, 90, 151);
 
         for (IObstacle o : terrain.obstacles) {
             // Trees
             if (o instanceof ObstacleTree) {
                 ObstacleTree t = (ObstacleTree) o;
-                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, treeColor, true);
-                drawCircle(g2, t.originPosition.x, t.originPosition.y, t.radius, treeOutlineColor, false);
+                drawCircle(g2, t.originPosition, t.radius, treeColor, true);
+                drawCircle(g2, t.originPosition, t.radius, treeOutlineColor, false);
             } else if (o instanceof ObstacleBox) {
                 ObstacleBox b = (ObstacleBox) o;
-                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, boxColor, true);
-                drawRectangle(g2, b.bottomLeftCorner, b.topRightCorner, boxOutlineColor, false);
+                drawRectangle(g2, b, boxColor, true);
+                drawRectangle(g2, b, boxOutlineColor, false);
+            } else if (o instanceof ObstacleWall) {
+                ObstacleWall w = (ObstacleWall) o;
+                drawLine(g2, w, wallColor, (float) w.getWallThickness());
             }
         }
     }
@@ -613,7 +619,7 @@ public class GameStateRenderer {
      * @param color  The color of the circle
      * @param filled Whether it's a filled circle or just an outline
      */
-    private void drawCircle(Graphics2D g2, double x, double y, double radius, Color color, boolean filled) {
+    private void drawCircle(Graphics2D g2, Vector2 position, double radius, Color color, boolean filled) {
         double heightRange = terrain.maxVal - terrain.minVal;
         int[] xPoints = new int[361];
         int[] yPoints = new int[361];
@@ -621,8 +627,8 @@ public class GameStateRenderer {
         int firstPointX = -1, firstPointY = -1;
         // Loop through 360 degrees and add the points
         for (int deg = 0; deg <= 360; deg++) {
-            double xx = x + radius * Math.cos(deg / (2 * Math.PI));
-            double yy = y + radius * Math.sin(deg / (2 * Math.PI));
+            double xx = position.x + radius * Math.cos(deg / (2 * Math.PI));
+            double yy = position.y + radius * Math.sin(deg / (2 * Math.PI));
             double h = terrain.getTerrainFunction().valueAt(xx, yy);
             if (h > 10) {
                 h = 10;
@@ -650,13 +656,14 @@ public class GameStateRenderer {
         }
     }
 
-    private void drawRectangle(Graphics2D g2, Vector2 bottomLeftCorner, Vector2 topRightCorner, Color color,
+    // region Rectangle
+    private void drawRectangle(Graphics2D g2, Rectangle rectangle, Color color,
             boolean filled) {
         int[] xPoints = new int[4];
         int[] yPoints = new int[4];
         g2.setColor(color);
 
-        fillListsWithRectangleCorners(xPoints, yPoints, bottomLeftCorner, topRightCorner);
+        fillListsWithRectangleCorners(xPoints, yPoints, rectangle);
 
         if (filled) {
             g2.fillPolygon(xPoints, yPoints, 4);
@@ -665,8 +672,10 @@ public class GameStateRenderer {
         }
     }
 
-    private void fillListsWithRectangleCorners(int[] xPoints, int[] yPoints, Vector2 bottomLeftCorner,
-            Vector2 topRightCorner) {
+    private void fillListsWithRectangleCorners(int[] xPoints, int[] yPoints, Rectangle rectangle) {
+        Vector2 bottomLeftCorner = rectangle.bottomLeftCorner;
+        Vector2 topRightCorner = rectangle.topRightCorner;
+
         Vector2 bottomRightCornerTranslated = getPointValue(new Vector2(topRightCorner.x, bottomLeftCorner.y));
         assignTranslatedPoint(xPoints, yPoints, 0, bottomRightCornerTranslated);
 
@@ -694,6 +703,28 @@ public class GameStateRenderer {
         int renderY = (int) ((yy - h - terrain.topLeftCorner.y + heightRange / 2) * PIXELS_PER_GAME_UNIT);
         return new Vector2(renderX, renderY);
     }
+
+    // endregion
+
+    // region Wall
+    private void drawLine(Graphics2D g2, Episode episode, Color color, float width) {
+        g2.setColor(color);
+        Stroke savedStroke = g2.getStroke();
+        g2.setStroke(new BasicStroke(width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        g2.draw(getLineToDraw(episode));
+        g2.setStroke(savedStroke);
+    }
+
+    private Line2D getLineToDraw(Episode episode) {
+        Vector2 firstPositionTranslated = getPointValue(episode.firstPosition);
+
+        Vector2 secondPositionTranslated = getPointValue(episode.secondPosition);
+        int[] xPoints = { (int) firstPositionTranslated.x, (int) secondPositionTranslated.x };
+        int[] yPoints = { (int) firstPositionTranslated.y, (int) secondPositionTranslated.y };
+        return new Line2D.Float(xPoints[0], yPoints[0], xPoints[1], yPoints[1]);
+    }
+    // endregion
     // endregion
 
     // region Translation from game units to pixels

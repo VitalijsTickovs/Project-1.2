@@ -6,6 +6,7 @@ import datastorage.*;
 import datastorage.obstacles.IObstacle;
 import datastorage.obstacles.ObstacleBox;
 import datastorage.obstacles.ObstacleTree;
+import datastorage.obstacles.ObstacleWall;
 import physics.*;
 
 public class GameStateSaver {
@@ -89,6 +90,7 @@ public class GameStateSaver {
       addSandZones(terrain);
       addTrees(terrain);
       addBoxes(terrain);
+      addWalls(terrain);
    }
    private static void addSandZones(Terrain terrain){
       for (Zone zone : terrain.zones) {
@@ -121,6 +123,18 @@ public class GameStateSaver {
             printWriter.println("boxBottomLeft = " + box.bottomLeftCorner.x + "," + box.bottomLeftCorner.y + delimiter);
             printWriter.println("boxTopRight = " + box.topRightCorner.x + "," + box.topRightCorner.y + delimiter);
             printWriter.println("boxBounciness = " + box.bounciness + delimiter);
+            printWriter.println("");
+
+         }
+      }
+   }
+   private static void addWalls(Terrain terrain){
+      for (IObstacle obstacle : terrain.obstacles) {
+         if (obstacle instanceof ObstacleWall) {
+            ObstacleWall wall = (ObstacleWall) obstacle;
+            printWriter.println("wallFirst = " + wall.firstPosition.x + "," + wall.firstPosition.y + delimiter);
+            printWriter.println("wallSecond = " + wall.secondPosition.x + "," + wall.secondPosition.y + delimiter);
+            printWriter.println("wallBounciness = " + wall.getBounciness() + delimiter);
             printWriter.println("");
 
          }

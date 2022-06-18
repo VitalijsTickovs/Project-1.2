@@ -37,6 +37,15 @@ treePosition = -2,-6;
 treeRadius = 1.5;
 treeBounciness = 0.9;
 
+//To create wall "wallFirst", "wallSecond", "wallBounciness";
+wallFirst = -2,-4;
+wallSecond 1,0;
+wallBounciness = 0.9;
+
+wallFirst = -4,-2;
+wallSecond -0.5,3;
+wallBounciness = 0.9;
+
 //To create box "boxBottomLeft", "boxTopRight", "boxBounciness";
 //boxBottomLeft = -10,-5;
 //boxTopRight = -5,5;

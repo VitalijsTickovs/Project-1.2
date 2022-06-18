@@ -8,6 +8,17 @@ import utility.math.InfLine2D;
 import utility.math.Vector2;
 
 public class ObstacleTree extends Circle implements IObstacle {
+    public ObstacleTree(){
+        super();
+    }
+    public ObstacleTree(Vector2 originPosition, double radius) {
+        super(originPosition, radius);
+    }
+
+    public ObstacleTree(Vector2 originPosition, double radius, double bounciness) {
+        super(originPosition, radius);
+        this.bounciness = bounciness;
+    }
 
     public double bounciness; // The percentage of momentum that the ball loses after bouncing.
     // This is basically friction for bounces
@@ -52,18 +63,22 @@ public class ObstacleTree extends Circle implements IObstacle {
     /**
      * The whole outline of the geometry is here
      * https://drive.google.com/file/d/1rt7-Zydk_wbFvLNzdlaMwInoSB4xYM0x/view?usp=sharing
-     * @return two collision points with this obstacle (the same one twice if it is a tangent)
-     * or null if there is no collision
+     * 
+     * @return two collision points with this obstacle (the same one twice if it is
+     *         a tangent)
+     *         or null if there is no collision
      */
-    public Vector2[] getCollisionPoints(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
+    private Vector2[] getCollisionPoints(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
         InfLine2D movementLine = new InfLine2D(currentPosition, previousPosition);
-        ArrayList<Vector2> collisionsWithLine = movementLine.getCrossPointsWithCircle(originPosition, radius + ballRadius);
+        ArrayList<Vector2> collisionsWithLine = movementLine.getCrossPointsWithCircle(originPosition,
+                radius + ballRadius);
 
         if (collisionsWithLine.size() == 0) {
             return null;
         }
 
-        // Vector2 deltaPositionToCollisionPoint = previousPosition.translated(collisionsWithLine.get(0).reversed()).normalize().scale(ballRadius).reverse();
+        // Vector2 deltaPositionToCollisionPoint =
+        // previousPosition.translated(collisionsWithLine.get(0).reversed()).normalize().scale(ballRadius).reverse();
         Vector2 deltaPositionToCollisionPoint = Vector2.zeroVector();
         Vector2[] collisionPoints = new Vector2[2];
         collisionPoints[0] = collisionsWithLine.get(0).translated(deltaPositionToCollisionPoint);
@@ -72,22 +87,19 @@ public class ObstacleTree extends Circle implements IObstacle {
         return collisionPoints;
     }
 
-    private Vector2 getClosestCollisionPoint(Vector2[] collisionPoints, Vector2 previousPosition){
+    private Vector2 getClosestCollisionPoint(Vector2[] collisionPoints, Vector2 previousPosition) {
         if (collisionPoints[0].distanceTo(previousPosition) < collisionPoints[1].distanceTo(previousPosition)) {
             return collisionPoints[0];
         }
         return collisionPoints[1];
     }
 
-    private Vector2 getNormal(Vector2 closestCollisionPoint){
+    private Vector2 getNormal(Vector2 closestCollisionPoint) {
         return closestCollisionPoint.translated(originPosition.reversed());
     }
 
     public ObstacleTree copy() {
-        ObstacleTree newTree = new ObstacleTree();
-        newTree.bounciness = bounciness;
-        newTree.originPosition = originPosition;
-        newTree.radius = radius;
+        ObstacleTree newTree = new ObstacleTree(originPosition, radius, bounciness);
         return newTree;
     }
 

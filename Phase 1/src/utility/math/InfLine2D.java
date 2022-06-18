@@ -113,6 +113,12 @@ public class InfLine2D {
         return crossPoint.deltaPositionTo(point);
     }
 
+    public Vector2 getClosestPointOnLineToPosition(Vector2 position){
+        InfLine2D perpendicularLineThroughPoint = getPerpendicularLineAtPoint(position);
+        Vector2 crossPoint = getCrossPointWithLine(perpendicularLineThroughPoint);
+        return crossPoint;
+    }
+
     /**
      * @return A new line that is perpendicular to this line and passes through the
      *         given point

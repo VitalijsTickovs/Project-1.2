@@ -55,7 +55,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
 
         updateLoop = new Update(gameState);
 
-        //setupInitialBot();
+        // setupInitialBot();
         setMouseInput();
         createCamera();
         createRenderer();
@@ -82,7 +82,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
         updateLoop.setManualInputType(new MouseInputReader(this));
     }
 
-    private void setInputWindow(){
+    private void setInputWindow() {
         updateLoop.setManualInputType(new ShotInputWindow(this));
     }
 
@@ -162,7 +162,6 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
         return input.isDown(key);
     }
 
-
     /**
      * Updates the state of the game each step
      */
@@ -233,7 +232,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
 
     private void drawImage(BufferedImage gameStateImage) {
         Graphics2D gameg2 = (Graphics2D) getGraphics();
-        gameg2.drawImage(gameStateImage,null,0, 0);
+        gameg2.drawImage(gameStateImage, null, 0, 0);
         gameg2.dispose();
     }
     // endregion
@@ -256,7 +255,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
         updateLoop.setBot(bot);
     }
 
-    public int getNumShots(){
+    public int getNumShots() {
         return updateLoop.numShots;
     }
 
