@@ -16,7 +16,7 @@ terrainTopLeft = -50,-50;
 terrainBottomRight = 50,50;
 greenKineticFriction = 0.1;
 greenStaticFriction = 0.2;
-terrainFunction = 0.1*x + 5;
+terrainFunction = 1;
 
 //To create ball "ballStartPoint", "ballRadius";
 ballStartPoint = 0,0;
@@ -27,7 +27,6 @@ targetRadius = 0.35;
 targetPosition = -22,10;
 
 //To create sand zone "sandZoneBottomLeft", "sandZoneTopRight", "sandKineticFriction", "sandStaticFriction";
-//Make this a range Eg. variableX = -2<5;
 
 //To create tree "treePosition", "treeRadius", "treeBounciness";
 treePosition = -22,2;
@@ -43,7 +42,7 @@ treeBounciness = 0.9;
 //boxTopRight = -5,5;
 //boxBounciness = 0.9;
 
-//boxBottomLeft = -25,-8;
+//boxBottomLeft = -25,-9;
 //boxTopRight = -13,-2;
 //boxBounciness = 0.8;
 

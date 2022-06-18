@@ -43,8 +43,9 @@ public class ShotInputWindow extends BallVelocityInput {
             isOpen = true;
         }
     }
+
     @Override
-    public void hideInputWindow(){
+    public void hideInputWindow() {
         frame.dispose();
     }
 
@@ -112,5 +113,11 @@ public class ShotInputWindow extends BallVelocityInput {
         shotVector.x = Double.parseDouble(xInputPanel.textField.getText());
         shotVector.y = Double.parseDouble(yInputPanel.textField.getText());
         return shotVector;
+    }
+
+    @Override
+    public void stopListening() {
+        frame.setVisible(false);
+        isOpen = false;
     }
 }

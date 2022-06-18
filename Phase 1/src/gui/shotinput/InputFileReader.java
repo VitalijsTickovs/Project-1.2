@@ -145,4 +145,9 @@ public class InputFileReader extends BallVelocityInput {
     }
     // endregion
     // endregion
+
+    @Override
+    public void stopListening() {
+        // Do nothing
+    }
 }

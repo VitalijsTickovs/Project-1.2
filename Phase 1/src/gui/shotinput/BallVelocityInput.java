@@ -10,4 +10,6 @@ public abstract class BallVelocityInput {
     public abstract void readyForNextInput();
 
     public abstract void hideInputWindow();
+
+    public abstract void stopListening();
 }

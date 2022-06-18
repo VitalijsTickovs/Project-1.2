@@ -26,9 +26,10 @@ public class MouseInputReader extends BallVelocityInput implements IClickListene
     }
 
     @Override
-    public void hideInputWindow() {}
+    public void hideInputWindow() {
+    }
 
-    public void mouseWasClicked(){
+    public void mouseWasClicked() {
         if (!isListening) {
             return;
         }
@@ -42,5 +43,10 @@ public class MouseInputReader extends BallVelocityInput implements IClickListene
 
         double forceValue = (clampedMousePosition.length() / GameStateRenderer.MAX_ARROW_LENGTH) * maxVelocity;
         return clampedMousePosition.normalized().scale(forceValue);
+    }
+
+    @Override
+    public void stopListening() {
+        isListening = false;
     }
 }

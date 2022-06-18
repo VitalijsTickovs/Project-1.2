@@ -59,7 +59,6 @@ public class ParticleSwarmBot implements IBot {
                 }
             }
         }
-        System.out.println("Best heuristic: " + bestHeuristic + " with shot: " + bestShot);
         return bestShot;
     }
 

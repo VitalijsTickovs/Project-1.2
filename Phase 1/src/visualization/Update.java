@@ -26,16 +26,97 @@ public class Update {
 
     }
 
+    public void updateLoop() {
+        handleBallInWater();
+        handleInput();
+        simulateShot();
+    }
+
+    // region Ball in water
+    private void handleBallInWater() {
+        if (isSimulationFinished()) {
+            boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(
+                    gameState.getBall().state.position.x,
+                    gameState.getBall().state.position.y) < 0;
+            if (isBallInWater) {
+                resetGame();
+            }
+        }
+    }
+
+    public void resetGame() {
+        gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
+        if (bot != null && botThread.isAlive()) {
+            // End the bot thread if it is still running
+            try {
+                botThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        resetStartingVariables();
+    }
+
+    private void resetStartingVariables() {
+        numShots = 0;
+        shotForce = null;
+        ballPositions = new ArrayList<Vector2>();
+    }
+
+    // endregion
+
+    private void handleInput() {
+        if (isSimulationFinished() && !hasReachedTarget()) {
+            if (bot == null) {
+                ballVelocityInput.readyForNextInput();
+            } else {
+                ballVelocityInput.stopListening();
+                drawArrow = true;
+                resetBotThread();
+                botThread.start();
+            }
+        }
+    }
+
+    private void resetBotThread() {
+        botThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Calculating shot...");
+                Vector2 bestShot = bot.findBestShot(gameState);
+                if (bot != null) {
+                    shotForce = bestShot;
+                    System.out.println("Velocity: " + shotForce);
+                    System.out.println("Number of simulations: " + bot.getNumSimulations());
+                    System.out.println("Number of iterations: " + bot.getNumIterations());
+                }
+            }
+        });
+    }
+
+    private void simulateShot() {
+        if (shouldPushBall()) {
+            ballPositions = gameState.simulateShot(shotForce);
+            numShots++;
+            shotForce = null;
+            drawArrow = false;
+        }
+    }
+
+    private boolean shouldPushBall() {
+        boolean ballStopped = ballPositions.size() == 0;
+        boolean ballHasNotBeenPushed = shotForce != null;
+        return ballStopped && ballHasNotBeenPushed && !hasReachedTarget();
+    }
+
+    private boolean hasReachedTarget() {
+        double distance = gameState.getBall().state.position.distanceTo(gameState.getTerrain().target.position);
+        return distance <= gameState.getTerrain().target.radius;
+    }
+
+    // region Accessor methods
     public ArrayList<Vector2> getBallPositions() {
         return ballPositions;
-    }
-
-    public void setBot(IBot bot) {
-        this.bot = bot;
-    }
-
-    public void setShotForce(Vector2 shotForce) {
-        this.shotForce = shotForce;
     }
 
     public IBot getBot() {
@@ -55,88 +136,19 @@ public class Update {
         boolean ballHasBeenPushed = shotForce == null;
         return ballHasBeenPushed && notWaitingForBot && ballStopped;
     }
+    // endregion
 
-    private void resetStartingVariables() {
-        numShots = 0;
-        shotForce = null;
-        ballPositions = new ArrayList<Vector2>();
-    }
-
-    public void resetGame() {
-        gameState.getBall().state.position = gameState.getTerrain().ballStartingPosition;
-        if (bot != null && botThread.isAlive()) {
-            // End the bot thread if it is still running
-            try {
-                botThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        resetStartingVariables();
-    }
-
-    private void handleBallInWater() {
-        if (isSimulationFinished()) {
-            boolean isBallInWater = gameState.getTerrain().getTerrainFunction().valueAt(
-                    gameState.getBall().state.position.x,
-                    gameState.getBall().state.position.y) < 0;
-            if (isBallInWater) {
-                resetGame();
-            }
-        }
+    // region Mutator methods
+    public void setShotForce(Vector2 shotForce) {
+        this.shotForce = shotForce;
     }
 
     public void setManualInputType(BallVelocityInput ballInput) {
         ballVelocityInput = ballInput;
     }
 
-    private boolean hasReachedTarget() {
-        double distance = gameState.getBall().state.position.distanceTo(gameState.getTerrain().target.position);
-        return distance <= gameState.getTerrain().target.radius;
+    public void setBot(IBot bot) {
+        this.bot = bot;
     }
-
-    public void resetBotThread() {
-        botThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Calculating shot...");
-                shotForce = bot.findBestShot(gameState);
-                System.out.println("Velocity: " + shotForce);
-                System.out.println("Number of simulations: " + bot.getNumSimulations());
-                System.out.println("Number of iterations: " + bot.getNumIterations());
-            }
-        });
-    }
-
-    private void handleInput() {
-        if (isSimulationFinished() && !hasReachedTarget()) {
-            if (bot == null) {
-                ballVelocityInput.readyForNextInput();
-            } else {
-                resetBotThread();
-                botThread.start();
-            }
-        }
-    }
-
-    private boolean shouldPushBall() {
-        boolean ballStopped = ballPositions.size() == 0;
-        boolean ballHasNotBeenPushed = shotForce != null;
-        return ballStopped && ballHasNotBeenPushed && !hasReachedTarget();
-    }
-
-    private void simulateShot() {
-        if (shouldPushBall()) {
-            ballPositions = gameState.simulateShot(shotForce);
-            numShots++;
-            shotForce = null;
-            drawArrow = false;
-        }
-    }
-
-    public void updateLoop() {
-        handleBallInWater();
-        handleInput();
-        simulateShot();
-    }
+    // endregion
 }
