@@ -170,7 +170,7 @@ public class MenuGUI extends javax.swing.JFrame {
         /////OPEN PUTTING RENDER
         
         //open settings
-        new settingsGUI().setVisible(true);
+        new SettingsGUI().setVisible(true);
         
         Renderer render = new Renderer();
         render.start3d();
@@ -185,7 +185,7 @@ public class MenuGUI extends javax.swing.JFrame {
         //render.start3d();
         
         //open settings
-        new settingsGUI().setVisible(true);
+        new SettingsGUI().setVisible(true);
         
         Game game = new Game(60);
         game.start();
