@@ -112,7 +112,9 @@ public class GameStateLoader {
       String[] allLinesSplit = splitLines();
       readVariables(allLinesSplit);
 
-      return createGameStateUsingGeneratedData();
+      GameState gameState = createGameStateUsingGeneratedData();
+      BotFactory.setTerrain(gameState.getTerrain());
+      return gameState;
    }
 
    private static void resetVariables() {

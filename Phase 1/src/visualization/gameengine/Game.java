@@ -61,8 +61,6 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
         createRenderer();
         createFrame();
         createInput();
-
-        BotFactory.setTerrain(gameState.getTerrain());
     }
 
     private void createInput() {
