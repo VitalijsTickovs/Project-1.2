@@ -9,18 +9,22 @@ import utility.math.InfLine2D;
 import utility.math.Vector2;
 
 public class ObstacleWall extends Episode implements IObstacle {
-    public static int id=0;
+    private static int staticID=0;
+    private final int id;
+
     public ObstacleWall(Vector2 firstPosition, Vector2 secondPosition) {
         super(firstPosition, secondPosition);
         createCorners();
-        id++;
+        staticID++;
+        id=staticID;
     }
 
     public ObstacleWall(Vector2 firstPosition, Vector2 secondPosition, double bounciness) {
         super(firstPosition, secondPosition);
         this.bounciness = bounciness;
         createCorners();
-        id++;
+        staticID++;
+        id = staticID;
     }
 
     @Override

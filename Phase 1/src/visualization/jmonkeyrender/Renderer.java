@@ -272,10 +272,15 @@ public class Renderer extends SimpleApplication implements InputInt {
     }
 
     public void removeObject(Geometry geometry) {
+        //Checking for the geometry not to be a terrain object
         if(!geometry.getName().contains("Course")){
-            terrain.removeObstacleAt(Integer.parseInt(geometry.getName()));
+            String geometryName = geometry.getName();
+            int obsID = Integer.parseInt(String.valueOf(geometryName.charAt(geometryName.length()-1)));
+            String obsType = geometryName.substring(0,geometryName.length()-1);
+            terrain.removeObstacleAt(obsID,obsType);
             obstacles.detachChild(geometry);
         }
+        uiGeneration.updateMinimap();
     }
 
     public void drawObstacle(String obstacleType, Vector3f start, Vector3f end){
@@ -292,5 +297,6 @@ public class Renderer extends SimpleApplication implements InputInt {
             }
         }
         obstacles.attachChild(objectGeneration.drawObstacle(obstacleType, start, end,-1));
+        uiGeneration.updateMinimap();
     }
 }

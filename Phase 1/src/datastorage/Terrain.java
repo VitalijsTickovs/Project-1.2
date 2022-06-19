@@ -4,6 +4,7 @@ import datastorage.obstacles.IObstacle;
 // import org.mariuszgromada.math.mxparser.Expression;
 import datastorage.obstacles.ObstacleBox;
 import datastorage.obstacles.ObstacleTree;
+import datastorage.obstacles.ObstacleWall;
 import function.Function;
 import utility.math.Vector2;
 
@@ -47,8 +48,17 @@ public class Terrain {
     public void addObstacle(IObstacle obstacle){
         obstacles.add(obstacle);
     }
-    public void removeObstacleAt(int id){
-        obstacles.removeIf(i -> i.getId()==id);
+    public void removeObstacleAt(int id, String obstacleType){
+        if(obstacleType.equals("Box")){
+            obstacles.removeIf(i -> i.getId() == id && i instanceof ObstacleBox);
+        }
+        if(obstacleType.equals("Tree")){
+            obstacles.removeIf(i -> i.getId() == id && i instanceof ObstacleTree);
+        }
+        if(obstacleType.equals("Wall")){
+            obstacles.removeIf(i -> i.getId() == id && i instanceof ObstacleWall);
+        }
+        System.out.println(obstacles.size());
     }
 
     // This value seems to be the right number, so no need to provide it as input

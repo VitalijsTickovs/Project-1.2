@@ -8,16 +8,19 @@ import utility.math.InfLine2D;
 import utility.math.Vector2;
 
 public class ObstacleTree extends Circle implements IObstacle {
-    private static int id=0;
+    private static int staticID=0;
+    private final int id;
     public ObstacleTree(){
         super();
-        id++;
+        staticID++;
+        id = staticID;
     }
 
     public ObstacleTree(Vector2 originPosition, double radius, double bounciness) {
         super(originPosition, radius);
         this.bounciness = bounciness;
-        id++;
+        staticID++;
+        id = staticID;
     }
 
     @Override
