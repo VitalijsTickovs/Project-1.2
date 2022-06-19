@@ -9,6 +9,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.Arrow;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
+import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
@@ -17,6 +18,7 @@ import datastorage.Terrain;
 import datastorage.obstacles.IObstacle;
 import datastorage.obstacles.ObstacleBox;
 import datastorage.obstacles.ObstacleTree;
+import datastorage.obstacles.ObstacleWall;
 import utility.math.Vector2;
 
 import java.util.ArrayList;
@@ -72,7 +74,6 @@ public class ObjectGeneration {
     private void initBall(){
         //Creates Sphere object and adds to Geometry object
         Sphere ball = new Sphere(120, 120, Renderer.ballRadius);
-        TangentBinormalGenerator.generate(ball);
         Geometry ballRender = new Geometry("Ball", ball);
 
         //Adding textures to the ball
@@ -121,12 +122,13 @@ public class ObjectGeneration {
 
                 Vector3f end = new Vector3f((float)(((ObstacleBox) obstacle).topRightCorner.x)*renderer.getPixelScale(),endY,
                         (float)(((ObstacleBox) obstacle).topRightCorner.y)* renderer.getPixelScale());
-                renderer.obstacles.attachChild(drawObstacle("Box", start,end,((ObstacleBox) obstacle).getId()));
+                renderer.obstacles.attachChild(drawObstacle("Box", start,end,obstacle.getId()));
             } else if(obstacle instanceof ObstacleTree){
-                float startY = terrain.heightMapValueAt(((ObstacleTree) obstacle).originPosition);
+                float startY = terrain.heightMapValueAt(((ObstacleTree) obstacle).originPosition)*terScale;
                 Vector3f start = new Vector3f((float)((ObstacleTree) obstacle).originPosition.x* renderer.getPixelScale(), startY,
                         (float)((ObstacleTree) obstacle).originPosition.y* renderer.getPixelScale());
-                drawObstacle("Tree", start,new Vector3f((float) ((ObstacleTree) obstacle).radius,0,0),((ObstacleTree) obstacle).getId());
+                renderer.obstacles.attachChild(drawObstacle("Tree", start,
+                        new Vector3f((float) ((ObstacleTree) obstacle).radius,0,0),obstacle.getId()));
             }
         }
     }
@@ -143,7 +145,7 @@ public class ObjectGeneration {
     public Spatial drawObstacle(String obstacleType, Vector3f start, Vector3f end, int id) {
         Spatial obstacle = new Geometry();
         if(obstacleType.equals("Box")){
-            end.y+=5;
+            end.y+=25;
             Box box = new Box(start, end);
             obstacle = new Geometry("Obstacle", box);
 
@@ -165,24 +167,27 @@ public class ObjectGeneration {
                 terrain.addObstacle(boxObstacle);
                 id = boxObstacle.getId();
             }
-            obstacle.setName(String.valueOf(id));
+            obstacle.setName("Box" + id);
         }
         if(obstacleType.equals("Tree")){
             float startRadius = .293f;
             obstacle = assetManager.loadModel("Models/Tree/Tree.mesh.j3o");
             float treeScale = 10;
-            if(end != null) treeScale = end.x/startRadius;
+            if(end != null) treeScale = end.x*pixelScale/startRadius;
             obstacle.scale(treeScale);
             obstacle.setLocalTranslation(start);
             if(Inputs.isTerrainEditor) {
                 Vector2 vector1 = new Vector2(start.x, start.z);
                 vector1.scale(1/renderer.getPixelScale());
+
                 double radius = (startRadius*treeScale)/ renderer.getPixelScale();
+
                 ObstacleTree tree = new ObstacleTree(vector1, radius, 0.75);
+
                 terrain.addObstacle(tree);
                 id = tree.getId();
             }
-            obstacle.setName(String.valueOf(id));
+            obstacle.setName("Tree" + id);
         }
         return obstacle;
     }

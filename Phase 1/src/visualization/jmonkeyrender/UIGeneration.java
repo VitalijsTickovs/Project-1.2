@@ -26,6 +26,11 @@ public class UIGeneration {
         minimapGenerator = new GameStateRenderer(renderer.getGameState());
     }
 
+    public void updateMinimap(){
+        minimapGenerator.updateTerrain();
+        generateMinimap(renderer.getGameState().getBall().state.position);
+    }
+
     public void generateMinimap(Vector2 ballState){
         Camera camera = new Camera(30,30);
         camera.xPos = ballState.x;
