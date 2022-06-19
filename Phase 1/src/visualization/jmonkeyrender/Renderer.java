@@ -141,6 +141,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     }
 
     public void drawPoint(Vector3f pointLoc){
+        System.out.println(pointLoc);
         Sphere lookingPoint = new Sphere(120, 120, 0.5f);
         Geometry pointRender = new Geometry("Point" + pointRenders.size(), lookingPoint);
 
@@ -278,15 +279,17 @@ public class Renderer extends SimpleApplication implements InputInt {
     }
 
     public void drawObstacle(String obstacleType, Vector3f start, Vector3f end){
-        if(start.x<end.x && start.z<end.z){
-            Vector3f hold = start.clone();
-            start.z = end.z;
-            end.z = hold.z;
-        }
-        if(start.x>end.x && start.z<end.z){
-            Vector3f hold = start.clone();
-            start.z = end.z;
-            end.z = hold.z;
+        if(end!=null) {
+            if (start.x > end.x && start.z > end.z) {
+                Vector3f hold = start.clone();
+                start.z = end.z;
+                end.z = hold.z;
+            }
+            if (start.x < end.x && start.z < end.z) {
+                Vector3f hold = start.clone();
+                start.z = end.z;
+                end.z = hold.z;
+            }
         }
         obstacles.attachChild(objectGeneration.drawObstacle(obstacleType, start, end));
     }
