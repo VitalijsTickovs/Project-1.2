@@ -9,9 +9,16 @@ import utility.math.Rectangle;
 import utility.math.Vector2;
 
 public class ObstacleBox extends Rectangle implements IObstacle {
+    private static int id=0;
     public ObstacleBox(Vector2 bottomLeftCorner, Vector2 topRightCorner){
         super(bottomLeftCorner, topRightCorner);
         bounciness = 0.75;
+        id++;
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 
     // This is basically friction for bounces

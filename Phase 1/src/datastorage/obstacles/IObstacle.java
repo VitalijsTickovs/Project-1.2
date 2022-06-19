@@ -4,6 +4,9 @@ import utility.CollisionData;
 import utility.math.Vector2;
 
 public interface IObstacle {
+    int id=0;
+
+    int getId();
 
     public abstract double getBounciness();
 
