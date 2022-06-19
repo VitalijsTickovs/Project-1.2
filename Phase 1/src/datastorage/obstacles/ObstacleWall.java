@@ -9,14 +9,14 @@ import utility.math.InfLine2D;
 import utility.math.Vector2;
 
 public class ObstacleWall extends Episode implements IObstacle {
-    private static int staticID=0;
+    private static int staticID = 0;
     private final int id;
 
     public ObstacleWall(Vector2 firstPosition, Vector2 secondPosition) {
         super(firstPosition, secondPosition);
         createCorners();
         staticID++;
-        id=staticID;
+        id = staticID;
     }
 
     public ObstacleWall(Vector2 firstPosition, Vector2 secondPosition, double bounciness) {
@@ -33,13 +33,13 @@ public class ObstacleWall extends Episode implements IObstacle {
     }
 
     private void createCorners() {
-        firstCorner = new ObstacleTree(firstPosition, wallThickness * 2, bounciness);
-        secondCorner = new ObstacleTree(secondPosition, wallThickness * 2, bounciness);
+        firstCorner = new ObstacleTree(firstPosition, wallThickness, bounciness);
+        secondCorner = new ObstacleTree(secondPosition, wallThickness, bounciness);
     }
 
     private double bounciness = 0.9; // The percentage of momentum that the ball loses after bouncing.
     // This is basically friction for bounces
-    private final double wallThickness = 0.6d;
+    private final double wallThickness = 0.05d;
     private double ballRadius;
 
     private ObstacleTree firstCorner;
@@ -73,10 +73,10 @@ public class ObstacleWall extends Episode implements IObstacle {
     @Override
     public CollisionData getCollisionData(Vector2 currentPosition, Vector2 previousPosition, double ballRadius) {
         this.ballRadius = ballRadius;
-        // CollisionData cornerCollisionData = getCornerCollisionData(currentPosition, previousPosition);
-        // if (cornerCollisionData != null) {
-        //     return cornerCollisionData;
-        // }
+        CollisionData cornerCollisionData = getCornerCollisionData(currentPosition, previousPosition);
+        if (cornerCollisionData != null) {
+            return cornerCollisionData;
+        }
 
         Vector2 collisionPoint = getCollisionPoint(previousPosition, currentPosition);
 
@@ -219,7 +219,7 @@ public class ObstacleWall extends Episode implements IObstacle {
         }
         double distanceToFirstPoint = firstPosition.distanceTo(crossPoints.get(0));
         double distanceToSecondPoint = firstPosition.distanceTo(crossPoints.get(1));
-        if (distanceToFirstPoint > distanceToSecondPoint) {
+        if (distanceToFirstPoint < distanceToSecondPoint) {
             return crossPoints.get(0);
         }
         return crossPoints.get(1);

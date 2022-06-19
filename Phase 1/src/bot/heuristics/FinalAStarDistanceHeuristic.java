@@ -1,5 +1,6 @@
 package bot.heuristics;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import bot.AStar;
@@ -26,8 +27,11 @@ public class FinalAStarDistanceHeuristic implements Heuristic {
         }
         // Otherwise, check AStar
         Vector2 finalPosition = shotPositions.get(shotPositions.size() - 1);
-        double shotValue = aStar.getDistanceToTarget(finalPosition, 2);
-        return shotValue;
+        try {
+            return aStar.getDistanceToTarget(finalPosition, 2);
+        } catch (NoSuchAlgorithmException e) {
+            return 1000;
+        }
     }
 
     private void trySwitchMode(ArrayList<Vector2> shotPositions, GameState gameState) {

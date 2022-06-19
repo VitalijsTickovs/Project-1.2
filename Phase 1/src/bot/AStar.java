@@ -1,38 +1,12 @@
 package bot;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 
-import datastorage.GameState;
 import datastorage.Terrain;
-import reader.GameStateLoader;
 import utility.math.Vector2;
 
 public class AStar {
-    public static void main(String[] args) {
-        lol();
-    }
-
-    private static void lol() {
-        GameState gameState = GameStateLoader.readFile();
-        AStar aStar = new AStar(gameState.getTerrain());
-
-        double distance = aStar.getDistanceToTarget(gameState.getTerrain().ballStartingPosition, 2);
-        System.out.println("Distance: " + distance);
-        distance = aStar.getDistanceToTarget(gameState.getTerrain().ballStartingPosition.translated(2,2), 1);
-        System.out.println("Distance: " + distance);
-
-        double negatives = 0;
-        for (int i = 0; i < aStar.map.length; i++) {
-            for (int j = 0; j < aStar.map[i].length; j++) {
-                if (aStar.map[i][j] == -1) {
-                    negatives++;
-                }
-            }
-        }
-        double percentage = negatives / (double) (aStar.map.length * aStar.map[0].length) * 100;
-        System.out.println("Obstacles take up this percentage of map: " + percentage);
-    }
-
     /**
      * Instantiate a new class for each new {@code Terrain}.
      * Only call the {@code getDistanceToTarget} method for heuristic purposes
@@ -65,7 +39,7 @@ public class AStar {
      *         while avoiding water and obstacles.
      *         Returns {@code -1} if an unobstructed path does not exist
      */
-    public double getDistanceToTarget(Vector2 ballPosition, int squaresPerGameUnit) {
+    public double getDistanceToTarget(Vector2 ballPosition, int squaresPerGameUnit) throws NoSuchAlgorithmException {
         checkSquares(squaresPerGameUnit);
         checkForNullPosition(ballPosition);
 
@@ -158,7 +132,7 @@ public class AStar {
      *         while avoiding water and obstacles.
      *         Returns {@code -1} if an unobstructed path does not exist.
      */
-    private double aStarPathfinding(Vector2 ballPosition) {
+    private double aStarPathfinding(Vector2 ballPosition) throws NoSuchAlgorithmException {
         LinkedList<Node> uncheckedNodes = new LinkedList<>();
         addCreatedNode(originNode);
 
@@ -175,7 +149,7 @@ public class AStar {
 
             if (currentNode == null) {
                 // This means that there exists no path to the target
-                return -1;
+                throw new NoSuchAlgorithmException("Ball is in water or inside obstacle");
             }
             uncheckedNodes.remove(currentNode);
             if (currentNode.equals(targetNode)) {

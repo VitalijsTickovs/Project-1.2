@@ -73,7 +73,6 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
 
     private void createGameState() {
         gameState = reader.GameStateLoader.readFile();
-        BotFactory.setTerrain(gameState.getTerrain());
     }
 
     private void setMouseInput() {

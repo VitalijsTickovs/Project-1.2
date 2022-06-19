@@ -258,7 +258,7 @@ public class ObstacleBox extends Rectangle implements IObstacle {
         }
         double distanceToFirstPoint = firstPosition.distanceTo(crossPoints.get(0));
         double distanceToSecondPoint = firstPosition.distanceTo(crossPoints.get(1));
-        if (distanceToFirstPoint > distanceToSecondPoint) {
+        if (distanceToFirstPoint < distanceToSecondPoint) {
             return crossPoints.get(0);
         }
         return crossPoints.get(1);

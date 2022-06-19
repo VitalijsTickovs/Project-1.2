@@ -39,18 +39,18 @@ treeBounciness = 0.9;
 
 //To create wall "wallFirst", "wallSecond", "wallBounciness";
 wallFirst = -10,2;
-wallSecond = -13,3;
+wallSecond = -13,4;
 wallBounciness = 0.9;
 
 wallFirst = -13,-6;
 wallSecond = -10,-8;
 wallBounciness = 0.9;
 
-wallFirst = -13,0;
-wallSecond = -15,3;
+wallFirst = -14,0;
+wallSecond = -16,2;
 wallBounciness = 0.7;
 
-wallFirst = -5,0;
+wallFirst = -6,0;
 wallSecond = 0,0;
 wallBounciness = 0.75;
 
