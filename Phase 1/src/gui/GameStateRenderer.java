@@ -27,17 +27,20 @@ public class GameStateRenderer {
      * Contains the green with all obstacles, zones and the target added. Displays
      * the entire map.
      */
-    private final BufferedImage STATIC_TERRAIN_IMAGE;
+    private BufferedImage STATIC_TERRAIN_IMAGE;
     private boolean displayMouseCoordinates = false;
 
     public GameStateRenderer(GameState gameState) {
         this.gameState = gameState;
         this.terrain = gameState.getTerrain();
-
-        STATIC_TERRAIN_IMAGE = getGreenWithObstacles();
+        updateTerrain();
     }
 
     // region Startup
+    public void updateTerrain() {
+        STATIC_TERRAIN_IMAGE = getGreenWithObstacles();
+    }
+
     private BufferedImage getGreenWithObstacles() {
         BufferedImage imageOfGreenWithObstacles = getImageOfGreen();
         Graphics2D g2 = (Graphics2D) imageOfGreenWithObstacles.getGraphics();

@@ -219,6 +219,16 @@ public class AStar {
         }
     }
 
+    private boolean startedInObstacle(Node currentNode){
+        Vector2 gridPosition = new Vector2(currentNode.xPosition,currentNode.yPosition);
+        Vector2 nodePosition = translatePositionToGameUnits(gridPosition);
+        double valueAtPoint = terrain.terrainFunction.valueAt(nodePosition);
+        if (valueAtPoint < 0) {
+            return true;
+        }
+        return false;
+    }
+
     private boolean nodeExistsAtPosition(int x, int y) {
         if (!isPositionInRange(x, y)) {
             return false;

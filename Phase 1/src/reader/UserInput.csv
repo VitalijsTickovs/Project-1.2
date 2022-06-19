@@ -19,7 +19,7 @@ greenStaticFriction = 0.2;
 terrainFunction = 1;
 
 //To create ball "ballStartPoint", "ballRadius";
-ballStartPoint = 0,0;
+ballStartPoint = -3,3;
 ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";
@@ -38,13 +38,21 @@ treeRadius = 1.5;
 treeBounciness = 0.9;
 
 //To create wall "wallFirst", "wallSecond", "wallBounciness";
-wallFirst = -2,-4;
-wallSecond 1,0;
+wallFirst = -10,2;
+wallSecond = -13,3;
 wallBounciness = 0.9;
 
-wallFirst = -4,-2;
-wallSecond -0.5,3;
+wallFirst = -13,-6;
+wallSecond = -10,-8;
 wallBounciness = 0.9;
+
+wallFirst = -13,0;
+wallSecond = -15,3;
+wallBounciness = 0.7;
+
+wallFirst = -5,0;
+wallSecond = 0,0;
+wallBounciness = 0.75;
 
 //To create box "boxBottomLeft", "boxTopRight", "boxBounciness";
 //boxBottomLeft = -10,-5;
@@ -63,7 +71,7 @@ wallBounciness = 0.9;
 //boxTopRight = -24,6;
 //boxBounciness = 0.75;
 
-//boxBottomLeft = 2,2;
+//boxBottomLeft = 2,4;
 //boxTopRight = 4,-5;
 //boxBounciness = 0.75;
 

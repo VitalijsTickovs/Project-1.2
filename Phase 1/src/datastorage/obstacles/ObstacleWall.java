@@ -28,7 +28,7 @@ public class ObstacleWall extends Episode implements IObstacle {
 
     private double bounciness = 0.9; // The percentage of momentum that the ball loses after bouncing.
     // This is basically friction for bounces
-    private final double wallThickness = 0.2d;
+    private final double wallThickness = 0.6d;
     private double ballRadius;
 
     private ObstacleTree firstCorner;
