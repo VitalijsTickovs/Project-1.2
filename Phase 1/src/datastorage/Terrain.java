@@ -35,10 +35,6 @@ public class Terrain {
     public double kineticFriction;
 
     public TerrainHeightFunction terrainFunction;
-    public double scaleFactor = 1;
-
-    public int xRes = 500;
-    public int yRes = 500;
 
     public float minVal = -10;
     public float maxVal = 10;
@@ -51,17 +47,8 @@ public class Terrain {
     public void addObstacle(IObstacle obstacle){
         obstacles.add(obstacle);
     }
-    public void removeObstacleAt(Vector2 obstaclePos){
-        for(IObstacle obstacle: obstacles)
-            if(obstacle instanceof ObstacleBox){
-                if(((ObstacleBox) obstacle).bottomLeftCorner == obstaclePos || ((ObstacleBox) obstacle).topRightCorner == obstaclePos){
-                    obstacles.remove(obstacle);
-                }
-            }else if(obstacle instanceof ObstacleTree){
-                if(((ObstacleTree) obstacle).originPosition == obstaclePos){
-                    obstacles.remove(obstacle);
-                }
-            }
+    public void removeObstacleAt(int id){
+        obstacles.removeIf(i -> i.getId()==id);
     }
 
     // This value seems to be the right number, so no need to provide it as input

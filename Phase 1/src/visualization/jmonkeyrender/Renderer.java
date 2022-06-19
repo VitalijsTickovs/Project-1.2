@@ -25,7 +25,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Renderer extends SimpleApplication implements InputInt {
+    //Stores all the obstacles that will be projected onto the screen
     protected Node obstacles = new Node("Obstacles");
+
     protected int WIDTH = 1280;
     protected int HEIGHT = 720;
 
@@ -43,9 +45,10 @@ public class Renderer extends SimpleApplication implements InputInt {
     private Geometry arrowRender = new Geometry("Arrow");
     private Vector2f shotInput = new Vector2f(0,0);
 
+    //Stores points that are rendered on to the screen with terrain editor
     ArrayList<Geometry> pointRenders = new ArrayList<>();
 
-    public ChaseCamera chaseCam;
+    protected ChaseCamera chaseCam;
 
     protected static final float ballRadius = 2.56f;
 
@@ -60,7 +63,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     private final float terScale = 6;
     private float pixelScale;
 
-    public ArrayList<IClickListener> clickListeners = new ArrayList<>();
+    protected ArrayList<IClickListener> clickListeners = new ArrayList<>();
 
     public Update getUpdateLoop() {
         return updateLoop;
@@ -270,24 +273,24 @@ public class Renderer extends SimpleApplication implements InputInt {
 
     public void removeObject(Geometry geometry) {
         if(!geometry.getName().contains("Course")){
-            Vector3f obstaclePos = geometry.getLocalTranslation();
-            Vector2 obstaclePos2d = new Vector2(obstaclePos.x/8.7,obstaclePos.z/8.7);
-            terrain.removeObstacleAt(obstaclePos2d);
+            terrain.removeObstacleAt(Integer.parseInt(geometry.getName()));
             obstacles.detachChild(geometry);
         }
     }
 
     public void drawObstacle(String obstacleType, Vector3f start, Vector3f end){
-        if(start.x<end.x && start.z<end.z){
-            Vector3f hold = start.clone();
-            start.z = end.z;
-            end.z = hold.z;
+        if(end!=null) {
+            if (start.x > end.x && start.z > end.z) {
+                Vector3f hold = start.clone();
+                start.z = end.z;
+                end.z = hold.z;
+            }
+            if (start.x < end.x && start.z < end.z) {
+                Vector3f hold = start.clone();
+                start.z = end.z;
+                end.z = hold.z;
+            }
         }
-        if(start.x>end.x && start.z<end.z){
-            Vector3f hold = start.clone();
-            start.z = end.z;
-            end.z = hold.z;
-        }
-        obstacles.attachChild(objectGeneration.drawObstacle(obstacleType, start, end));
+        obstacles.attachChild(objectGeneration.drawObstacle(obstacleType, start, end,-1));
     }
 }

@@ -8,16 +8,21 @@ import utility.math.InfLine2D;
 import utility.math.Vector2;
 
 public class ObstacleTree extends Circle implements IObstacle {
+    private static int id=0;
     public ObstacleTree(){
         super();
-    }
-    public ObstacleTree(Vector2 originPosition, double radius) {
-        super(originPosition, radius);
+        id++;
     }
 
     public ObstacleTree(Vector2 originPosition, double radius, double bounciness) {
         super(originPosition, radius);
         this.bounciness = bounciness;
+        id++;
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 
     public double bounciness; // The percentage of momentum that the ball loses after bouncing.
