@@ -67,7 +67,7 @@ public class SettingsGUI extends javax.swing.JFrame {
         updateB.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255), 4));
         updateB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateBActionlPerformed(evt);
+                updateBActionPerformed(evt);
             }
         });
 
