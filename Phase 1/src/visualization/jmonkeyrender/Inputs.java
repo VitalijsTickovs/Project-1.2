@@ -1,6 +1,7 @@
 package visualization.jmonkeyrender;
 
-import bot.botimplementations.BotFactory;
+import bot.botimplementations.*;
+import bot.heuristics.FinalAStarDistanceHeuristic;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;

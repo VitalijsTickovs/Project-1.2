@@ -20,6 +20,7 @@ public class AdaptiveHillClimbingBot implements IBot {
         this.maxLearningRate = maxLearningRate;
         this.minLearningRate = minLearningRate;
         this.decayRate = decayRate;
+        this.numNeighbours = numNeighbours;
     }
 
     @Override
@@ -84,6 +85,7 @@ public class AdaptiveHillClimbingBot implements IBot {
                 learningRate /= decayRate;
             }
         }
+
         return bestShot;
     }
 

@@ -144,7 +144,7 @@ public class MenuGUI extends javax.swing.JFrame {
 
         //open settings
         Renderer render= new Renderer();
-        new SettingsGUI(render).setVisible(true);
+        new SettingsGUI().setVisible(true);
 
         render.start3d();
         this.dispose();
@@ -159,7 +159,7 @@ public class MenuGUI extends javax.swing.JFrame {
         Game game= new Game(60);
         //open settings
         //new SettingsGUI(game).setVisible(true);
-        
+
         //Game game = new Game(60);
         game.start();
         this.setVisible(false);

@@ -188,9 +188,9 @@ public class GameStateLoader {
          return dir + "\\src\\reader\\UserInput.csv";
       }
       if (OS.contains("Windows")) {
-         return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput.csv";
+         return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput_Best.csv";
       } else {
-         return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput.csv";
+         return dir + separator + "Phase 1" + separator + "src" + separator + "reader" + separator + "UserInput_Best.csv";
       }
    }
 

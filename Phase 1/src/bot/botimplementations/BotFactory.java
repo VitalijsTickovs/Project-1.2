@@ -21,7 +21,6 @@ public class BotFactory {
     public static IBot getBot(BotImplementations implementation) {
         if (implementation == BotImplementations.PARTICLE_SWARM) {
             return new ParticleSwarmBot(new FinalAStarDistanceHeuristic(terrain), 0.5, 0.5, 0.5, 100, 10);
-            // return new ParticleSwarmBot(new FinalClosestEuclidianDistanceHeuristic(), 0.5, 0.5, 0.5, 100, 10);
         }
         if (implementation == BotImplementations.RULE) {
             return new RuleBasedBot();
@@ -30,12 +29,12 @@ public class BotFactory {
             //return new HillClimbingBot(new FinalClosestEuclidianDistanceHeuristic(), 0.01, 4,
             //        getBot(BotImplementations.PARTICLE_SWARM));
             return new AdaptiveHillClimbingBot(
-                    new FinalClosestEuclidianDistanceHeuristic(),
-                    1,
+                    new FinalAStarDistanceHeuristic(terrain),
+                    4,
                     0.01,
                     2,
                     4,
-                    BotFactory.getBot(BotImplementations.RULE)
+                    null
             );
         }
         if (implementation == BotImplementations.GRADIENT_DESCENT) {
