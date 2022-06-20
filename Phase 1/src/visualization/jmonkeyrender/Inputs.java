@@ -32,12 +32,25 @@ public class Inputs {
         return isTerrainEditor;
     }
 
+    public void setTerrainEditor(boolean terrainEditor){
+        isTerrainEditor = terrainEditor;
+    }
+
+    public void setObstacleType(String obstacleType) {
+        this.obstacleType = obstacleType;
+    }
+
+    public void setMouseInput(boolean mouseInput) {
+        isMouseInput = mouseInput;
+    }
+
     protected void initKeys() {
         //Mapping each bot implementation to keys
         renderer.getInputManager().addMapping("HC Bot",  new KeyTrigger(KeyInput.KEY_H));
         renderer.getInputManager().addMapping("PS Bot",   new KeyTrigger(KeyInput.KEY_P));
         renderer.getInputManager().addMapping("GD Bot",  new KeyTrigger(KeyInput.KEY_G));
         renderer.getInputManager().addMapping("Rule Bot", new KeyTrigger(KeyInput.KEY_B));
+        renderer.getInputManager().addMapping("AStar Bot", new KeyTrigger(KeyInput.KEY_A));
         renderer.getInputManager().addMapping("Manual Input", new KeyTrigger(KeyInput.KEY_L));
         renderer.getInputManager().addMapping("Change Input Type", new KeyTrigger(KeyInput.KEY_K));
         renderer.getInputManager().addMapping("Reset", new KeyTrigger(KeyInput.KEY_R));
@@ -46,7 +59,7 @@ public class Inputs {
         renderer.getInputManager().addMapping("Tree", new KeyTrigger(KeyInput.KEY_2));
 
         //Setting listeners for inputs
-        renderer.getInputManager().addListener(keyListener, "PS Bot","HC Bot","GD Bot","Rule Bot","Manual Input","Reset", "Change Input Type", "Terrain Editor", "Box", "Tree");
+        renderer.getInputManager().addListener(keyListener, "PS Bot","HC Bot","GD Bot","Rule Bot","AStar Bot","Manual Input","Reset", "Change Input Type", "Terrain Editor", "Box", "Tree");
     }
     private final ActionListener keyListener = new ActionListener() {
         public void resetGame(){
@@ -58,23 +71,21 @@ public class Inputs {
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("HC Bot") && !keyPressed && !isTerrainEditor) {
                 renderer.getUpdateLoop().setBot(BotFactory.getBot(BotFactory.BotImplementations.HILL_CLIMBING));
-                renderer.getUpdateLoop().setManualInputType(null);
             }
             if (name.equals("PS Bot") && !keyPressed && !isTerrainEditor) {
                 renderer.getUpdateLoop().setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
-                renderer.getUpdateLoop().setManualInputType(null);
             }
             if (name.equals("GD Bot") && !keyPressed && !isTerrainEditor) {
                 renderer.getUpdateLoop().setBot(BotFactory.getBot(BotFactory.BotImplementations.GRADIENT_DESCENT));
-                renderer.getUpdateLoop().setManualInputType(null);
             }
             if (name.equals("Rule Bot") && !keyPressed && !isTerrainEditor) {
                 renderer.getUpdateLoop().setBot(BotFactory.getBot(BotFactory.BotImplementations.RULE));
-                renderer.getUpdateLoop().setManualInputType(null);
+            }
+            if(name.equals("AStar Bot") && !keyPressed && !isTerrainEditor){
+                renderer.getUpdateLoop().setBot(BotFactory.getBot(BotFactory.BotImplementations.PARTICLE_SWARM));
             }
             if (name.equals("Manual Input") && !keyPressed && !isTerrainEditor) {
                 renderer.getUpdateLoop().setBot(null);
-                renderer.getUpdateLoop().setManualInputType(new MouseInputReader(renderer));
                 resetGame();
                 System.out.println("Manual Input");
             }
@@ -96,6 +107,7 @@ public class Inputs {
                 if(!isTerrainEditor){
                     isMouseInput = false;
                     System.out.println("Terrain editor mode on");
+                    System.out.println("Object Type: "+ obstacleType);
 
                     terrainEditor = new TerrainEditor(renderer);
 
@@ -109,9 +121,11 @@ public class Inputs {
             }
             if(name.equals("Box") && !keyPressed){
                 obstacleType = name;
+                System.out.println("Object Type: "+ obstacleType);
             }
             if(name.equals("Tree") && !keyPressed){
                 obstacleType = name;
+                System.out.println("Object Type: "+ obstacleType);
             }
         }
     };

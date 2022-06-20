@@ -1,7 +1,7 @@
 package gui.shotinput;
 
 import datastorage.Ball;
-import visualization.InputInt;
+import visualization.IInput;
 import visualization.gameengine.Game;
 import gui.GameStateRenderer;
 import utility.UtilityClass;
@@ -9,7 +9,7 @@ import utility.math.Vector2;
 
 public class MouseInputReader extends BallVelocityInput implements IClickListener {
 
-    public MouseInputReader(InputInt game) {
+    public MouseInputReader(IInput game) {
         super(game);
         game.getClickListener().add(this);
     }

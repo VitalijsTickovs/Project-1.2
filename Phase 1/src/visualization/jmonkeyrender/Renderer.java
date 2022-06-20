@@ -18,13 +18,13 @@ import com.jme3.math.*;
 import com.jme3.scene.Geometry;
 import com.jme3.system.AppSettings;
 import com.jme3.terrain.geomipmap.TerrainQuad;
-import visualization.InputInt;
+import visualization.IInput;
 import visualization.UpdateLoop;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class Renderer extends SimpleApplication implements InputInt {
+public class Renderer extends SimpleApplication implements IInput {
     //Stores all the obstacles that will be projected onto the screen
     protected Node obstacles = new Node("Obstacles");
 
@@ -110,6 +110,9 @@ public class Renderer extends SimpleApplication implements InputInt {
         return shotInput;
     }
 
+    public Inputs getInputsGenerator() {
+        return inputsGenerator;
+    }
 
     /**
      * Moves the by finding the normal tangent by radius of the ball
@@ -144,7 +147,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     }
 
     public void drawPoint(Vector3f pointLoc){
-        Sphere lookingPoint = new Sphere(120, 120, 0.5f);
+        Sphere lookingPoint = new Sphere(120, 120, 2);
         Geometry pointRender = new Geometry("Point" + pointRenders.size(), lookingPoint);
 
         //Adding textures to the ball
@@ -214,7 +217,7 @@ public class Renderer extends SimpleApplication implements InputInt {
 
     @Override
     public void simpleInitApp() {
-        //Disabling unnecessary information
+        //Disabling unnecessary information and commands
         inputManager.deleteMapping( SimpleApplication.INPUT_MAPPING_MEMORY );
         setDisplayStatView(false);
 
@@ -241,6 +244,7 @@ public class Renderer extends SimpleApplication implements InputInt {
         //While the user's input is through mouse, it will draw an arrow
         if(inputsGenerator.isMouseInput() && !inputsGenerator.isTerrainEditor())drawArrow();
         else getRootNode().detachChild(arrowRender);
+        //Simulation of shot
         if(updateLoop.getBallPositions().size() != 0) {
             getRootNode().detachChild(arrowRender);
             gameState.setBallPosition(updateLoop.getBallPositions().get(0));
@@ -298,5 +302,9 @@ public class Renderer extends SimpleApplication implements InputInt {
         }
         obstacles.attachChild(objectGeneration.drawObstacle(obstacleType, start, end,-1));
         uiGeneration.updateMinimap();
+    }
+
+    public Terrain getTerrain() {
+        return gameState.getTerrain();
     }
 }

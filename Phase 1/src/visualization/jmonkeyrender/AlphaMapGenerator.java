@@ -32,8 +32,8 @@ public final class AlphaMapGenerator {
 
         graphics2D.dispose ();
         try {
-            ImageIO.write(image, "png", new File(System.getProperty("user.dir") + "/src/main/resources/Terrain/image.png"));
-            ImageIO.write(image, "png", new File(System.getProperty("user.dir") + "/target/classes/Terrain/image.png"));
+            ImageIO.write(image, "png", new File(System.getProperty("user.dir") + "/src/main/resources/Terrain/alpha.png"));
+            ImageIO.write(image, "png", new File(System.getProperty("user.dir") + "/target/classes/Terrain/alpha.png"));
         }catch (IOException e){
             e.printStackTrace();
         }
