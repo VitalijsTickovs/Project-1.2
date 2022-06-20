@@ -19,17 +19,17 @@ greenStaticFriction = 0.2;
 terrainFunction = 1;
 
 //To create ball "ballStartPoint", "ballRadius";
-ballStartPoint = -3,3;
+ballStartPoint =-3,0;
 ballRadius = 0.25;
 
 //To create target "targetRadius", "targetX", "targetX";
 targetRadius = 0.35;
-targetPosition = -22,10;
+targetPosition = -27,-8;
 
 //To create sand zone "sandZoneBottomLeft", "sandZoneTopRight", "sandKineticFriction", "sandStaticFriction";
 
 //To create tree "treePosition", "treeRadius", "treeBounciness";
-treePosition = -22,2;
+treePosition = -22,-1;
 treeRadius = 1.5;
 treeBounciness = 0.9;
 
@@ -37,18 +37,46 @@ treePosition = -2,-6;
 treeRadius = 1.5;
 treeBounciness = 0.9;
 
+treePosition = -27,-0;
+treeRadius = 1;
+treeBounciness = 0.9;
+
+treePosition = -12,-7;
+treeRadius = 2;
+treeBounciness = 0.9;
+
 //To create wall "wallFirst", "wallSecond", "wallBounciness";
 wallFirst = -10,2;
 wallSecond = -13,4;
 wallBounciness = 0.9;
 
-wallFirst = -13,-6;
-wallSecond = -10,-8;
+wallFirst = -29,-4;
+wallSecond = -31,-8;
+wallBounciness = 0.9;
+
+wallFirst = -25,-4;
+wallSecond = -28,-6;
 wallBounciness = 0.9;
 
 //To create box "boxBottomLeft", "boxTopRight", "boxBounciness";
 //boxBottomLeft = -10,-5;
 //boxTopRight = -5,5;
+//boxBounciness = 0.9;
+
+//boxBottomLeft = -25,-7;
+//boxTopRight = -28,-6;
+//boxBounciness = 0.9;
+
+//boxBottomLeft = -31,-8;
+//boxTopRight = -35,-4;
+//boxBounciness = 0.9;
+
+//boxBottomLeft = -20,-9;
+//boxTopRight = -35,-14;
+//boxBounciness = 0.9;
+
+//boxTopRight = -35,-14;
+//boxBottomLeft = -40,-5;
 //boxBounciness = 0.9;
 
 //boxBottomLeft = -25,-9;
@@ -61,6 +89,10 @@ wallBounciness = 0.9;
 
 //boxBottomLeft = -35,12;
 //boxTopRight = -24,6;
+//boxBounciness = 0.75;
+
+//boxBottomLeft = -29,-4;
+//boxTopRight = -35,6;
 //boxBounciness = 0.75;
 
 //boxBottomLeft = 2,4;
