@@ -84,7 +84,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
     }
 
     private void createCamera() {
-        camera = new Camera(15, 15);
+        camera = new Camera(25, 20);
         camera.xPos = gameState.getBall().state.position.x;
         camera.yPos = gameState.getBall().state.position.y;
     }
@@ -222,7 +222,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
 
     // region Render
     public void render() {
-        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera, updateLoop.drawArrow, true);
+        BufferedImage gameStateImage = gameStateRenderer.getSubimage(camera, updateLoop.drawArrow, false);
         drawImage(gameStateImage);
         gameStateImage.flush();
     }
