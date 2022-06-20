@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public interface InputInt {
 
-    Update getUpdateLoop();
+    UpdateLoop getUpdateLoop();
 
     ArrayList<IClickListener> getClickListener();
 }

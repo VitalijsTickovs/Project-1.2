@@ -19,7 +19,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.system.AppSettings;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import visualization.InputInt;
-import visualization.Update;
+import visualization.UpdateLoop;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class Renderer extends SimpleApplication implements InputInt {
     private Inputs inputsGenerator;
     private final Cam camInit = new Cam();
 
-    private Update updateLoop;
+    private UpdateLoop updateLoop;
 
     private TerrainQuad terrainQuad;
     private GameState gameState;
@@ -65,7 +65,7 @@ public class Renderer extends SimpleApplication implements InputInt {
 
     protected ArrayList<IClickListener> clickListeners = new ArrayList<>();
 
-    public Update getUpdateLoop() {
+    public UpdateLoop getUpdateLoop() {
         return updateLoop;
     }
 
@@ -197,7 +197,7 @@ public class Renderer extends SimpleApplication implements InputInt {
         objectGeneration = new ObjectGeneration(this);
         uiGeneration = new UIGeneration(this);
         inputsGenerator = new Inputs(this);
-        updateLoop = new Update(gameState);
+        updateLoop = new UpdateLoop(gameState);
     }
     /**
      * Initializes physics for calculating the ball movement

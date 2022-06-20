@@ -21,10 +21,10 @@ import java.awt.event.MouseListener;
 
 import bot.botimplementations.BotFactory;
 import visualization.InputInt;
-import visualization.Update;
+import visualization.UpdateLoop;
 
 public class Game extends JPanel implements Runnable, GameObject, MouseListener, InputInt {
-    private final Update updateLoop;
+    private final UpdateLoop updateLoop;
 
     public JFrame frame;
     public GameState gameState;
@@ -53,7 +53,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
         FPS = fps;
         createGameState();
 
-        updateLoop = new Update(gameState);
+        updateLoop = new UpdateLoop(gameState);
 
         // setupInitialBot();
         setMouseInput();
@@ -340,7 +340,7 @@ public class Game extends JPanel implements Runnable, GameObject, MouseListener,
     }
 
     @Override
-    public Update getUpdateLoop() {
+    public UpdateLoop getUpdateLoop() {
         return updateLoop;
     }
 

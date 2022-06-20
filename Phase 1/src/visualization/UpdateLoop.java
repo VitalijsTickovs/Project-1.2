@@ -7,7 +7,7 @@ import utility.math.Vector2;
 
 import java.util.ArrayList;
 
-public class Update {
+public class UpdateLoop {
     private final GameState gameState;
 
     private ArrayList<Vector2> ballPositions = new ArrayList<Vector2>();
@@ -21,7 +21,7 @@ public class Update {
 
     public boolean drawArrow = false;
 
-    public Update(GameState gameState) {
+    public UpdateLoop(GameState gameState) {
         this.gameState = gameState;
 
     }
