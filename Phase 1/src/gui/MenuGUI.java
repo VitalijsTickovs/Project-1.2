@@ -34,7 +34,6 @@ public class MenuGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel3 = new javax.swing.JPanel();
         singleB = new javax.swing.JButton();
         multiB = new javax.swing.JButton();
