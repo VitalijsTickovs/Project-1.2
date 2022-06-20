@@ -1,11 +1,11 @@
 package gui.shotinput;
 
-import visualization.InputInt;
+import visualization.IInput;
 
 public abstract class BallVelocityInput {
-    protected InputInt game;
+    protected IInput game;
 
-    public BallVelocityInput(InputInt game){this.game = game;}
+    public BallVelocityInput(IInput game){this.game = game;}
 
     public abstract void readyForNextInput();
 

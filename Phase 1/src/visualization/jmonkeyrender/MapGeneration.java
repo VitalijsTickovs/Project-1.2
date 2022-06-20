@@ -26,7 +26,7 @@ public class MapGeneration {
 
     public MapGeneration(Renderer renderer) {
         this.renderer = renderer;
-        this.terrain = renderer.getGameState().getTerrain();
+        this.terrain = renderer.getTerrain();
 
         this.terScale = renderer.getTerScale();
         this.normalFactor = renderer.getNormalFactor();
@@ -48,7 +48,7 @@ public class MapGeneration {
         //Grass Texture
         Material matTerrain = new Material(assetManager,"Common/MatDefs/Terrain/Terrain.j3md");
         matTerrain.setTexture("Alpha", renderer.getAssetManager().loadTexture(
-                "Terrain/image.png"));
+                "Terrain/alpha.png"));
         Texture grass = assetManager.loadTexture(texPath);
         grass.setWrap(Texture.WrapMode.Repeat);
         matTerrain.setTexture("Tex1", grass);

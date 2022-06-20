@@ -4,7 +4,7 @@ import gui.shotinput.IClickListener;
 
 import java.util.ArrayList;
 
-public interface InputInt {
+public interface IInput {
 
     UpdateLoop getUpdateLoop();
 

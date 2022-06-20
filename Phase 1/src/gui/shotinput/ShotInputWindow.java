@@ -1,6 +1,6 @@
 package gui.shotinput;
 
-import visualization.InputInt;
+import visualization.IInput;
 import gui.InputPanel;
 import gui.InterfaceFactory;
 import utility.math.Vector2;
@@ -21,7 +21,7 @@ public class ShotInputWindow extends BallVelocityInput {
     /**
      * Constructor. Creates a new ShotInput
      */
-    public ShotInputWindow(InputInt game) {
+    public ShotInputWindow(IInput game) {
         super(game);
         isOpen = false;
         this.game = game;

@@ -20,10 +20,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import bot.botimplementations.BotFactory;
-import visualization.InputInt;
+import visualization.IInput;
 import visualization.UpdateLoop;
 
-public class Game extends JPanel implements Runnable, GameObject, MouseListener, InputInt {
+public class Game extends JPanel implements Runnable, GameObject, MouseListener, IInput {
     private final UpdateLoop updateLoop;
 
     public JFrame frame;

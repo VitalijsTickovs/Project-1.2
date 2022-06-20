@@ -172,7 +172,7 @@ public class ObjectGeneration {
         if(obstacleType.equals("Tree")){
             float startRadius = .293f;
             obstacle = assetManager.loadModel("Models/Tree/Tree.mesh.j3o");
-            float treeScale = 10;
+            float treeScale = (float) (1.5*pixelScale/startRadius);
             if(end != null) treeScale = end.x*pixelScale/startRadius;
             obstacle.scale(treeScale);
             obstacle.setLocalTranslation(start);

@@ -6,12 +6,12 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Scanner;
 
-import visualization.InputInt;
+import visualization.IInput;
 import utility.math.Vector2;
 
 public class InputFileReader extends BallVelocityInput {
 
-    public InputFileReader(InputInt game){
+    public InputFileReader(IInput game){
         super(game);
     }
     
