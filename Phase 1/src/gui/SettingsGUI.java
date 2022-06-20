@@ -1,45 +1,33 @@
 package gui;
-/*
-import bot.botimplementations.BotFactory;
-import com.jme3.collision.CollisionResults;
-import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
-import com.jme3.input.controls.*;
-import com.jme3.math.Ray;
-import gui.shotinput.MouseInputReader;
-import gui.shotinput.ShotInputWindow;
-import utility.math.Vector2;
-*/
+
+import java.awt.Robot;
+import java.awt.AWTException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.awt.event.KeyEvent;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.File;
 
 public class SettingsGUI extends javax.swing.JFrame {
-    /*
-    private final Renderer renderer;
-    private boolean isMouseInput= true;
-    protected static boolean isTerrainEditor = false;
-    private String obstacleType = "Box";
-    private TerrainEditor terrainEditor;
-    private ArrayList<CollisionResults> collisions = new ArrayList<>();
-    */
-
+    private Robot robot;
     public SettingsGUI() {
         initComponents();
-
-        //this.renderer = renderer;
         
         ////default game state
         manualTB.setSelected(true);
-    }
 
-    /*
-    public boolean isMouseInput() {
-        return isMouseInput;
-    }
+        try {
+            robot= new Robot();
+            // Simulate a key press
+            robot.keyPress('L');
+            robot.keyRelease('L');
     
-    public boolean isTerrainEditor() {
-        return isTerrainEditor;
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
     }
-    */
 
     @SuppressWarnings("unchecked")
 
@@ -79,7 +67,7 @@ public class SettingsGUI extends javax.swing.JFrame {
         updateB.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255), 4));
         updateB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateBActionPerformed(evt);
+                updateBActionlPerformed(evt);
             }
         });
 
@@ -143,12 +131,8 @@ public class SettingsGUI extends javax.swing.JFrame {
         botsDD.setBackground(new java.awt.Color(0, 204, 0));
         botsDD.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 24)); // NOI18N
         botsDD.setForeground(new java.awt.Color(51, 51, 51));
-        botsDD.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Hill Climbing", "Gradient Descent", "Rule Based" }));
-        botsDD.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botsDDActionPerformed(evt);
-            }
-        });
+        botsDD.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Hill Climbing", "Gradient Descent", "Rule Based", "Particle Swarm" }));
+
 
         runBotB.setBackground(new java.awt.Color(0, 204, 0));
         runBotB.setFont(new java.awt.Font("Tw Cen MT Condensed Extra Bold", 0, 24)); // NOI18N
@@ -265,29 +249,81 @@ public class SettingsGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void updateBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateBActionPerformed
+    public void simulateKey(char c){
+        try {
+            robot= new Robot();
+            // Simulate a key press
+            robot.keyPress('R');
+            robot.keyRelease('R');
+
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateBActionPerformed(java.awt.event.ActionEvent evt) throws IOException {//GEN-FIRST:event_updateBActionPerformed
         String newTerrainFormula =terrainTF.getText();
 
-        //set new terrain
+        //Instantiating the File class
+        String filePath = "D://input.txt";
+        //Instantiating the Scanner class to read the file
+        Scanner sc = new Scanner(new File(filePath));
+        //instantiating the StringBuffer class
+        StringBuffer buffer = new StringBuffer();
+        //Reading lines of the file and appending them to StringBuffer
+        while (sc.hasNextLine()) {
+            buffer.append(sc.nextLine()+System.lineSeparator());
+        }
+        String fileContents = buffer.toString();
+        System.out.println("Contents of the file: "+fileContents);
+        //closing the Scanner object
+        sc.close();
+        String oldLine = "No preconditions and no impediments. Simply Easy Learning!";
+        String newLine = "Enjoy the free content";
+        //Replacing the old line with new line
+        fileContents = fileContents.replaceAll(oldLine, newLine);
+        //instantiating the FileWriter class
+        FileWriter writer = null;
 
-        //update
+        writer = new FileWriter(filePath);
+
+
+        System.out.println("");
+        System.out.println("new data: "+fileContents);
+        writer.append(fileContents);
+        writer.flush();
 
     }//GEN-LAST:event_updateBActionPerformed
 
     private void editTreesTBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editTreesTBActionPerformed
         //end/change edit mode 
 
-        //set to edit mode
+        try {
+            robot= new Robot();
+            // Simulate a key press
+            robot.keyPress('Z');
+            robot.keyRelease('Z');
+            robot.keyPress('2');
+            robot.keyRelease('2');
+    
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
 
-        //obstacleType = "Tree";
     }//GEN-LAST:event_editTreesTBActionPerformed
 
     private void editRocksTBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRocksTBActionPerformed
-        //end/change edit mode 
-
-        //set to edit mode
-
-        //obstacleType = "Box";
+        try {
+            robot= new Robot();
+            // Simulate a key press
+            robot.keyPress('Z');
+            robot.keyRelease('Z');
+            robot.keyPress('1');
+            robot.keyRelease('1');
+    
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_editRocksTBActionPerformed
 
     private void manualTBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualTBActionPerformed
@@ -301,18 +337,55 @@ public class SettingsGUI extends javax.swing.JFrame {
         switch (botsDD.getSelectedItem().toString()) {
             case "Hill Climbing":
                 //set bot and run
+                try {
+                    robot= new Robot();
+                    // Simulate a key press
+                    robot.keyPress('H');
+                    robot.keyRelease('H');
+            
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
                 break;
             case "Gradient Descent":
                 //set bot and run
+                try {
+                    robot= new Robot();
+                    // Simulate a key press
+                    robot.keyPress('H');
+                    robot.keyRelease('H');
+            
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
                 break;
             case "Rule Based":
                 //set bot and run
+                try {
+                    robot= new Robot();
+                    // Simulate a key press
+                    robot.keyPress('H');
+                    robot.keyRelease('H');
+            
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "Particle Swarm":
+                //set bot and run
+                try {
+                    robot= new Robot();
+                    // Simulate a key press
+                    robot.keyPress('H');
+                    robot.keyRelease('H');
+            
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
-        
-        //Hill Climbing, Gradient Descent, Rule Based
+        //Hill Climbing, Gradient Descent, Rule Based, Particle Swarm
         //System.out.println(botsDD.getSelectedItem());
-
     }//GEN-LAST:event_runBotBActionPerformed
 
     private void backBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBActionPerformed
@@ -323,11 +396,15 @@ public class SettingsGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_backBActionPerformed
 
     private void resetBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetBActionPerformed
-        /*
-        renderer.getUpdateLoop().resetGame();
-        renderer.moveBall(renderer.ball.state.position);
-        */
-        
+        try {
+            robot= new Robot();
+            // Simulate a key press
+            robot.keyPress('R');
+            robot.keyRelease('R');
+    
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_resetBActionPerformed
 
     public static void main(String args[]) {
